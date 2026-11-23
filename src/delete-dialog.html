@@ -1,0 +1,6 @@
+<dialog id="deleteDialog" class="delete-dialog">
+  <div class="eyebrow">DELETE / SECOND CONFIRMATION REQUIRED</div><h2 id="deleteHeading">Delete this recording?</h2>
+  <p id="deleteWarning"></p><p class="deletion-scope">Prototype: this removes the local video, snapshots and receipt image data, and prevents this record from re-entering the local show. It does NOT erase exported files, backups or a cloud service.</p>
+  <label class="check"><input id="deleteAck" type="checkbox"><span id="deleteAckLabel">I understand this cannot be undone.</span></label>
+  <p id="deleteError" role="alert"></p><div class="button-row"><button id="deleteCancel" class="btn secondary">Keep my recording</button><button id="deleteConfirm" class="btn danger" disabled>Yes, delete permanently</button></div>
+</dialog>

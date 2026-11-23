@@ -1,0 +1,23 @@
+<section id="view-guest" class="view" hidden>
+  <div class="guest-boundary">GUEST PAGE PROTOTYPE / SAME BROWSER ONLY / NOT AN ONLINE QR DESTINATION</div>
+  <article class="guest-card">
+    <div class="eyebrow">LOVE, ON TAPE. / YOUR PRIVATE MOMENT</div>
+    <h1 id="guestTitle">Your little moment.</h1><p id="guestEvent"></p>
+    <div id="guestMedia" class="guest-media"><video id="guestVideo" controls playsinline hidden></video><img id="guestImage" alt="Snapshot of this message" hidden></div>
+    <p id="guestMessage" role="status"></p><div id="guestStatus" class="status-chip"></div>
+    <div id="guestControls">
+      <button id="guestDownload" class="btn primary" hidden>Download video</button>
+      <section class="privacy-box"><h2 id="guestVisibilityTitle">Big-screen visibility</h2><p id="guestVisibilityHelp"></p>
+        <div class="button-row"><button id="guestHide" class="btn secondary">Hide from live show</button><button id="guestAllow" class="btn secondary">Allow live show</button></div>
+      </section>
+      <section class="privacy-box danger-box"><h2 id="guestDeleteTitle">Remove this recording</h2><p id="guestDeleteHelp"></p><button id="guestDelete" class="btn danger">Delete recording</button></section>
+    </div>
+    <div class="guest-footnote">This prototype changes only clips held in this browser. Exported/downloaded copies cannot be recalled. Real cloud deletion and permissions are not connected.</div>
+    <button class="text-button" data-view="library">Back to staff workspace (prototype)</button>
+  </article>
+</section>
+<section id="view-show" class="view" hidden>
+  <div class="show-top"><div><span class="eyebrow">LUCE STUDIO / LIVE MEMORIES</span><h2 id="showEvent">Love, on tape.</h2></div><span class="show-label">LOCAL PREVIEW / NOT A LIVE NETWORK FEED</span></div>
+  <div class="show-stage"><video id="showVideo" playsinline muted hidden></video><img id="showImage" alt="Demo-only snapshot preview" hidden><div id="showEmpty"><div class="show-orbit">03</div><h1>Good words are worth keeping.</h1><p>Waiting for guest permission and staff approval.</p></div><div id="showMessage" class="show-message"></div></div>
+  <div class="show-bottom"><span id="showStatus">No eligible tapes</span><div class="button-row"><button id="showSound" class="btn secondary">Sound: OFF</button><button id="showFullscreen" class="btn secondary">Fullscreen</button><button class="btn secondary" data-view="admin">Control room</button></div></div>
+</section>

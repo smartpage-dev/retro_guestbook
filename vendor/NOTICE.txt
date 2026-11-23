@@ -1,0 +1,1 @@
+QRCode generator: Kazuhiko Arase (c) 2009, MIT license; node adaptation vendored from qrcode-terminal 0.12.0, Apache-2.0. Original source headers retained. The browser module wrapper is newly authored for this prototype. No fonts or network runtime dependencies are included.
