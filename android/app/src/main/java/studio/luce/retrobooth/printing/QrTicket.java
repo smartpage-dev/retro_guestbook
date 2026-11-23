@@ -1,0 +1,56 @@
+package studio.luce.retrobooth.printing;
+
+import java.io.ByteArrayOutputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Locale;
+
+/** Independent QR-only ESC/POS profile. NOT a port of the inaccessible H5.3 driver. */
+public final class QrTicket {
+    public static final String PROFILE="native-qr-model2-m-size4-v1";
+    public static final int MAX_URL_BYTES=256;
+    public final String id, clipId, payload, origin, label, parent, kind;
+    public final byte[] bytes;
+    public final String fingerprint;
+    public QrTicket(String id,String clipId,String payload,String label,String parent,String kind,String approvedOrigin) {
+        if(!hex(id,32)||!hex(clipId,32))throw new IllegalArgumentException("Invalid ticket identity");
+        if(!parent.isEmpty()&&!hex(parent,32))throw new IllegalArgumentException("Invalid parent identity");
+        if(!kind.equals("guest")&&!kind.equals("test"))throw new IllegalArgumentException("Invalid ticket kind");
+        if(label==null||!label.matches("[0-9]{1,7}"))throw new IllegalArgumentException("Invalid numeric message label");
+        if(payload==null||payload.length()>MAX_URL_BYTES||!payload.matches("[\\x21-\\x7E]+"))throw new IllegalArgumentException("QR must be bounded printable ASCII");
+        URI u;
+        try {u=new URI(payload);}catch(Exception e){throw new IllegalArgumentException("Invalid QR URL");}
+        if(!"https".equals(u.getScheme())||u.getHost()==null||u.getUserInfo()!=null||u.getRawQuery()!=null||u.getPort()!=-1)
+            throw new IllegalArgumentException("Root HTTPS origin required; no userinfo, query or non-default port");
+        this.origin="https://"+u.getHost().toLowerCase(Locale.ROOT);
+        if(kind.equals("test")) {
+            if(!this.origin.equals("https://example.invalid")||!u.getRawPath().equals("/retrobooth-printer-test/"+clipId)||u.getRawFragment()!=null)
+                throw new IllegalArgumentException("Invalid diagnostic QR");
+        } else {
+            if(!this.origin.equals(approvedOrigin)||!"/guest/".equals(u.getRawPath())||u.getRawFragment()==null||!u.getRawFragment().matches("[a-f0-9]{32}\\.[A-Za-z0-9_-]{32}"))
+                throw new IllegalArgumentException("QR is not an exact guest capability on the approved cloud origin");
+        }
+        this.id=id;this.clipId=clipId;this.payload=payload;this.label=label;this.parent=parent;this.kind=kind;
+        this.bytes=encode(payload,label,kind.equals("test"));
+        this.fingerprint=sha((PROFILE+"\n"+clipId+"\n"+payload+"\n"+label+"\n"+kind).getBytes(StandardCharsets.UTF_8));
+    }
+    public static boolean hex(String x,int n){return x!=null&&x.length()==n&&x.matches("[a-f0-9]+");}
+    public static String sha(byte[] b){try{byte[] d=MessageDigest.getInstance("SHA-256").digest(b);StringBuilder s=new StringBuilder();for(byte x:d)s.append(String.format(Locale.ROOT,"%02x",x&255));return s.toString();}catch(Exception e){throw new IllegalStateException(e);}}
+    private static byte[] encode(String value,String label,boolean test){
+        ByteArrayOutputStream b=new ByteArrayOutputStream();
+        emit(b,0x1b,0x40,0x1b,0x61,1); // initialize; centered ASCII only
+        text(b,"RETROBOOTH\n"+(test?"PRINTER TEST - NOT A VIDEO":"PRIVATE VIDEO TICKET")+"\nMESSAGE "+label+"\n\n");
+        emit(b,0x1d,0x28,0x6b,4,0,49,65,50,0); // Model 2
+        emit(b,0x1d,0x28,0x6b,3,0,49,67,4); // 4 dots/module
+        emit(b,0x1d,0x28,0x6b,3,0,49,69,49); // error correction M
+        byte[] data=value.getBytes(StandardCharsets.US_ASCII);int n=data.length+3;
+        emit(b,0x1d,0x28,0x6b,n&255,n>>8,49,80,48);b.write(data,0,data.length);
+        emit(b,0x1d,0x28,0x6b,3,0,49,81,48);
+        text(b,"\n"+(test?"Scan and check the EXACT content":"Keep private - includes delete access")+"\n");
+        emit(b,0x1b,0x64,4,0x1b,0x61,0); // feed; no cutter command
+        return b.toByteArray();
+    }
+    private static void emit(ByteArrayOutputStream b,int... values){for(int v:values)b.write(v);}
+    private static void text(ByteArrayOutputStream b,String s){byte[] d=s.getBytes(StandardCharsets.US_ASCII);b.write(d,0,d.length);}
+}

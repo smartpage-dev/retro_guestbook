@@ -1,0 +1,11 @@
+PASS failed local save blocks continuous loop
+PASS no false successful save
+PASS save recovery cannot be silently dismissed
+PASS save retry stores exactly one clip
+PASS print and upload failures stay independent
+PASS printer offline does not erase local clip
+PASS fixed-time recording does not require or stop on hangup
+PASS reset after handset release is ready
+PASS no JavaScript runtime errors
+PASS no external HTTP requests
+TOTAL 10 PASSED

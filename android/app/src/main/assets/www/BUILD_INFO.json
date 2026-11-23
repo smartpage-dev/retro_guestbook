@@ -1,0 +1,10 @@
+{
+  "version": "0.8.0-alpha.1",
+  "stage": "prototype - not event ready",
+  "commit": "local-uncommitted",
+  "run": "local",
+  "standaloneSHA256": "8886976d30ec16b1cddd3d29d5f5f7f3475150564ad58ec61a8406a38c216986",
+  "cloud": "opt-in PHP private-delivery alpha",
+  "printer": "independent Android secure-SPP QR-only alpha; physical validation pending",
+  "android": "WebView test shell, native recording not implemented"
+}

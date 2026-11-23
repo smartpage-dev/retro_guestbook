@@ -1,0 +1,21 @@
+PASS private clip excluded from show
+PASS guest page opens
+PASS demo cannot download nonexistent video
+PASS hide preserves clip and snapshot
+PASS guest permission alone is not sufficient
+PASS guest plus staff permission enters show
+PASS hiding current show immediately clears its media
+PASS hide can be reversed without creating another clip
+PASS delete opens separate confirmation
+PASS delete cannot confirm without acknowledgment
+PASS cancel keeps clip
+PASS escape keeps clip
+PASS confirmed deletion removes local clip
+PASS deleted route does not display cached snapshot
+PASS deleted route has no restore/download controls
+PASS tombstone persists for route in same memory session
+PASS deleted clip cannot re-enter show
+PASS deletion does not reuse receipt number
+PASS no JavaScript runtime errors
+PASS no external HTTP requests
+TOTAL 20 PASSED

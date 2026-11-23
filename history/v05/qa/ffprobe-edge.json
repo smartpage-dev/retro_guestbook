@@ -1,0 +1,24 @@
+{
+    "programs": [
+
+    ],
+    "stream_groups": [
+
+    ],
+    "streams": [
+        {
+            "codec_name": "vp9",
+            "width": 1040,
+            "height": 720,
+            "avg_frame_rate": "8010000/299173"
+        },
+        {
+            "codec_name": "opus",
+            "avg_frame_rate": "0/0"
+        }
+    ],
+    "format": {
+        "duration": "9.978667",
+        "size": "3027935"
+    }
+}

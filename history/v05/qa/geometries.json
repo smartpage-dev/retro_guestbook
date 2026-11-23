@@ -1,0 +1,488 @@
+[
+  {
+    "style": "heritage",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 57.671875,
+        "y": 57.671875,
+        "width": 1438.90625,
+        "height": 964.65625
+      },
+      ".control-panel": {
+        "x": 1550.40625,
+        "y": 24,
+        "width": 345.59375,
+        "height": 1032
+      },
+      "#touchBtn": {
+        "x": 1649.21875,
+        "y": 623.375,
+        "width": 147.953125,
+        "height": 147.953125
+      }
+    }
+  },
+  {
+    "style": "heritage",
+    "viewport": [
+      1366,
+      768
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 41.59375,
+        "y": 41.59375,
+        "width": 1022.609375,
+        "height": 684.8125
+      },
+      ".control-panel": {
+        "x": 1103.0625,
+        "y": 17.0625,
+        "width": 245.875,
+        "height": 733.875
+      },
+      "#touchBtn": {
+        "x": 1171,
+        "y": 422.15625,
+        "width": 110,
+        "height": 110
+      }
+    }
+  },
+  {
+    "style": "heritage",
+    "viewport": [
+      1280,
+      720
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 39.109375,
+        "y": 39.109375,
+        "width": 957.953125,
+        "height": 641.78125
+      },
+      ".control-panel": {
+        "x": 1033.609375,
+        "y": 16,
+        "width": 230.390625,
+        "height": 688
+      },
+      "#touchBtn": {
+        "x": 1093.796875,
+        "y": 419.78125,
+        "width": 110,
+        "height": 110
+      }
+    }
+  },
+  {
+    "style": "heritage",
+    "viewport": [
+      1024,
+      600
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 31.6875,
+        "y": 31.6875,
+        "width": 765.5625,
+        "height": 536.625
+      },
+      ".control-panel": {
+        "x": 826.890625,
+        "y": 12.796875,
+        "width": 184.3125,
+        "height": 574.40625
+      },
+      "#touchBtn": {
+        "x": 870.046875,
+        "y": 298.125,
+        "width": 98,
+        "height": 98
+      }
+    }
+  },
+  {
+    "style": "heritage",
+    "viewport": [
+      800,
+      360
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 23,
+        "y": 23,
+        "width": 568,
+        "height": 314
+      },
+      ".control-panel": {
+        "x": 615,
+        "y": 9,
+        "width": 176,
+        "height": 342
+      },
+      "#touchBtn": {
+        "x": 667,
+        "y": 152.796875,
+        "width": 72,
+        "height": 72
+      }
+    }
+  },
+  {
+    "style": "heritage",
+    "viewport": [
+      1920,
+      1200
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 57.671875,
+        "y": 57.671875,
+        "width": 1438.90625,
+        "height": 1084.65625
+      },
+      ".control-panel": {
+        "x": 1550.40625,
+        "y": 24,
+        "width": 345.59375,
+        "height": 1152
+      },
+      "#touchBtn": {
+        "x": 1643.703125,
+        "y": 650.578125,
+        "width": 159,
+        "height": 159
+      }
+    }
+  },
+  {
+    "style": "heritage",
+    "viewport": [
+      3840,
+      2160
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 66,
+        "y": 66,
+        "width": 3318,
+        "height": 2028
+      },
+      ".control-panel": {
+        "x": 3444,
+        "y": 28,
+        "width": 368,
+        "height": 2104
+      },
+      "#touchBtn": {
+        "x": 3548.5,
+        "y": 667.375,
+        "width": 159,
+        "height": 159
+      }
+    }
+  },
+  {
+    "style": "heritage",
+    "viewport": [
+      390,
+      844
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 26,
+        "y": 26,
+        "width": 338,
+        "height": 245
+      },
+      ".control-panel": {
+        "x": 12,
+        "y": 303,
+        "width": 366,
+        "height": 408.828125
+      },
+      "#touchBtn": {
+        "x": 253,
+        "y": 452.5,
+        "width": 91,
+        "height": 91
+      }
+    }
+  },
+  {
+    "style": "heritage",
+    "viewport": [
+      320,
+      720
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 26,
+        "y": 26,
+        "width": 268,
+        "height": 242
+      },
+      ".control-panel": {
+        "x": 12,
+        "y": 300,
+        "width": 296,
+        "height": 408.828125
+      },
+      "#touchBtn": {
+        "x": 183,
+        "y": 449.5,
+        "width": 91,
+        "height": 91
+      }
+    }
+  },
+  {
+    "style": "edge",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 0,
+        "y": 0,
+        "width": 1560,
+        "height": 1080
+      },
+      ".control-panel": {
+        "x": 1560,
+        "y": 0,
+        "width": 360,
+        "height": 1080
+      },
+      "#touchBtn": {
+        "x": 1662.203125,
+        "y": 628.625,
+        "width": 156.59375,
+        "height": 156.59375
+      }
+    }
+  },
+  {
+    "style": "edge",
+    "viewport": [
+      1366,
+      768
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 0,
+        "y": 0,
+        "width": 1109.875,
+        "height": 768
+      },
+      ".control-panel": {
+        "x": 1109.875,
+        "y": 0,
+        "width": 256.125,
+        "height": 768
+      },
+      "#touchBtn": {
+        "x": 1182.75,
+        "y": 425.09375,
+        "width": 111.359375,
+        "height": 111.359375
+      }
+    }
+  },
+  {
+    "style": "edge",
+    "viewport": [
+      1280,
+      720
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 0,
+        "y": 0,
+        "width": 1040,
+        "height": 720
+      },
+      ".control-panel": {
+        "x": 1040,
+        "y": 0,
+        "width": 240,
+        "height": 720
+      },
+      "#touchBtn": {
+        "x": 1108.296875,
+        "y": 414.296875,
+        "width": 104.390625,
+        "height": 104.390625
+      }
+    }
+  },
+  {
+    "style": "edge",
+    "viewport": [
+      1024,
+      600
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 0,
+        "y": 0,
+        "width": 832,
+        "height": 600
+      },
+      ".control-panel": {
+        "x": 832,
+        "y": 0,
+        "width": 192,
+        "height": 600
+      },
+      "#touchBtn": {
+        "x": 878.5,
+        "y": 258.96875,
+        "width": 100,
+        "height": 100
+      }
+    }
+  },
+  {
+    "style": "edge",
+    "viewport": [
+      800,
+      360
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 0,
+        "y": 0,
+        "width": 624,
+        "height": 360
+      },
+      ".control-panel": {
+        "x": 624,
+        "y": 0,
+        "width": 176,
+        "height": 360
+      },
+      "#touchBtn": {
+        "x": 671.5,
+        "y": 135.6875,
+        "width": 82,
+        "height": 82
+      }
+    }
+  },
+  {
+    "style": "edge",
+    "viewport": [
+      1920,
+      1200
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 0,
+        "y": 0,
+        "width": 1560,
+        "height": 1200
+      },
+      ".control-panel": {
+        "x": 1560,
+        "y": 0,
+        "width": 360,
+        "height": 1200
+      },
+      "#touchBtn": {
+        "x": 1659.5,
+        "y": 652.75,
+        "width": 162,
+        "height": 162
+      }
+    }
+  },
+  {
+    "style": "edge",
+    "viewport": [
+      3840,
+      2160
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 0,
+        "y": 0,
+        "width": 3460,
+        "height": 2160
+      },
+      ".control-panel": {
+        "x": 3460,
+        "y": 0,
+        "width": 380,
+        "height": 2160
+      },
+      "#touchBtn": {
+        "x": 3569.5,
+        "y": 661.28125,
+        "width": 162,
+        "height": 162
+      }
+    }
+  },
+  {
+    "style": "edge",
+    "viewport": [
+      390,
+      844
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 270
+      },
+      ".control-panel": {
+        "x": 0,
+        "y": 270,
+        "width": 390,
+        "height": 532
+      },
+      "#touchBtn": {
+        "x": 246,
+        "y": 345.125,
+        "width": 110,
+        "height": 110
+      }
+    }
+  },
+  {
+    "style": "edge",
+    "viewport": [
+      320,
+      720
+    ],
+    "bounds": {
+      "#screen": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 270
+      },
+      ".control-panel": {
+        "x": 0,
+        "y": 270,
+        "width": 320,
+        "height": 408
+      },
+      "#touchBtn": {
+        "x": 201,
+        "y": 326.484375,
+        "width": 94,
+        "height": 94
+      }
+    }
+  }
+]

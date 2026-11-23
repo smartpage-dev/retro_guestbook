@@ -1,0 +1,21 @@
+{
+  "group": "receipt",
+  "static_renderer": false,
+  "passed": 11,
+  "checks": [
+    "classic template renders bounded receipt",
+    "ticket template renders bounded receipt",
+    "minimal template renders bounded receipt",
+    "receipt design saved with event settings",
+    "title does not create HTML elements",
+    "clip freezes its receipt settings",
+    "later design changes do not rewrite old receipt",
+    "original receipt rendered in staff DOM",
+    "receipt pixels are black and white only",
+    "no JavaScript runtime errors",
+    "no external HTTP requests"
+  ],
+  "errors": [],
+  "external_requests": [],
+  "scope": "Chromium set_content; opaque origin; memory demo; no native IDB / BLE / cloud / iPad validation"
+}

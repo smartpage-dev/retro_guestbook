@@ -1,0 +1,22 @@
+PASS webcam controller accepts synthetic video plus audio
+PASS camera and microphone choices populate after enable
+PASS microphone meter responds to synthetic audio
+PASS edge raw comparison explicitly labelled
+PASS edge controls lock during capture
+PASS edge cannot change active look while recording
+PASS edge full fixed duration recorded
+PASS edge finalized actual encoded blob
+PASS edge resolved look frozen in metadata
+PASS edge no print or upload success claimed
+PASS edge saved media plays
+PASS heritage raw comparison explicitly labelled
+PASS heritage controls lock during capture
+PASS heritage cannot change active look while recording
+PASS heritage full fixed duration recorded
+PASS heritage finalized actual encoded blob
+PASS heritage resolved look frozen in metadata
+PASS heritage no print or upload success claimed
+PASS heritage saved media plays
+PASS two sequential real-codepath synthetic clips
+PASS no JavaScript runtime errors
+TOTAL 21 PASSED

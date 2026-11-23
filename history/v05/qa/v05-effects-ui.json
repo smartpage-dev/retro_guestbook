@@ -1,0 +1,24 @@
+{
+  "group": "effects-ui",
+  "passed": 16,
+  "checks": [
+    "default Heritage uses subdued camera palette",
+    "staff camera lab is available",
+    "Admin view blocks physical/programmatic session start",
+    "draft look does not mutate saved settings",
+    "look saves and returns without resetting event",
+    "style switch selects colour film",
+    "both profiles retained independently",
+    "discard restores saved look",
+    "neutral BW controls stay neutral",
+    "manual BW override survives shell switch",
+    "failed save is reported and not applied",
+    "1920 Camera Lab has no horizontal overflow",
+    "800 Camera Lab has no horizontal overflow",
+    "390 Camera Lab has no horizontal overflow",
+    "320 Camera Lab has no horizontal overflow",
+    "no JavaScript runtime errors"
+  ],
+  "errors": [],
+  "scope": "Chromium set_content; shared CPU compositor. Mock storage and synthetic media fixtures where applicable. No real device/permissions/IDB/native execution."
+}

@@ -1,0 +1,30 @@
+{
+  "group": "privacy",
+  "static_renderer": false,
+  "passed": 20,
+  "checks": [
+    "private clip excluded from show",
+    "guest page opens",
+    "demo cannot download nonexistent video",
+    "hide preserves clip and snapshot",
+    "guest permission alone is not sufficient",
+    "guest plus staff permission enters show",
+    "hiding current show immediately clears its media",
+    "hide can be reversed without creating another clip",
+    "delete opens separate confirmation",
+    "delete cannot confirm without acknowledgment",
+    "cancel keeps clip",
+    "escape keeps clip",
+    "confirmed deletion removes local clip",
+    "deleted route does not display cached snapshot",
+    "deleted route has no restore/download controls",
+    "tombstone persists for route in same memory session",
+    "deleted clip cannot re-enter show",
+    "deletion does not reuse receipt number",
+    "no JavaScript runtime errors",
+    "no external HTTP requests"
+  ],
+  "errors": [],
+  "external_requests": [],
+  "scope": "Chromium set_content; opaque origin; memory demo; no native IDB / BLE / cloud / iPad validation"
+}
