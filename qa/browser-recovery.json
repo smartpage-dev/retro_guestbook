@@ -1,0 +1,20 @@
+{
+  "group": "recovery",
+  "static_renderer": false,
+  "passed": 10,
+  "checks": [
+    "failed local save blocks continuous loop",
+    "no false successful save",
+    "save recovery cannot be silently dismissed",
+    "save retry stores exactly one clip",
+    "print and upload failures stay independent",
+    "printer offline does not erase local clip",
+    "fixed-time recording does not require or stop on hangup",
+    "reset after handset release is ready",
+    "no JavaScript runtime errors",
+    "no external HTTP requests"
+  ],
+  "errors": [],
+  "external_requests": [],
+  "scope": "Chromium set_content; opaque origin; memory demo; no native IDB / BLE / cloud / iPad validation"
+}

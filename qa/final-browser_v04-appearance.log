@@ -1,0 +1,18 @@
+PASS new preview starts with Heritage
+PASS five version taps open Admin
+PASS two native radio style options
+PASS choice is draft until Apply
+PASS Apply switches to Edge and returns to booth
+PASS style switch preserves all other settings
+PASS edge geometry equals v0.3
+PASS no recording created by switch
+PASS event settings submit preserves selected screen style
+PASS Heritage does not reset duration receipt or camera preset
+PASS new duration visible after skin switch
+PASS invalid appearance value rejected
+PASS chrome colour is not a CSS filter on capture canvas
+PASS selection restored on revisiting Admin
+PASS fallback persistence is disclosed
+PASS no JavaScript runtime errors
+PASS no external HTTP requests
+TOTAL 17 PASSED

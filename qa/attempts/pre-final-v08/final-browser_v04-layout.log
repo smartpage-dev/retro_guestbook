@@ -1,0 +1,235 @@
+PASS heritage 1920x1080 no horizontal overflow
+PASS heritage 1920x1080 one enabled guest action
+PASS heritage 1920x1080 staff and receipt hidden
+PASS heritage 1920x1080 privacy disclosure visible
+PASS heritage 1920x1080 button is a usable touch target
+PASS heritage 1920x1080 screen appearance applied
+PASS heritage 1920x1080 no vertical scroll
+PASS heritage 1920x1080 television face fills viewport
+PASS heritage 1920x1080 #touchBtn not clipped by panel
+PASS heritage 1920x1080 #panelTimer not clipped by panel
+PASS heritage 1920x1080 .panel-footer not clipped by panel
+PASS heritage 1920x1080 .panel-lamps not clipped by panel
+PASS heritage 1920x1080 picture matches capture aspect
+PASS heritage 1920x1080 heritage has curved screen rim
+PASS heritage 1366x768 no horizontal overflow
+PASS heritage 1366x768 one enabled guest action
+PASS heritage 1366x768 staff and receipt hidden
+PASS heritage 1366x768 privacy disclosure visible
+PASS heritage 1366x768 button is a usable touch target
+PASS heritage 1366x768 screen appearance applied
+PASS heritage 1366x768 no vertical scroll
+PASS heritage 1366x768 television face fills viewport
+PASS heritage 1366x768 #touchBtn not clipped by panel
+PASS heritage 1366x768 #panelTimer not clipped by panel
+PASS heritage 1366x768 .panel-footer not clipped by panel
+PASS heritage 1366x768 .panel-lamps not clipped by panel
+PASS heritage 1366x768 picture matches capture aspect
+PASS heritage 1366x768 heritage has curved screen rim
+PASS heritage 1280x720 no horizontal overflow
+PASS heritage 1280x720 one enabled guest action
+PASS heritage 1280x720 staff and receipt hidden
+PASS heritage 1280x720 privacy disclosure visible
+PASS heritage 1280x720 button is a usable touch target
+PASS heritage 1280x720 screen appearance applied
+PASS heritage 1280x720 no vertical scroll
+PASS heritage 1280x720 television face fills viewport
+PASS heritage 1280x720 #touchBtn not clipped by panel
+PASS heritage 1280x720 #panelTimer not clipped by panel
+PASS heritage 1280x720 .panel-footer not clipped by panel
+PASS heritage 1280x720 .panel-lamps not clipped by panel
+PASS heritage 1280x720 picture matches capture aspect
+PASS heritage 1280x720 heritage has curved screen rim
+PASS heritage 1024x600 no horizontal overflow
+PASS heritage 1024x600 one enabled guest action
+PASS heritage 1024x600 staff and receipt hidden
+PASS heritage 1024x600 privacy disclosure visible
+PASS heritage 1024x600 button is a usable touch target
+PASS heritage 1024x600 screen appearance applied
+PASS heritage 1024x600 no vertical scroll
+PASS heritage 1024x600 television face fills viewport
+PASS heritage 1024x600 #touchBtn not clipped by panel
+PASS heritage 1024x600 #panelTimer not clipped by panel
+PASS heritage 1024x600 .panel-footer not clipped by panel
+PASS heritage 1024x600 .panel-lamps not clipped by panel
+PASS heritage 1024x600 picture matches capture aspect
+PASS heritage 1024x600 heritage has curved screen rim
+PASS heritage 800x360 no horizontal overflow
+PASS heritage 800x360 one enabled guest action
+PASS heritage 800x360 staff and receipt hidden
+PASS heritage 800x360 privacy disclosure visible
+PASS heritage 800x360 button is a usable touch target
+PASS heritage 800x360 screen appearance applied
+PASS heritage 800x360 no vertical scroll
+PASS heritage 800x360 television face fills viewport
+PASS heritage 800x360 #touchBtn not clipped by panel
+PASS heritage 800x360 #panelTimer not clipped by panel
+PASS heritage 800x360 .panel-footer not clipped by panel
+PASS heritage 800x360 .panel-lamps not clipped by panel
+PASS heritage 800x360 picture matches capture aspect
+PASS heritage 800x360 heritage has curved screen rim
+PASS heritage 1920x1200 no horizontal overflow
+PASS heritage 1920x1200 one enabled guest action
+PASS heritage 1920x1200 staff and receipt hidden
+PASS heritage 1920x1200 privacy disclosure visible
+PASS heritage 1920x1200 button is a usable touch target
+PASS heritage 1920x1200 screen appearance applied
+PASS heritage 1920x1200 no vertical scroll
+PASS heritage 1920x1200 television face fills viewport
+PASS heritage 1920x1200 #touchBtn not clipped by panel
+PASS heritage 1920x1200 #panelTimer not clipped by panel
+PASS heritage 1920x1200 .panel-footer not clipped by panel
+PASS heritage 1920x1200 .panel-lamps not clipped by panel
+PASS heritage 1920x1200 picture matches capture aspect
+PASS heritage 1920x1200 heritage has curved screen rim
+PASS heritage 3840x2160 no horizontal overflow
+PASS heritage 3840x2160 one enabled guest action
+PASS heritage 3840x2160 staff and receipt hidden
+PASS heritage 3840x2160 privacy disclosure visible
+PASS heritage 3840x2160 button is a usable touch target
+PASS heritage 3840x2160 screen appearance applied
+PASS heritage 3840x2160 no vertical scroll
+PASS heritage 3840x2160 television face fills viewport
+PASS heritage 3840x2160 #touchBtn not clipped by panel
+PASS heritage 3840x2160 #panelTimer not clipped by panel
+PASS heritage 3840x2160 .panel-footer not clipped by panel
+PASS heritage 3840x2160 .panel-lamps not clipped by panel
+PASS heritage 3840x2160 picture matches capture aspect
+PASS heritage 3840x2160 heritage has curved screen rim
+PASS heritage 390x844 no horizontal overflow
+PASS heritage 390x844 one enabled guest action
+PASS heritage 390x844 staff and receipt hidden
+PASS heritage 390x844 privacy disclosure visible
+PASS heritage 390x844 button is a usable touch target
+PASS heritage 390x844 screen appearance applied
+PASS heritage 320x720 no horizontal overflow
+PASS heritage 320x720 one enabled guest action
+PASS heritage 320x720 staff and receipt hidden
+PASS heritage 320x720 privacy disclosure visible
+PASS heritage 320x720 button is a usable touch target
+PASS heritage 320x720 screen appearance applied
+PASS edge 1920x1080 no horizontal overflow
+PASS edge 1920x1080 one enabled guest action
+PASS edge 1920x1080 staff and receipt hidden
+PASS edge 1920x1080 privacy disclosure visible
+PASS edge 1920x1080 button is a usable touch target
+PASS edge 1920x1080 screen appearance applied
+PASS edge 1920x1080 no vertical scroll
+PASS edge 1920x1080 television face fills viewport
+PASS edge 1920x1080 #touchBtn not clipped by panel
+PASS edge 1920x1080 #panelTimer not clipped by panel
+PASS edge 1920x1080 .panel-footer not clipped by panel
+PASS edge 1920x1080 .panel-lamps not clipped by panel
+PASS edge 1920x1080 picture matches capture aspect
+PASS edge 1920x1080 edge screen has no frame
+PASS edge 1366x768 no horizontal overflow
+PASS edge 1366x768 one enabled guest action
+PASS edge 1366x768 staff and receipt hidden
+PASS edge 1366x768 privacy disclosure visible
+PASS edge 1366x768 button is a usable touch target
+PASS edge 1366x768 screen appearance applied
+PASS edge 1366x768 no vertical scroll
+PASS edge 1366x768 television face fills viewport
+PASS edge 1366x768 #touchBtn not clipped by panel
+PASS edge 1366x768 #panelTimer not clipped by panel
+PASS edge 1366x768 .panel-footer not clipped by panel
+PASS edge 1366x768 .panel-lamps not clipped by panel
+PASS edge 1366x768 picture matches capture aspect
+PASS edge 1366x768 edge screen has no frame
+PASS edge 1280x720 no horizontal overflow
+PASS edge 1280x720 one enabled guest action
+PASS edge 1280x720 staff and receipt hidden
+PASS edge 1280x720 privacy disclosure visible
+PASS edge 1280x720 button is a usable touch target
+PASS edge 1280x720 screen appearance applied
+PASS edge 1280x720 no vertical scroll
+PASS edge 1280x720 television face fills viewport
+PASS edge 1280x720 #touchBtn not clipped by panel
+PASS edge 1280x720 #panelTimer not clipped by panel
+PASS edge 1280x720 .panel-footer not clipped by panel
+PASS edge 1280x720 .panel-lamps not clipped by panel
+PASS edge 1280x720 picture matches capture aspect
+PASS edge 1280x720 edge screen has no frame
+PASS edge 1024x600 no horizontal overflow
+PASS edge 1024x600 one enabled guest action
+PASS edge 1024x600 staff and receipt hidden
+PASS edge 1024x600 privacy disclosure visible
+PASS edge 1024x600 button is a usable touch target
+PASS edge 1024x600 screen appearance applied
+PASS edge 1024x600 no vertical scroll
+PASS edge 1024x600 television face fills viewport
+PASS edge 1024x600 #touchBtn not clipped by panel
+PASS edge 1024x600 #panelTimer not clipped by panel
+PASS edge 1024x600 .panel-footer not clipped by panel
+PASS edge 1024x600 .panel-lamps not clipped by panel
+PASS edge 1024x600 picture matches capture aspect
+PASS edge 1024x600 edge screen has no frame
+PASS edge 800x360 no horizontal overflow
+PASS edge 800x360 one enabled guest action
+PASS edge 800x360 staff and receipt hidden
+PASS edge 800x360 privacy disclosure visible
+PASS edge 800x360 button is a usable touch target
+PASS edge 800x360 screen appearance applied
+PASS edge 800x360 no vertical scroll
+PASS edge 800x360 television face fills viewport
+PASS edge 800x360 #touchBtn not clipped by panel
+PASS edge 800x360 #panelTimer not clipped by panel
+PASS edge 800x360 .panel-footer not clipped by panel
+PASS edge 800x360 .panel-lamps not clipped by panel
+PASS edge 800x360 picture matches capture aspect
+PASS edge 800x360 edge screen has no frame
+PASS edge 1920x1200 no horizontal overflow
+PASS edge 1920x1200 one enabled guest action
+PASS edge 1920x1200 staff and receipt hidden
+PASS edge 1920x1200 privacy disclosure visible
+PASS edge 1920x1200 button is a usable touch target
+PASS edge 1920x1200 screen appearance applied
+PASS edge 1920x1200 no vertical scroll
+PASS edge 1920x1200 television face fills viewport
+PASS edge 1920x1200 #touchBtn not clipped by panel
+PASS edge 1920x1200 #panelTimer not clipped by panel
+PASS edge 1920x1200 .panel-footer not clipped by panel
+PASS edge 1920x1200 .panel-lamps not clipped by panel
+PASS edge 1920x1200 picture matches capture aspect
+PASS edge 1920x1200 edge screen has no frame
+PASS edge 3840x2160 no horizontal overflow
+PASS edge 3840x2160 one enabled guest action
+PASS edge 3840x2160 staff and receipt hidden
+PASS edge 3840x2160 privacy disclosure visible
+PASS edge 3840x2160 button is a usable touch target
+PASS edge 3840x2160 screen appearance applied
+PASS edge 3840x2160 no vertical scroll
+PASS edge 3840x2160 television face fills viewport
+PASS edge 3840x2160 #touchBtn not clipped by panel
+PASS edge 3840x2160 #panelTimer not clipped by panel
+PASS edge 3840x2160 .panel-footer not clipped by panel
+PASS edge 3840x2160 .panel-lamps not clipped by panel
+PASS edge 3840x2160 picture matches capture aspect
+PASS edge 3840x2160 edge screen has no frame
+PASS edge 390x844 no horizontal overflow
+PASS edge 390x844 one enabled guest action
+PASS edge 390x844 staff and receipt hidden
+PASS edge 390x844 privacy disclosure visible
+PASS edge 390x844 button is a usable touch target
+PASS edge 390x844 screen appearance applied
+PASS edge 320x720 no horizontal overflow
+PASS edge 320x720 one enabled guest action
+PASS edge 320x720 staff and receipt hidden
+PASS edge 320x720 privacy disclosure visible
+PASS edge 320x720 button is a usable touch target
+PASS edge 320x720 screen appearance applied
+PASS Admin 1440 no horizontal overflow
+PASS Admin 1440 both style cards visible
+PASS Admin 1440 current viewport labels
+PASS Admin 800 no horizontal overflow
+PASS Admin 800 both style cards visible
+PASS Admin 800 current viewport labels
+PASS Admin 390 no horizontal overflow
+PASS Admin 390 both style cards visible
+PASS Admin 390 current viewport labels
+PASS Admin 320 no horizontal overflow
+PASS Admin 320 both style cards visible
+PASS Admin 320 current viewport labels
+PASS no JavaScript runtime errors
+PASS no external HTTP requests
+TOTAL 234 PASSED

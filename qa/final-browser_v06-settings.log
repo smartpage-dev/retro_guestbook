@@ -1,0 +1,14 @@
+PASS new defaults preserve effects
+PASS QR form only changes draft
+PASS form saves QR and wait times
+PASS unrelated settings preserved
+PASS new fields persisted in mock
+PASS failed save preserves previous values
+PASS failed save reported
+PASS start blocked during settings save
+PASS start enabled after save
+PASS settings restored from mock adapter
+PASS scenario resets after reload
+PASS no uncaught JS errors
+PASS no external HTTP requests
+TOTAL 13 PASSED

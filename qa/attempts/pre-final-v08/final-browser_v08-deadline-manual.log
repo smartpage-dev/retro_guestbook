@@ -1,0 +1,18 @@
+PASS selected printer pinned
+PASS fast return OFF by default
+PASS deadline returns to QR without indefinite blocking
+PASS timeout cancellation is request-bound
+PASS late success cannot hide current QR
+PASS history print uses selected older recording not newest
+PASS repeat print once reports duplicate, no automatic resend
+PASS explicit reprint new ID with same parent and URL
+PASS scan value cleared after observation
+PASS mock acceptance reflected in status
+Traceback (most recent call last):
+  File "/mnt/data/retro_v08_work/RetroBooth/tests/browser_v08.py", line 101, in <module>
+    p.locator('#printerFastOff').click();p.wait_for_function('!printerFastOff.disabled');check('explicit safe default restored','fast return OFF' in p.locator('#printerStatus').inner_text())
+                                                                                         ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/data/retro_v08_work/RetroBooth/tests/browser_v08.py", line 10, in check
+    if not v:raise AssertionError(s)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: explicit safe default restored

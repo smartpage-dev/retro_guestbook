@@ -1,0 +1,21 @@
+{
+  "version": "0.8.0-alpha.1",
+  "standaloneSHA256": "8886976d30ec16b1cddd3d29d5f5f7f3475150564ad58ec61a8406a38c216986",
+  "browser": 666,
+  "js_unit_contracts": 205,
+  "syntax_static": 29,
+  "native_jvm_fake_transport": 57,
+  "actual_php_http": 78,
+  "total_scoped_checks": 1035,
+  "php_syntax_lints": 5,
+  "android_compile": {
+    "status": "not_executed",
+    "reason": "SDK/toolchain unavailable; DNS download failed"
+  },
+  "true_origin_browser": {
+    "status": "blocked",
+    "assertions": 0
+  },
+  "physical_printer": "not_tested",
+  "document_pages_reviewed": 17
+}

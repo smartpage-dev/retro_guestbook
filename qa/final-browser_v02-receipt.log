@@ -1,0 +1,12 @@
+PASS classic template renders bounded receipt
+PASS ticket template renders bounded receipt
+PASS minimal template renders bounded receipt
+PASS receipt design saved with event settings
+PASS title does not create HTML elements
+PASS clip freezes its receipt settings
+PASS later design changes do not rewrite old receipt
+PASS original receipt rendered in staff DOM
+PASS receipt pixels are black and white only
+PASS no JavaScript runtime errors
+PASS no external HTTP requests
+TOTAL 11 PASSED

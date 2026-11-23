@@ -1,0 +1,36 @@
+PASS connected_only saves exactly once
+PASS connected_only QR visible
+PASS connected_only truthful reason
+PASS connected_only Start locked
+PASS connected_only never claims physical success
+PASS sent_unconfirmed saves exactly once
+PASS sent_unconfirmed QR visible
+PASS sent_unconfirmed truthful reason
+PASS sent_unconfirmed Start locked
+PASS sent_unconfirmed never claims physical success
+PASS outcome_unknown saves exactly once
+PASS outcome_unknown QR visible
+PASS outcome_unknown truthful reason
+PASS outcome_unknown Start locked
+PASS outcome_unknown never claims physical success
+PASS failed_before_send saves exactly once
+PASS failed_before_send QR visible
+PASS failed_before_send truthful reason
+PASS failed_before_send Start locked
+PASS failed_before_send never claims physical success
+PASS timeout saves exactly once
+PASS timeout QR visible
+PASS timeout truthful reason
+PASS timeout Start locked
+PASS late result cannot replace QR
+PASS timeout never claims physical success
+PASS printed_confirmed saves exactly once
+PASS confirmed demo bypasses QR
+PASS zero thanks returns immediately
+PASS printed_confirmed never claims physical success
+PASS both mode retains QR
+PASS photo-only receipt never bypasses
+PASS screen-only ignores print attempt
+PASS no uncaught JS errors
+PASS no external HTTP requests
+TOTAL 35 PASSED
