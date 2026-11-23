@@ -1,0 +1,34 @@
+{
+  "python_ast": "all current tools/tests parsed",
+  "workflow_yaml": "parsed, jobs present",
+  "unchanged_baseline": {
+    "src/renderer.js": {
+      "unchanged": true,
+      "sha256": "04a07a0ec205316715af4176b1352640e2c64bc44b12b4831941c7355d984932"
+    },
+    "src/effects.js": {
+      "unchanged": true,
+      "sha256": "e78c4a98b217a310dc691a3bc03d9aba42e3f67f4ecea7c4fc48fc90356ef3f9"
+    },
+    "src/receipt.js": {
+      "unchanged": true,
+      "sha256": "93cf024b314f924bdd9fbfbdd08e2c03c2bb441df3268d8597c7f0f104d13ed8"
+    },
+    "src/store.js": {
+      "unchanged": true,
+      "sha256": "d489ca28083c6cda4a32bfc4cd822e3e9111f2debdbaddf3e198c80e4b17233b"
+    },
+    "cloud/retrobooth_private/app/Cloud.php": {
+      "unchanged": true,
+      "sha256": "5d32ef12f13ba9cb958e376d19049624eb282a8d4793b7675b19a67796ab7cf9"
+    },
+    "cloud/public_html/assets/guest.js": {
+      "unchanged": true,
+      "sha256": "5c7acb8231445778e695c1f19d08ff825c770c0eb3d5655e728acfa6b2954d13"
+    },
+    "cloud/public_html/assets/admin.js": {
+      "unchanged": true,
+      "sha256": "23dc7dd5394958f792ad9e834c75faa5ff5bd3f0bf307bdee6048b32da40bc2e"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "group": "media",
+  "passed": 8,
+  "checks": [
+    "heritage synthetic media nonempty",
+    "heritage canvas encoding matches picture dimensions",
+    "heritage synthetic clip playback progresses",
+    "edge synthetic media nonempty",
+    "edge canvas encoding matches picture dimensions",
+    "edge synthetic clip playback progresses",
+    "no JavaScript runtime errors",
+    "no external HTTP requests"
+  ],
+  "errors": [],
+  "requests": [
+    "blob:null/5d75558a-4848-45f3-980b-ab467aa60f47",
+    "blob:null/cc99bc48-fc4e-47c2-97a5-ede81bbf7d32"
+  ],
+  "scope": "Linux Chromium set_content; Canvas2D fallback; demo memory. Storage-contract uses a labeled adapter fixture. No hardware, real IndexedDB durability, cloud, or production acceptance."
+}

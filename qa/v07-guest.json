@@ -1,0 +1,21 @@
+{
+  "passed": 14,
+  "checks": [
+    "pending page does not require booth waiting",
+    "owner receives privacy controls",
+    "Hide is reversible and keeps recording",
+    "Allow does not grant staff approval",
+    "delete has explicit confirmation",
+    "cancel has no delete request",
+    "network failure does not claim deleted",
+    "delete clears guest player and controls",
+    "offline booth cleanup explicitly pending",
+    "view-only has no management controls",
+    "320 guest fits viewport",
+    "390 guest fits viewport",
+    "800 guest fits viewport",
+    "no uncaught JavaScript errors"
+  ],
+  "errors": [],
+  "scope": "Opaque-origin UI harness; mocked API/storage and synthetic A/V, not real permissions/CSP/CORS or Android"
+}

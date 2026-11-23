@@ -1,0 +1,22 @@
+{
+  "group": "native-flow",
+  "passed": 14,
+  "checks": [
+    "selected printer pinned",
+    "fast return OFF by default",
+    "native receives only after local commit",
+    "native payload is EXACT saved QR",
+    "default unconfirmed send retains screen QR",
+    "native screen reason is not fake simulation",
+    "automatic job ID equals local clip ID",
+    "accepted native send returns without QR",
+    "fast result never records printed-confirmed",
+    "always-screen overrides accepted native send",
+    "duplicate acknowledgement cannot hide QR",
+    "wrong native payload hash fails closed",
+    "unknown native outcome retains QR",
+    "no uncaught JavaScript errors"
+  ],
+  "errors": [],
+  "scope": "MOCK native bridge + mocked IDB/cloud, synthetic A/V; not Android or paper"
+}

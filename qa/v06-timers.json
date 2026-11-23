@@ -1,0 +1,22 @@
+{
+  "group": "timers",
+  "passed": 14,
+  "checks": [
+    "QR bound to saved recording",
+    "per-clip settings frozen",
+    "QR distinct from recording canvas",
+    "cannot start or navigate during QR",
+    "active settings mutation rejected",
+    "no added five second thank-you delay",
+    "QR pixels and labels cleared",
+    "next guest unique QR",
+    "hidden page hides QR",
+    "hidden time does not extend QR",
+    "pagehide is bfcache-safe",
+    "native-pause clears QR",
+    "no uncaught JS errors",
+    "no external HTTP requests"
+  ],
+  "errors": [],
+  "scope": "Opaque-origin Chromium; mock storage and synthetic media. Not hardware/real IDB/Android."
+}

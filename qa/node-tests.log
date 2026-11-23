@@ -1,0 +1,198 @@
+
+> luce-retrobooth@0.8.0-alpha.1 test
+> node tests/core.test.cjs && node tests/delivery.test.cjs && node tests/effects.test.cjs && node tests/cloud_client.test.cjs && node tests/store_cloud_contract.test.cjs && node tools/validate.mjs
+
+PASS fixed duration defaults to ten
+PASS single touch start is default
+PASS show is off by default
+PASS receipt contains photo and QR by default
+PASS invalid duration is rejected
+PASS all offered durations supported
+PASS minimum hold defaults to sixty
+PASS invalid hold is rejected
+PASS confirmed-print return may be immediate
+PASS countdown can be omitted
+PASS receipt template whitelist
+PASS logo rejects remote references
+PASS logo rejects SVG payload
+PASS caption is bounded
+PASS identifier has 128-bit length
+PASS QR never claims online destination
+PASS bad QR ID rejected
+PASS state transitions are checked
+PASS explicit guest+staff approval is eligible after hold
+PASS private clip cannot enter show
+PASS hidden clip cannot enter show
+PASS deleted clip cannot enter show
+PASS staff cannot override guest privacy
+PASS guest permission alone is insufficient
+PASS future hold prevents show
+PASS show off rejects all clips
+PASS missing hold fails closed
+PASS interrupted recording cannot enter show
+PASS unverified real media fails closed
+PASS verified real media may enter show
+PASS new preview defaults to heritage
+PASS edge look is retained
+PASS screen style whitelist
+PASS style and camera preset are independent
+PASS style change preserves fixed duration
+TOTAL 35 PASSED
+PASS default smart mode
+PASS default ten second QR
+PASS physical print disabled by default
+PASS print wait bounded by default
+PASS QR bound 0
+PASS QR bound -10
+PASS QR bound 99
+PASS QR bound 7.7
+PASS QR bound Infinity
+PASS QR bound NaN
+PASS QR bound bad
+PASS QR bound null
+PASS QR bound 
+PASS QR bound undefined
+PASS print wait bound 0
+PASS print wait bound 99
+PASS print wait bound 2.5
+PASS print wait bound bad
+PASS print wait bound null
+PASS mode whitelist
+PASS boolean print opt-in is strict
+PASS snapshot freezes exact session and payload
+PASS snapshot is immutable
+PASS no fabricated online QR
+PASS identity rejects unknown route
+PASS identity rejects different guest
+PASS invalid identity rejected
+PASS photo-only snapshot has no paper QR
+PASS same logical session gives stable issue key
+PASS different guest never shares issue key
+PASS explicit demo confirmed print may bypass
+PASS disabled print always screen
+PASS screen-only ignores positive print result
+PASS print-plus-screen never bypasses
+PASS photo-only receipt never bypasses
+PASS receipt composition failure never bypasses
+PASS no bypass for not_connected
+PASS no bypass for connected_only
+PASS no bypass for queued
+PASS no bypass for sending
+PASS no bypass for sent_unconfirmed
+PASS no bypass for failed_before_send
+PASS no bypass for outcome_unknown
+PASS no bypass for timeout
+PASS no bypass for no_paper
+PASS no bypass for undefined
+PASS mismatched issueKey never bypasses
+PASS mismatched clipId never bypasses
+PASS mismatched payload never bypasses
+PASS real webcam cannot use simulated success
+PASS simulation requires explicit activation
+PASS unimplemented physical confirmation fails closed
+PASS missing print result fails closed
+PASS countdown uses deadline ceiling
+PASS deadline expiry is zero
+PASS throttled callbacks cannot extend deadline
+PASS QR may return straight to standby
+PASS QR cannot jump to recording
+PASS saved receipt may enter QR
+PASS saved receipt may bypass to thanks
+PASS new defaults do not change duration or effects
+TOTAL 61 PASSED
+PASS look follows shell by default
+PASS edge resolves to film
+PASS heritage resolves to soft mono
+PASS manual film overrides heritage shell
+PASS manual mono overrides edge shell
+PASS invalid look mode falls back safely
+PASS null settings accepted safely
+PASS film default grain is subtle
+PASS film independent profile object
+PASS film nonfinite input falls back
+PASS film zero value is preserved
+PASS film values are bounded
+PASS heritage default grain is subtle
+PASS heritage independent profile object
+PASS heritage nonfinite input falls back
+PASS heritage zero value is preserved
+PASS heritage values are bounded
+PASS bw default grain is subtle
+PASS bw independent profile object
+PASS bw nonfinite input falls back
+PASS bw zero value is preserved
+PASS bw values are bounded
+PASS film retains substantially more scene colour
+PASS soft mono is warm grey, not saturated green
+PASS neutral BW ignores stored warmth/saturation
+PASS neutral BW channels match
+PASS black details are lifted but not crushed
+PASS white retains highlight detail
+PASS no hard four-level posterization by default
+PASS profile edits survive safeSettings and style changes
+PASS copying session settings detaches nested profiles
+PASS effect selection does not change flow or privacy
+TOTAL 32 PASSED
+PASS valid HTTPS setup is normalized
+PASS remote plain HTTP rejected
+PASS loopback development HTTP supported
+PASS unsafe base URL rejected https://u:p@example.test
+PASS unsafe base URL rejected https://example.test/path
+PASS unsafe base URL rejected https://example.test/?x=1
+PASS unsafe base URL rejected https://example.test/#x
+PASS mismatched device credential rejected
+PASS guest management link is in URL fragment
+PASS owner and viewer links distinct
+PASS wrong reservation identity rejected
+PASS wrong event rejected
+PASS new install cloud off
+PASS connect verifies server then reserves twelve links
+PASS claim consumes one link
+PASS slot freezes server and event
+PASS restarted client restores connection and pool
+PASS restart does not reuse consumed link
+PASS recording pauses new cloud work
+PASS partial upload retained for retry
+PASS queue resumes after client restart
+PASS already accepted chunk not resent
+PASS whole file hash acknowledged before ready
+PASS cloud copy does not auto-delete local media
+PASS local-only affects new capture not frozen jobs
+PASS server tombstone purges local Blob
+PASS local cleanup acknowledged after purge
+PASS pending ack can finish without resurrecting clip
+PASS device tokens only in authorization not URL
+PASS cross-origin requests omit ambient cookies
+PASS network redirects forbidden
+TOTAL 31 PASSED
+PASS aux settings round trip
+PASS aborted claim rejects caller
+PASS aborted claim does not consume slot
+PASS claim returns correct reservation
+PASS claim consumes exactly one slot
+PASS claim writes separate burned identity
+PASS duplicated consumed reservation not reused
+PASS claim never changes prior identity
+PASS empty pool returns null
+PASS ack handler actually writes tombstone
+PASS ack removes device credential from tombstone
+PASS ack absent clip does not insert a new record
+TOTAL 12 PASSED
+PASS source markers fully expanded
+PASS no external script/font runtime dependencies
+PASS runtime camera look controls present
+PASS local-only QR marker remains explicit
+PASS two shells retained
+PASS v05 storage preserved; v04 remains separate
+PASS native and standalone app bytes match
+PASS native media permission has trusted-origin check
+PASS native message channel main-frame origin restricted
+PASS native exports check order size and checksum
+PASS native files are not served as file URLs
+PASS timed QR module present
+PASS native QR bridge is top-frame origin restricted
+PASS independent secure SPP adapter present
+PASS cloud bundle includes frozen-link adapter
+PASS private cloud files are separate from public root
+PASS native approved cloud host is explicit
+TOTAL 29 PASSED (syntax/static contracts only; not Java compilation)

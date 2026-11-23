@@ -1,0 +1,21 @@
+{
+  "group": "deadline-manual",
+  "passed": 13,
+  "checks": [
+    "selected printer pinned",
+    "fast return OFF by default",
+    "deadline returns to QR without indefinite blocking",
+    "timeout cancellation is request-bound",
+    "late success cannot hide current QR",
+    "history print uses selected older recording not newest",
+    "repeat print once reports duplicate, no automatic resend",
+    "explicit reprint new ID with same parent and URL",
+    "scan value cleared after observation",
+    "mock acceptance reflected in status",
+    "explicit safe default restored",
+    "pause clears UI fast acceptance",
+    "no uncaught JavaScript errors"
+  ],
+  "errors": [],
+  "scope": "MOCK native bridge + mocked IDB/cloud, synthetic A/V; not Android or paper"
+}

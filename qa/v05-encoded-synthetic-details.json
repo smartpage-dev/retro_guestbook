@@ -1,0 +1,26 @@
+[
+  {
+    "style": "edge",
+    "mime": "video/mp4;codecs=vp9,opus",
+    "bytes": 1953565,
+    "durationMs": 10078,
+    "validation": {
+      "status": "metadata_readable",
+      "width": 1040,
+      "height": 720,
+      "durationSeconds": 9.923563
+    }
+  },
+  {
+    "style": "heritage",
+    "mime": "video/mp4;codecs=vp9,opus",
+    "bytes": 2142834,
+    "durationMs": 10012,
+    "validation": {
+      "status": "metadata_readable",
+      "width": 1074,
+      "height": 720,
+      "durationSeconds": 9.942729
+    }
+  }
+]

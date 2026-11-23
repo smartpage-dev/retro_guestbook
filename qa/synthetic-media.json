@@ -1,0 +1,26 @@
+[
+  {
+    "style": "heritage",
+    "bytes": 151097,
+    "mime": "video/mp4;codecs=vp9,opus",
+    "width": 1074,
+    "height": 720,
+    "playing": true,
+    "canvas": [
+      1074,
+      720
+    ]
+  },
+  {
+    "style": "edge",
+    "bytes": 38731,
+    "mime": "video/mp4;codecs=vp9,opus",
+    "width": 1040,
+    "height": 720,
+    "playing": true,
+    "canvas": [
+      1040,
+      720
+    ]
+  }
+]

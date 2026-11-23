@@ -1,0 +1,14 @@
+{
+  "group": "webcam-guard",
+  "passed": 6,
+  "checks": [
+    "synthetic webcam produces encoded clip",
+    "demo print result cannot bypass real capture",
+    "validation and effects retained",
+    "no fabricated print or cloud success",
+    "no uncaught JS errors",
+    "no external HTTP requests"
+  ],
+  "errors": [],
+  "scope": "Opaque-origin Chromium; mock storage and synthetic media. Not hardware/real IDB/Android."
+}

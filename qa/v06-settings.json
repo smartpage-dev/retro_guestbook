@@ -1,0 +1,21 @@
+{
+  "group": "settings",
+  "passed": 13,
+  "checks": [
+    "new defaults preserve effects",
+    "QR form only changes draft",
+    "form saves QR and wait times",
+    "unrelated settings preserved",
+    "new fields persisted in mock",
+    "failed save preserves previous values",
+    "failed save reported",
+    "start blocked during settings save",
+    "start enabled after save",
+    "settings restored from mock adapter",
+    "scenario resets after reload",
+    "no uncaught JS errors",
+    "no external HTTP requests"
+  ],
+  "errors": [],
+  "scope": "Opaque-origin Chromium; mock storage and synthetic media. Not hardware/real IDB/Android."
+}

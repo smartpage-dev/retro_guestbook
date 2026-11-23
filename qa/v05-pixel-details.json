@@ -1,0 +1,50 @@
+[
+  {
+    "mode": "film",
+    "pixel": [
+      163,
+      98,
+      82
+    ],
+    "expected": [
+      162.75371914704,
+      97.969326,
+      81.819592554
+    ],
+    "noiseChanges": 18206,
+    "scanDark": true,
+    "backend": "Canvas 2D + shared CRT compositor"
+  },
+  {
+    "mode": "heritage",
+    "pixel": [
+      118,
+      113,
+      101
+    ],
+    "expected": [
+      118.28993839079997,
+      112.98335099999998,
+      101.05637330399999
+    ],
+    "noiseChanges": 18234,
+    "scanDark": true,
+    "backend": "Canvas 2D + shared CRT compositor"
+  },
+  {
+    "mode": "bw",
+    "pixel": [
+      113,
+      113,
+      113
+    ],
+    "expected": [
+      113.10719999999999,
+      113.10719999999999,
+      113.10719999999999
+    ],
+    "noiseChanges": 18282,
+    "scanDark": true,
+    "backend": "Canvas 2D + shared CRT compositor"
+  }
+]
