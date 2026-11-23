@@ -1,17 +1,19 @@
-# v0.8 migration and rollback
+# v0.9 migration and rollback
 
-## Preserved
-Original v0.7 ZIP/HTML are not overwritten. Browser DB `luce-retrobooth-prototype-v05`, schema and Android application ID `studio.luce.retrobooth.preview` remain. Android versionCode is 8. No old video is rewritten, enrolled into cloud or printed by upgrade. v0.7 PHP API/storage stays byte-identical.
+## Existing Android / web / cloud
 
-Optional clip `printTicket` metadata is additive; native deduplication uses its own hash-only journal. The dedicated printer address is a native preference. Automatic permission/fast-return acceptance are session-memory only and start OFF. Reconnect explicitly; no startup replay.
+No media migration is performed. IndexedDB name/schema and Android application ID are unchanged, and Android versionCode is 9. Android Java printing/ledger implementation is retained. Export recordings and close old tabs/apps before upgrade. Keep the same Android signing key; never uninstall as the first response to a signature mismatch.
 
-## Before upgrade
-Export and verify important videos; finish/record cloud jobs and deletion acknowledgements; close old tabs. Use the same browser origin or Android signing identity. Different signatures may require a deliberate migration: do NOT fix it by uninstalling first. Never publish cloud configuration or guest owner QR links to GitHub.
+The PHP service and guest/Admin code remain unchanged. The config EXAMPLE and configuration generator add the Windows origin. For an existing deployment, back up `config.php`, add `retrobooth://app` to `corsOrigins`, preserve every secret/path and required origin, and test. Do not replace existing config with an example or regenerate keys. No upload/deployment takes place automatically.
 
-## Rollback to v0.7
-Stop capture, disconnect printer, export recordings. Restore the tagged source while keeping all browser data, cloud private state and the native journal. v0.7 does not operate the new printer; it can continue its existing cloud protocol. A rollback Android build may need a higher versionCode with the same key rather than an unsafe forced downgrade. The v0.8 native journal must remain for any future return to v0.8; deleting it loses duplicate protection.
+## Windows is a new local application
 
-Rolling back further to v0.6 removes cloud processing. Drain uploads and deletion acknowledgements and deliberately retire credentials first. It cannot undo server deletion. Do not restore stale cloud metadata over newer deletion tombstones.
+Origin: `retrobooth://app`. Per-account profile: `%APPDATA%/Luce RetroBooth`, with Chromium storage beneath it. No browser/Android import is implemented. Start with a new device credential. The portable and installed edition use the same profile and single-instance lock in that Windows account. Copying EXE to another PC does not copy media/configuration.
 
-## Maintenance
-Journal corruption, failed atomic commit, full 9,999-entry ledger or native revocation failure needs staff review. Keep screen QR and disconnect. This release does not provide a native journal export/compaction UI or safe in-place reset. Do not delete files or clear app storage to recover: media, credentials and idempotency may be lost. No background automatic ticket retry is implemented.
+Keep tested build outputs and export/playback-verify all important clips. Close the app before any verified full-profile backup; no profile restore/merge utility is certified. File exports are independent playable copies, not a restore archive. Avoid synchronizing the live Chromium database with cloud-folder clients.
+
+## Rollback
+
+Retain v0.8 source unmodified. Reverting source cannot reverse cloud Delete or recreate media. Drain uploads and deletion acknowledgements before reverting. Android may require an intentionally increased versionCode with the same signing key for a rollback APK; do not lower schema or wipe data. Windows profile is separate from v0.8 browser storage; an older web/Android program cannot load it automatically.
+
+Disabling Windows cloud access or removing the desktop CORS origin may strand its queued uploads. Retire devices deliberately, and keep the original credentials until uploads/cleanup complete.

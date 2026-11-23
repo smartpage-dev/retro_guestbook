@@ -1,0 +1,19 @@
+{
+  "name": "luce-retrobooth-desktop",
+  "version": "0.9.0-alpha.1",
+  "description": "Luce RetroBooth desktop video guestbook - development alpha",
+  "author": "Luce Studio",
+  "private": true,
+  "license": "UNLICENSED",
+  "main": "main.cjs",
+  "engines": { "node": ">=22.16.0" },
+  "scripts": {
+    "start": "electron .",
+    "package:win:x64": "electron-builder --config electron-builder.cjs --win nsis portable --x64 --publish never",
+    "package:win:arm64": "electron-builder --config electron-builder.cjs --win nsis portable --arm64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "electron-builder": "26.18.0"
+  }
+}

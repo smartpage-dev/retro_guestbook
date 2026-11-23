@@ -1,4 +1,4 @@
-/* RetroBooth v0.8.0-alpha.1. Pure, independently testable domain helpers. */
+/* RetroBooth v0.9.0-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');

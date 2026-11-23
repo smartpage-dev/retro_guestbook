@@ -1,0 +1,2 @@
+RetroBooth project source for Luce Studio. No public open-source license is granted by this package.
+Third-party components retain their own licenses; see vendor/ and bundled THIRD_PARTY_NOTICES.txt.

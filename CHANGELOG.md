@@ -1,3 +1,14 @@
+# v0.9.0-alpha.1 - ANDROID_WINDOWS_GITHUB_BUILD
+
+- Adds restricted Electron desktop source, installer/portable Windows targets, native export and per-user storage profile.
+- Adds manual combined Android/Windows workflow, platform artifact separation, APK signature check and required desktop runtime/packaged x64 smoke gates.
+- Retains Android secure-SPP QR pilot and app ID; versionCode 9. No Windows printer implementation.
+- Adds exact desktop origin to new cloud config templates; existing live config is never overwritten.
+- Adds updated operator guide, quick starts, current tests and migration instructions.
+- Native APK/EXE compilation/runtime and physical acceptance were NOT performed here. See current test report.
+
+## Historical release notes
+
 # Changelog
 
 ## 0.8.0-alpha.1 - ANDROID_SECURE_SPP_QR_PILOT

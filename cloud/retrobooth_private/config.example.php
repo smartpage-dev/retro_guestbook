@@ -6,6 +6,6 @@ return [
     'signingKey'=>'CHANGE_ME_A_DIFFERENT_RANDOM_SECRET_FOR_COOKIES',
     'dataDir'=>__DIR__.'/data',
     'quotaBytes'=>2147483648,
-    'corsOrigins'=>['http://127.0.0.1:4173','https://appassets.androidplatform.net'],
+    'corsOrigins'=>['http://127.0.0.1:4173','https://appassets.androidplatform.net','retrobooth://app'],
     'allowLoopbackHttp'=>false,
 ];

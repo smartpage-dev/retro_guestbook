@@ -1,3 +1,11 @@
+# v0.9 desktop architecture addition
+
+Windows runs the same bundled renderer in a sandboxed Electron BrowserWindow at retrobooth://app, with no renderer Node access. A narrowly scoped preload supports cloud-origin approval, fullscreen, profile-location display and export notifications. Blob downloads use the native Save dialog. Only fixed local assets and one explicitly approved HTTPS /api/ origin are permitted. Installed and portable builds share a per-account profile; no automatic browser/Android media migration. Windows printing is not implemented.
+
+The independent Android WebView and SPP implementation remain unchanged; native app IDs are platform-specific. Cloud remains the existing single-host private PHP service. See desktop/ for the implementation and the workflow for unexecuted native build/runtime gates.
+
+## Retained v0.8 architecture notes
+
 # RetroBooth v0.8 architecture
 
 ```

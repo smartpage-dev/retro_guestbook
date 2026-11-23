@@ -9,7 +9,7 @@ def digest(b):return hashlib.sha256(b).hexdigest()
 with tempfile.TemporaryDirectory(prefix='retro-cloud-api-') as tmp:
  T=Path(tmp);sock=socket.socket();sock.bind(('127.0.0.1',0));port=sock.getsockname()[1];sock.close();origin=f'http://127.0.0.1:{port}'
  admin='a'*64;config=T/'config.php';data=T/'private-data'
- config.write_text("<?php return "+"['publicOrigin'=>'"+origin+"','adminKey'=>'"+admin+"','signingKey'=>'"+'s'*64+"','dataDir'=>'"+str(data)+"','quotaBytes'=>33554432,'corsOrigins'=>['http://127.0.0.1:4173'],'allowLoopbackHttp'=>true];")
+ config.write_text("<?php return "+"['publicOrigin'=>'"+origin+"','adminKey'=>'"+admin+"','signingKey'=>'"+'s'*64+"','dataDir'=>'"+str(data)+"','quotaBytes'=>33554432,'corsOrigins'=>['http://127.0.0.1:4173','retrobooth://app'],'allowLoopbackHttp'=>true];")
  env={**os.environ,'RETRO_CONFIG':str(config),'PHP_CLI_SERVER_WORKERS':'4'};log=open(Q/'cloud-http-server.log','w')
  server=subprocess.Popen(['php','-S',f'127.0.0.1:{port}','-t',str(R/'cloud/public_html'),str(R/'cloud/router.php')],env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
  def request(route,token='',body=None,method=None,raw=None,headers=None):
@@ -38,12 +38,19 @@ with tempfile.TemporaryDirectory(prefix='retro-cloud-api-') as tmp:
   check('wrong admin denied',request('/api/admin/events','b'*64)[0]==401)
   check('unknown CORS origin denied',request('/api/health',headers={'Origin':'https://evil.invalid'})[0]==403)
   check('approved local test origin accepted',request('/api/health',headers={'Origin':'http://127.0.0.1:4173'})[2].get('Access-Control-Allow-Origin')=='http://127.0.0.1:4173')
+  check('exact desktop CORS origin accepted',request('/api/health',headers={'Origin':'retrobooth://app'})[2].get('Access-Control-Allow-Origin')=='retrobooth://app')
+  pre=request('/api/device/verify',method='OPTIONS',headers={'Origin':'retrobooth://app','Access-Control-Request-Method':'GET','Access-Control-Request-Headers':'authorization'})
+  check('desktop authenticated preflight allowed',pre[0]==204 and pre[2].get('Access-Control-Allow-Origin')=='retrobooth://app')
+  check('lookalike desktop origin denied',request('/api/health',headers={'Origin':'retrobooth://other'})[0]==403)
+  check('opaque null origin denied',request('/api/health',headers={'Origin':'null'})[0]==403)
   check('spoofed host denied',request('/api/health',headers={'Host':'evil.invalid'})[0]==400)
   check('public filesystem traversal blocked',request('/retrobooth_private/config.php')[0]==404)
   check('invalid title rejected',request('/api/admin/events',admin,{'title':'','days':30})[0]==400)
   code,event,_=request('/api/admin/events',admin,{'title':'SYNTHETIC TEST EVENT','days':30});check('event creation',code==200)
   eid=event['id'];_,bundle,_=request('/api/admin/device',admin,{'eventId':eid,'label':'TEST ONLY'});device=bundle['deviceToken']
   check('device scoped verify',request('/api/device/verify',device)[1]['event']['id']==eid)
+  check('desktop device authorization remains required',request('/api/device/verify',headers={'Origin':'retrobooth://app'})[0]==401)
+  check('desktop device auth and CORS together',request('/api/device/verify',device,headers={'Origin':'retrobooth://app'})[1]['event']['id']==eid)
   check('device cannot administer',request('/api/admin/events',device)[0]==401)
   code,slots,_=request('/api/device/reserve',device,{'count':6});check('reserved pending identities',code==200 and len(slots['slots'])==6)
   a,b,c,d,e,f=slots['slots'];cid=a['id'];owner=a['ownerToken'];view=a['viewToken'];base='/api/device/clip/'+cid

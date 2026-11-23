@@ -1,6 +1,6 @@
 /* Only bundled Android can connect SPP. The cloud server never talks to nearby Bluetooth. */
 let printerClient=null,printerActionBusy=false;
-function printerText(){const s=printerClient?.status;if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.8 TEST APK for this pilot.';
+function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9 TEST APK for this pilot.';
  return (s.connected?'CONNECTED (transport only)':'DISCONNECTED')+' / '+(s.pinned||'no pinned device')+' / automatic '+(s.automaticEnabled?'ON':'OFF')+' / fast return '+(s.fastReturnArmed?'OPERATOR RISK ACCEPTED':'OFF; screen QR retained')+' / no electronic paper confirmation'+(s.error?' / '+s.error:'');}
 function renderPrinter(){if(!$('printerStatus'))return;$('printerStatus').textContent=printerText();const available=!!printerClient?.available;
  for(const id of ['printerPermission','printerSettings','printerList','printerPin','printerConnect','printerTest','printerEnableAuto','printerDisableAuto','printerManual','printerReprint','printerObserve','printerFastOff','printerRefresh'])$(id).disabled=!available||printerActionBusy;

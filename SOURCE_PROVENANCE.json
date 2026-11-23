@@ -1,79 +1,142 @@
 {
-  "baseline": "0.7.0-alpha.1",
-  "target": "0.8.0-alpha.1",
-  "inputs": {
-    "RetroBooth_v0.7_GitHub_Ready.zip": "dfc64ddb541a9592c82f860bdfc403bb32b99fb54bbc4cc2bd35ffddacaab3b0",
-    "RetroBooth_Prototype_v0.7_Webcam.html": "043ce64910f313af300aa6b13a859d01255dd3fd0c08b703c4c6a237956134dc"
+  "version": "0.9.0-alpha.1",
+  "baseline": {
+    "name": "RetroBooth_v0.8_GitHub_Ready.zip",
+    "sha256": "f8a0a7b13a84bbd371f9f7f9ca007c36afa77448b5a0fff4d49834cd017683e2",
+    "source": "exact mounted v0.8 GitHub-ready ZIP"
   },
-  "baseline_input_files_not_modified": true,
-  "unchanged_modules": {
-    "src/renderer.js": {
-      "unchanged": true,
-      "sha256": "04a07a0ec205316715af4176b1352640e2c64bc44b12b4831941c7355d984932"
+  "standaloneSHA256": "e73c2f3ccc0055e5a54631d339d4f42b973b9a0021f8f39cdc05ceebc886639b",
+  "unchangedModules": [
+    {
+      "file": "src/renderer.js",
+      "sha256": "04a07a0ec205316715af4176b1352640e2c64bc44b12b4831941c7355d984932",
+      "unchanged": true
     },
-    "src/effects.js": {
-      "unchanged": true,
-      "sha256": "e78c4a98b217a310dc691a3bc03d9aba42e3f67f4ecea7c4fc48fc90356ef3f9"
+    {
+      "file": "src/effects.js",
+      "sha256": "e78c4a98b217a310dc691a3bc03d9aba42e3f67f4ecea7c4fc48fc90356ef3f9",
+      "unchanged": true
     },
-    "src/receipt.js": {
-      "unchanged": true,
-      "sha256": "93cf024b314f924bdd9fbfbdd08e2c03c2bb441df3268d8597c7f0f104d13ed8"
+    {
+      "file": "src/store.js",
+      "sha256": "d489ca28083c6cda4a32bfc4cd822e3e9111f2debdbaddf3e198c80e4b17233b",
+      "unchanged": true
     },
-    "src/store.js": {
-      "unchanged": true,
-      "sha256": "d489ca28083c6cda4a32bfc4cd822e3e9111f2debdbaddf3e198c80e4b17233b"
+    {
+      "file": "src/receipt.js",
+      "sha256": "93cf024b314f924bdd9fbfbdd08e2c03c2bb441df3268d8597c7f0f104d13ed8",
+      "unchanged": true
     },
-    "cloud/retrobooth_private/app/Cloud.php": {
-      "unchanged": true,
-      "sha256": "5d32ef12f13ba9cb958e376d19049624eb282a8d4793b7675b19a67796ab7cf9"
+    {
+      "file": "cloud/retrobooth_private/app/Cloud.php",
+      "sha256": "5d32ef12f13ba9cb958e376d19049624eb282a8d4793b7675b19a67796ab7cf9",
+      "unchanged": true
     },
-    "cloud/public_html/assets/guest.js": {
-      "unchanged": true,
-      "sha256": "5c7acb8231445778e695c1f19d08ff825c770c0eb3d5655e728acfa6b2954d13"
+    {
+      "file": "cloud/public_html/assets/guest.js",
+      "sha256": "5c7acb8231445778e695c1f19d08ff825c770c0eb3d5655e728acfa6b2954d13",
+      "unchanged": true
     },
-    "cloud/public_html/assets/admin.js": {
-      "unchanged": true,
-      "sha256": "23dc7dd5394958f792ad9e834c75faa5ff5bd3f0bf307bdee6048b32da40bc2e"
+    {
+      "file": "cloud/public_html/assets/admin.js",
+      "sha256": "23dc7dd5394958f792ad9e834c75faa5ff5bd3f0bf307bdee6048b32da40bc2e",
+      "unchanged": true
+    },
+    {
+      "file": "android/app/src/main/java/studio/luce/retrobooth/MainActivity.java",
+      "sha256": "6002e58bb0aa54cfa1f194d26a0ac9f50e31f43bbeab95aa8a3c7ef744231026",
+      "unchanged": true
+    },
+    {
+      "file": "android/app/src/main/java/studio/luce/retrobooth/NativePrinter.java",
+      "sha256": "4d317de868947fb3763f3aef7ba69a082a3571f2c5b1fb12d339081491118b86",
+      "unchanged": true
+    },
+    {
+      "file": "android/app/src/main/java/studio/luce/retrobooth/printing/QrTicket.java",
+      "sha256": "562e310497cb79935065706cc715a5a8b45e4118d4df9ebf40d7f0538347cbbf",
+      "unchanged": true
+    },
+    {
+      "file": "android/app/src/main/java/studio/luce/retrobooth/printing/TicketEngine.java",
+      "sha256": "378c409f575647bc2f0cb4dd384d61a83e22d181d7109eaf1a3383c90fc5ea93",
+      "unchanged": true
+    },
+    {
+      "file": "android/app/src/main/java/studio/luce/retrobooth/printing/FastReturnGate.java",
+      "sha256": "80f00f553ac8e65bf0aedbf169def3bd6e3e3e367c2ffe4d5ef81a349bfd37fe",
+      "unchanged": true
+    },
+    {
+      "file": "android/app/src/main/java/studio/luce/retrobooth/printing/TicketLedger.java",
+      "sha256": "95f36b40230ad5e2b441cf5c3f8912a6197c0a65fa2a5ece9abd353f1a4b0cee",
+      "unchanged": true
     }
-  },
-  "changed_text_files": [
+  ],
+  "changedFiles": [
+    ".github/workflows/build-all.yml",
+    ".gitignore",
+    "CHANGELOG.md",
+    "README.md",
+    "VERSION.txt",
+    "android/app/build.gradle",
+    "android/app/src/main/assets/www/BUILD_INFO.json",
+    "android/app/src/main/assets/www/index.html",
+    "cloud/public_html/booth/index.html",
+    "cloud/retrobooth_private/config.example.php",
+    "docs/ADAPTER_MAP.md",
+    "docs/ARCHITECTURE.md",
+    "docs/MIGRATION_AND_ROLLBACK.md",
+    "docs/QUICK_START.md",
+    "docs/SETUP_AND_RUNNING_GUIDE.md",
+    "package.json",
     "src/app.js",
+    "src/cloud-flow.js",
     "src/core.js",
-    "src/delivery-admin.html",
-    "src/delivery-flow.js",
-    "src/delivery-policy.js",
-    "src/experience.js",
-    "src/landscape.js",
-    "src/printer-admin.html",
     "src/printer-client.js",
     "src/printer-flow.js",
-    "src/printer.css",
     "src/sw.js",
     "src/template.html",
-    "android/app/build.gradle",
-    "android/app/src/main/AndroidManifest.xml",
-    "android/app/src/main/java/studio/luce/retrobooth/MainActivity.java",
-    "android/app/src/main/java/studio/luce/retrobooth/NativePrinter.java",
-    "android/app/src/main/java/studio/luce/retrobooth/printing/FastReturnGate.java",
-    "android/app/src/main/java/studio/luce/retrobooth/printing/QrTicket.java",
-    "android/app/src/main/java/studio/luce/retrobooth/printing/TicketEngine.java",
-    "android/app/src/main/java/studio/luce/retrobooth/printing/TicketLedger.java",
+    "tests/cloud_api.py",
     "tools/build.mjs",
+    "tools/generate-cloud-config.mjs",
     "tools/guide_content.json",
     "tools/make_guide.py",
     "tools/native_build_info.py",
     "tools/package.mjs",
-    "tools/package_source.py",
-    "tools/test_native_core.py",
-    "tools/validate.mjs",
-    "tests/browser_v08.py",
-    "tests/java/TicketCoreTest.java",
-    "tests/printer_client.test.cjs",
-    "tests/run_suite.py",
-    ".github/workflows/build-all.yml",
-    "cloud/public_html/booth/index.html"
+    "tools/package_source.py"
   ],
-  "handoff_archive": "Authorized bytes unavailable. Independent implementation; NOT H5.3 port or inherited hardware validation.",
-  "native_compilation": "Pure printing core compiled/executed with javac --release 17. Android glue/SDK/APK not compiled.",
-  "server_version": "Retained v0.7 API1; Android native printer is not a server feature."
+  "newFiles": [
+    "LICENSE.txt",
+    "START_HERE.md",
+    "desktop/assets.cjs",
+    "desktop/electron-builder.cjs",
+    "desktop/main.cjs",
+    "desktop/package.json",
+    "desktop/preload.cjs",
+    "desktop/resources/icon.ico",
+    "desktop/security.cjs",
+    "desktop/self-test.cjs",
+    "docs/ANDROID_QUICK_START.md",
+    "docs/PLATFORM_REFERENCES.md",
+    "docs/RetroBooth_v0.9_Setup_and_Running_Guide.docx",
+    "docs/WINDOWS_QUICK_START.md",
+    "src/desktop-admin.html",
+    "src/desktop.js",
+    "tests/browser_v09.py",
+    "tests/desktop.test.cjs",
+    "tools/collect-windows.mjs",
+    "tools/install-desktop.mjs",
+    "tools/prepare-desktop.mjs",
+    "tools/run-desktop-smoke.mjs",
+    "tools/verify-repository.py"
+  ],
+  "notPerformed": [
+    "Android SDK compilation/lint/install",
+    "Electron install or runtime",
+    "Windows EXE packaging/execution",
+    "GitHub push/Actions",
+    "Hostinger deployment",
+    "physical device or printer acceptance"
+  ]
 }

@@ -1,0 +1,809 @@
+--- v0.8/.github/workflows/build-all.yml
++++ v0.9/.github/workflows/build-all.yml
+@@ -1,25 +1,29 @@
+-name: RetroBooth - Build all test versions
++name: RetroBooth - Build APK and Windows EXE
+ on:
+   workflow_dispatch:
+     inputs:
+       build_android:
+-        description: Build Android test APK and unsigned release outputs
++        description: Build installable Android TEST APK (and separate unsigned developer files)
+         type: boolean
+         default: true
+-      origin_tests:
+-        description: Require localhost fake-device and IndexedDB browser integration tests
++      build_windows:
++        description: Build Windows x64 installer and portable EXE
+         type: boolean
+         default: true
++      windows_arm64:
++        description: Also build Windows ARM64 (requires separate ARM64 device acceptance)
++        type: boolean
++        default: false
+ permissions:
+   contents: read
+ concurrency:
+   group: retrobooth-build-${{ github.ref }}
+   cancel-in-progress: false
+ jobs:
+-  web:
+-    name: Web, PHP cloud tests and preview packages
+-    runs-on: ubuntu-latest
+-    timeout-minutes: 25
++  verify:
++    name: Verify source, browser and private-cloud flow
++    runs-on: ubuntu-24.04
++    timeout-minutes: 30
+     steps:
+       - uses: actions/checkout@v6
+         with:
+@@ -31,16 +35,16 @@
+       - uses: actions/setup-python@v6
+         with:
+           python-version: '3.13'
+-      - name: Build and static tests (no npm dependencies)
+-        run: |
+-          npm run build
+-          npm test
+       - uses: actions/setup-java@v5
+         with:
+           distribution: temurin
+           java-version: '17'
+-      - name: Platform-independent ticket journal tests
+-        run: npm run test:native-core
++      - name: Prepare assets and run unit contracts
++        run: |
++          npm run desktop:prepare
++          npm test
++          npm run test:native-core
++          python tools/verify-repository.py
+       - name: PHP private-cloud integration
+         run: |
+           sudo apt-get update
+@@ -52,23 +56,22 @@
+         run: |
+           python -m pip install -r requirements-test.txt
+           python -m playwright install --with-deps chromium
+-      - name: Browser regressions
+-        run: python tests/run_suite.py
+-      - name: Local-origin fake-device integration
+-        if: ${{ inputs.origin_tests }}
+-        run: |
++      - name: Browser regressions and real-origin persistence
++        run: |
++          python tests/run_suite.py
++          python tests/browser_v09.py
+           python tests/real_origin.py --require-origin
+           python tests/cloud_real_origin.py
+-      - name: Package standalone, static, cloud and local webcam builds
++      - name: Build optional web and hosting distributions
+         run: npm run package:web
+-      - name: Upload web programs
+-        uses: actions/upload-artifact@v6
+-        with:
+-          name: RetroBooth-Web-v0.8-${{ github.run_number }}
++      - name: Upload web distributions
++        uses: actions/upload-artifact@v6
++        with:
++          name: RetroBooth-Web-v0.9-${{ github.run_number }}
+           path: artifacts/*
+           if-no-files-found: error
+-          retention-days: 14
+-      - name: Upload diagnostic evidence (not programs)
++          retention-days: 30
++      - name: Upload verification evidence
+         if: ${{ always() }}
+         uses: actions/upload-artifact@v6
+         with:
+@@ -80,11 +83,11 @@
+           if-no-files-found: warn
+           retention-days: 14
+   android:
+-    name: Android secure-SPP QR pilot
+-    needs: web
++    name: Android APK
++    needs: verify
+     if: ${{ inputs.build_android }}
+-    runs-on: ubuntu-latest
+-    timeout-minutes: 25
++    runs-on: ubuntu-24.04
++    timeout-minutes: 30
+     env:
+       RETRO_TEST_STORE_PASSWORD: ${{ secrets.RETRO_TEST_STORE_PASSWORD }}
+       RETRO_TEST_KEY_ALIAS: ${{ secrets.RETRO_TEST_KEY_ALIAS }}
+@@ -104,43 +107,60 @@
+       - uses: gradle/actions/setup-gradle@v6
+         with:
+           gradle-version: '8.11.1'
+-          cache-disabled: true # No use of the separate proprietary v6 caching component.
+-      - name: Install pinned Android SDK packages
++          cache-disabled: true
++      - name: Install the Android SDK packages
+         run: |
+           test -n "$ANDROID_HOME"
+           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+-      - name: Optional persistent TEST signing key
++      - name: Configure optional stable TEST signing
+         env:
+           KEY_B64: ${{ secrets.RETRO_TEST_KEYSTORE_BASE64 }}
+         run: |
+           if [ -n "$KEY_B64" ]; then
+-            test -n "$RETRO_TEST_STORE_PASSWORD"
+-            test -n "$RETRO_TEST_KEY_ALIAS"
+-            test -n "$RETRO_TEST_KEY_PASSWORD"
++            test -n "$RETRO_TEST_STORE_PASSWORD" || { echo 'Missing RETRO_TEST_STORE_PASSWORD'; exit 1; }
++            test -n "$RETRO_TEST_KEY_ALIAS" || { echo 'Missing RETRO_TEST_KEY_ALIAS'; exit 1; }
++            test -n "$RETRO_TEST_KEY_PASSWORD" || { echo 'Missing RETRO_TEST_KEY_PASSWORD'; exit 1; }
+             printf '%s' "$KEY_B64" | base64 --decode > "$RUNNER_TEMP/retro-test.jks"
++            chmod 600 "$RUNNER_TEMP/retro-test.jks"
+             echo "RETRO_TEST_KEYSTORE_PATH=$RUNNER_TEMP/retro-test.jks" >> "$GITHUB_ENV"
+             echo "SIGNING_MODE=persistent-test-key" >> "$GITHUB_ENV"
+           else
++            if [ -n "$RETRO_TEST_STORE_PASSWORD$RETRO_TEST_KEY_ALIAS$RETRO_TEST_KEY_PASSWORD" ]; then
++              echo 'Partial signing secrets: supply all four secrets or remove all four.'; exit 1
++            fi
++            echo '::warning::Temporary debug signing: later builds may not update this APK. Set all four RETRO_TEST secrets before retaining valuable recordings.'
+             echo "SIGNING_MODE=ephemeral-debug-key" >> "$GITHUB_ENV"
+           fi
+-      - name: Build bundled web assets and Android formats
++      - name: Compile Android and run native lint
+         run: |
+           npm run android:assets
+           gradle -p android --no-daemon :app:assembleDebug :app:assembleRelease :app:bundleRelease :app:lintDebug --stacktrace
+-      - name: Collect native programs and checksums
+-        run: |
+-          mkdir -p native-artifacts
+-          cp android/app/build/outputs/apk/debug/app-debug.apk native-artifacts/RetroBooth-v0.8-Android-TEST.apk
+-          cp android/app/build/outputs/apk/release/app-release-unsigned.apk native-artifacts/RetroBooth-v0.8-UNSIGNED.apk
+-          cp android/app/build/outputs/bundle/release/app-release.aab native-artifacts/RetroBooth-v0.8-UNSIGNED.aab
++      - name: Verify signed test APK and collect outputs
++        run: |
++          mkdir -p native-artifacts unsigned-artifacts
++          cp android/app/build/outputs/apk/debug/app-debug.apk native-artifacts/RetroBooth-v0.9-Android-TEST.apk
++          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs native-artifacts/RetroBooth-v0.9-Android-TEST.apk > native-artifacts/SIGNATURE.txt
++          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging native-artifacts/RetroBooth-v0.9-Android-TEST.apk > native-artifacts/APK_INFO.txt
++          grep "name='studio.luce.retrobooth.preview'" native-artifacts/APK_INFO.txt
++          grep "versionCode='9'" native-artifacts/APK_INFO.txt
+           python tools/native_build_info.py
++          cp docs/ANDROID_QUICK_START.md native-artifacts/READ_ME_FIRST.md
++          cp android/app/build/outputs/apk/release/app-release-unsigned.apk unsigned-artifacts/RetroBooth-v0.9-UNSIGNED.apk
++          cp android/app/build/outputs/bundle/release/app-release.aab unsigned-artifacts/RetroBooth-v0.9-UNSIGNED.aab
+           cd native-artifacts
+-          sha256sum *.apk *.aab BUILD_INFO.json > SHA256SUMS.txt
+-      - name: Upload Android programs
+-        uses: actions/upload-artifact@v6
+-        with:
+-          name: RetroBooth-Android-v0.8-${{ github.run_number }}
++          sha256sum *.apk *.json > SHA256SUMS.txt
++      - name: Upload installable TEST APK
++        uses: actions/upload-artifact@v6
++        with:
++          name: RetroBooth-Android-APK-v0.9-${{ github.run_number }}
+           path: native-artifacts/*
++          if-no-files-found: error
++          retention-days: 30
++      - name: Upload unsigned developer files (not installable)
++        uses: actions/upload-artifact@v6
++        with:
++          name: RetroBooth-UNSIGNED-DEVELOPER-FILES-v0.9-${{ github.run_number }}
++          path: unsigned-artifacts/*
+           if-no-files-found: error
+           retention-days: 14
+       - name: Upload Android lint/build evidence
+@@ -151,6 +171,59 @@
+           path: android/app/build/reports/
+           if-no-files-found: warn
+           retention-days: 14
+-      - name: Remove temporary test signing material
++      - name: Remove temporary signing key
+         if: ${{ always() }}
+         run: rm -f "$RUNNER_TEMP/retro-test.jks"
++  windows:
++    name: Windows EXE (${{ matrix.arch }})
++    needs: verify
++    if: ${{ inputs.build_windows }}
++    runs-on: windows-2022
++    timeout-minutes: 35
++    strategy:
++      fail-fast: false
++      matrix:
++        arch: ${{ fromJSON(inputs.windows_arm64 && '["x64","arm64"]' || '["x64"]') }}
++    env:
++      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
++    steps:
++      - uses: actions/checkout@v6
++        with:
++          persist-credentials: false
++      - uses: actions/setup-node@v6
++        with:
++          node-version: '22'
++          package-manager-cache: false
++      - name: Prepare bundled desktop assets
++        run: npm run desktop:prepare
++      - name: Install pinned desktop tooling
++        run: npm run desktop:install
++      - name: Actual Electron runtime smoke (isolated profile, fake camera)
++        run: node tools/run-desktop-smoke.mjs
++      - name: Build Windows installer and portable EXE
++        run: npm --prefix desktop run package:win:${{ matrix.arch }}
++      - name: Test actual packaged x64 application
++        if: ${{ matrix.arch == 'x64' }}
++        run: node tools/run-desktop-smoke.mjs desktop/release/win-unpacked/RetroBooth.exe
++      - name: Collect programs and hashes
++        run: node tools/collect-windows.mjs ${{ matrix.arch }}
++      - name: Upload Windows programs
++        uses: actions/upload-artifact@v6
++        with:
++          name: RetroBooth-Windows-${{ matrix.arch }}-EXE-v0.9-${{ github.run_number }}
++          path: windows-artifacts/*
++          if-no-files-found: error
++          retention-days: 30
++      - name: Upload Windows build evidence and resolved lockfile
++        if: ${{ always() }}
++        uses: actions/upload-artifact@v6
++        with:
++          name: RetroBooth-Windows-${{ matrix.arch }}-Evidence-${{ github.run_number }}
++          include-hidden-files: true
++          path: |
++            desktop/.smoke-output/
++            desktop/package-lock.json
++            desktop/release/builder-debug.yml
++            desktop/release/builder-effective-config.yaml
++          if-no-files-found: warn
++          retention-days: 14
+--- v0.8/android/app/build.gradle
++++ v0.9/android/app/build.gradle
+@@ -6,8 +6,8 @@
+         applicationId 'studio.luce.retrobooth.preview'
+         minSdk 26
+         targetSdk 35
+-        versionCode 8
+-        versionName '0.8.0-alpha.1'
++        versionCode 9
++        versionName '0.9.0-alpha.1'
+     }
+     buildFeatures { buildConfig true }
+     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+--- v0.8/android/app/src/main/assets/www/index.html
++++ v0.9/android/app/src/main/assets/www/index.html
+@@ -4,7 +4,7 @@
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#141c16"><meta name="robots" content="noindex,nofollow">
+ <meta name="referrer" content="no-referrer">
+-<title>Retrovision | Luce Studio | Landscape Prototype v0.8</title>
++<title>Retrovision | Luce Studio | Landscape Prototype v0.9</title>
+ <style>:root{--paper:#f4f1e8;--ink:#30382c;--muted:#73786b;--line:#d9d8cb;--green:#536247;--cream:#ece2c7;--amber:#a07d41;--red:#a34534;--white:#fffdf6;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang HK','Microsoft JhengHei',sans-serif;--serif:Georgia,'Times New Roman',serif}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.6 var(--sans)}button,a,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}button,a,input,select{touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #9d7a45;outline-offset:4px}button{color:inherit}a{color:inherit}h1,h2,p{margin:0}h1{font:52px/1.08 var(--serif);font-weight:400;letter-spacing:-1.9px}h1 em{font-weight:400;color:var(--green)}h2{font:30px/1.15 var(--serif);font-weight:400;letter-spacing:-.7px}p{line-height:1.75}.site-header{max-width:1440px;margin:auto;padding:22px 48px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{text-decoration:none;font:italic 38px/.95 var(--serif);letter-spacing:-2px}.brand span{display:block;font:8px/1.5 var(--mono);letter-spacing:1.1px;margin-top:6px}.site-header nav{display:flex;gap:8px}.nav{border:0;background:transparent;padding:12px 16px;font-size:13px}.nav.active{background:#e4e6d9;border-radius:3px}#countBadge{font:10px var(--mono);background:#d3d8c6;border-radius:50%;padding:2px 5px;margin-left:6px}.build-tag{text-align:right;font:9px/1.8 var(--mono);letter-spacing:.8px}.build-tag span{display:block;color:var(--muted)}.notice{display:flex;align-items:center;justify-content:center;gap:8px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#eeebdf;padding:9px 20px;font:11px/1.5 var(--mono)}.notice button{border:0;border-bottom:1px solid currentColor;padding:0;margin-left:14px;background:none;font:inherit}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;flex:none}.amber{background:#ae833a}.green{background:#667c50}.small{font-size:12px}.muted{color:var(--muted)}.mono{font-family:var(--mono)}.separator{margin:0 10px;color:#a9ad9c}main{max-width:1370px;margin:auto;padding:0 48px}.section-intro{display:flex;align-items:flex-end;justify-content:space-between;padding:36px 0 28px;gap:40px}.eyebrow{font:10px/1.6 var(--mono);letter-spacing:1.6px;margin-bottom:12px;color:var(--green)}.intro-aside{max-width:322px;padding-bottom:3px}.intro-aside p{margin-bottom:17px;font-size:14px;letter-spacing:.4px}.booth-layout{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:44px;align-items:start}.television{background:repeating-linear-gradient(2deg,transparent 0 4px,#ffffff04 5px 7px),linear-gradient(110deg,#7a6551,#a0886b 45%,#80674f);border:2px solid #665541;border-radius:17px 17px 11px 11px;padding:22px 20px 0;display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:17px;box-shadow:inset 0 2px 0 #c6b59d,0 16px 24px #44362218}.tv-bezel{padding:12px;background:#333930;border:1px solid #252b24;border-radius:42px;box-shadow:inset 0 2px 6px #0008,0 1px 0 #b4a18b}.tv-screen{isolation:isolate;position:relative;aspect-ratio:4/3;overflow:hidden;border-radius:34px;background:#223025;color:#f5ebc9;box-shadow:inset 0 0 25px #000}#cameraCanvas{display:block;width:100%;height:100%;object-fit:contain;transform-origin:center}#cameraCanvas.mirrored{transform:scaleX(-1)}.screen-top,.screen-bottom{position:absolute;z-index:4;left:6%;right:6%;display:flex;justify-content:space-between;gap:6px;align-items:center;font:clamp(8px,.85vw,11px)/1.3 var(--mono);text-shadow:0 1px 2px #000}.screen-top{top:6%;letter-spacing:1px}.screen-top button{background:none;border:0;color:inherit;font:inherit;padding:4px 0;user-select:none;-webkit-user-select:none}.screen-top #screenEvent{max-width:55%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.screen-bottom{bottom:5%;font-size:8px;letter-spacing:.6px}.screen-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 38px #071a1c77;border-radius:inherit;z-index:4}.idle-overlay{position:absolute;bottom:12%;left:0;right:0;text-align:center;z-index:3}.screen-prompt{font-weight:600;font-size:clamp(13px,1.6vw,21px);letter-spacing:2px;text-shadow:0 2px 4px #000;padding:8px;background:#1e2c236e}.idle-overlay p{font-size:10px;margin-top:7px;color:#eee5cd}.state-overlay{position:absolute;inset:0;z-index:5;background:#18271dcc;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}.state-kicker{font:11px var(--mono);letter-spacing:2px;margin-bottom:18px}.state-title{font:clamp(30px,4vw,64px)/1.2 var(--serif)}.state-title.countdown{font:120px var(--mono)}.state-overlay p{font-size:13px;max-width:90%;margin-top:20px}.record-overlay{position:absolute;inset:0;background:#12201680;z-index:5}.rec-bar{display:flex;justify-content:space-between;padding:13% 7% 0;font:14px var(--mono)}.rec-bar i{background:#f1866a;display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;animation:recblink 1s infinite}.wave-block{position:absolute;top:43%;left:10%;width:80%;text-align:center}.wave-block canvas{width:100%;height:70px}.wave-block p{font-size:13px;margin-top:8px;letter-spacing:2px}.wave-block small{display:block;font-size:10px;margin-top:4px;color:#e8c79b}.record-progress{position:absolute;bottom:12%;left:8%;width:84%;height:3px;background:#ffffff22}.record-progress div{height:3px;background:#d9dfac;width:0}.tv-hardware{display:flex;align-items:center;flex-direction:column;padding:10px 0;min-width:0}.tv-hw-label{color:#eadcc3;font:italic 22px/.9 var(--serif);text-align:center}.tv-hw-label small{font:8px var(--mono);letter-spacing:2px}.dial{width:57px;height:57px;border-radius:50%;background:repeating-conic-gradient(#4c4c40 0 4deg,#33352e 5deg 10deg);border:3px solid #aaa28a;box-shadow:2px 4px 6px #0005;display:grid;place-items:center;margin-top:26px;margin-bottom:6px}.dial i{width:7px;height:37px;background:linear-gradient(90deg,#b3b2a0,#dddac4,#858777);transform:rotate(29deg);border-radius:3px}.small-dial{width:42px;height:42px;margin-top:15px;margin-bottom:14px}.small-dial i{height:25px;width:5px;transform:rotate(-50deg)}.tv-hardware>small{font:7px var(--mono);letter-spacing:1px;color:#eadcc3}.speaker{background:repeating-linear-gradient(#33372c 0 2px,#796f5a 3px 6px);width:65px;flex:1;min-height:42px;margin:7px 0 19px;border-radius:5px;border:1px solid #655b4b}.power-dot{height:6px;width:6px;border-radius:50%;background:#d1c986;box-shadow:0 0 6px #ebdd9c;margin-bottom:7px}.tv-bottom{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;margin-top:-4px;color:#ece2cb;font:8px var(--mono);letter-spacing:1px}.tv-bottom span:first-child{font-weight:bold;letter-spacing:3px}.tv-feet{display:flex;justify-content:space-between;padding:0 13%;height:12px}.tv-feet i{width:45px;background:#4b4a3c;clip-path:polygon(0 0,100% 0,85% 100%,15% 100%)}.guest-actions{display:flex;gap:10px;justify-content:center;margin-top:23px}.btn{min-height:46px;border:1px solid transparent;padding:12px 20px;border-radius:4px;display:inline-flex;gap:10px;align-items:center;justify-content:center;font-weight:500;font-size:13px;line-height:1.4}.btn svg{width:18px;height:18px;flex:none}.primary{background:var(--green);color:#fff9e8}.primary:hover{background:#46563b}.secondary{background:transparent;border-color:#b9beaa}.secondary:hover{background:#e7e8dd}.stop{background:#a44a36;color:#fff}.control-strip{display:flex;gap:15px;align-items:center;justify-content:center;margin:17px 0 10px;font-size:10px}.control-strip button{border:0;background:none;padding:5px 0;border-bottom:1px solid #b0b6a1;font-size:11px}.control-strip span{font:9px var(--mono);color:var(--muted)}.privacy-line{text-align:center;color:var(--muted);font-size:10px}.workflow{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);margin-top:22px;padding:17px 0;gap:10px}.workflow>div{display:flex;gap:10px;align-items:center;opacity:.45}.workflow>div.active{opacity:1}.workflow b{font:11px var(--mono);border:1px solid #afb69f;padding:4px 6px;border-radius:50%}.workflow .active b{background:#dae1c9}.workflow span{font-size:11px}.receipt-column{padding-top:4px}.panel-heading{display:flex;justify-content:space-between;align-items:center}.panel-heading .eyebrow{font-size:8px;letter-spacing:1.4px}.paper-badge{width:45px;height:45px;border:1px solid #b6baab;border-radius:50%;font:17px/1 var(--serif);display:flex;align-items:center;justify-content:center;flex-direction:column;transform:rotate(12deg)}.paper-badge small{font:8px var(--mono)}.printer-slot{height:12px;background:#606653;border-radius:6px;margin:23px 8px 0;box-shadow:inset 0 3px 5px #0004}.receipt-paper{position:relative;background:#fff;margin:-5px 17px 0;padding:11px 8px 16px;box-shadow:0 8px 19px #29251a13;transform:rotate(-1deg)}.receipt-paper:after{content:'';position:absolute;height:6px;left:0;right:0;bottom:-5px;background:linear-gradient(135deg,#fff 25%,transparent 25%) -3px 0,linear-gradient(225deg,#fff 25%,transparent 25%) -3px 0;background-size:8px 8px}.receipt-paper canvas{display:block;width:100%;height:auto;image-rendering:pixelated}.receipt-caption{display:flex;gap:8px;align-items:center;margin-top:24px;font:10px/1.5 var(--mono)}.receipt-column>.small{font-size:10px;margin-top:9px}.text-button{background:none;border:0;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 0;font-size:12px;width:100%;text-align:left}.under-row{border-top:1px solid var(--line);padding:16px 0;display:flex;gap:20px;justify-content:space-between;font:8px/1.6 var(--mono);letter-spacing:.6px;color:var(--muted)}footer{max-width:1370px;padding:24px 48px 28px;margin:auto;display:flex;justify-content:space-between;gap:20px;font:9px/1.6 var(--mono);letter-spacing:1px;color:var(--muted)}.footer-dot{margin:0 12px}footer button{border:0;background:var(--paper);text-decoration:underline;padding:7px}.page-heading{display:flex;justify-content:space-between;gap:25px;align-items:center;padding:40px 0 30px}.page-heading p{font-size:13px;margin-top:16px;color:var(--muted)}.stats-row{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:6px;margin-bottom:28px;padding:22px 0}.stats-row>div{padding:0 24px;border-right:1px solid var(--line)}.stats-row>div:last-child{border:0}.stats-row span{font:32px var(--serif)}.stats-row p{font-size:11px;color:var(--muted);margin-top:6px}.library-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.clip-card{border:1px solid var(--line);background:var(--white);padding:12px;border-radius:6px;min-width:0}.clip-card img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;display:block}.clip-card .card-info{padding:13px 4px}.clip-card h3{font:22px var(--serif);margin:8px 0}.clip-card p{font-size:11px;color:var(--muted);word-break:break-word}.clip-card .button-row{margin-top:12px}.clip-card .btn{min-height:38px;padding:9px 13px;font-size:11px}.pill{font:9px var(--mono);padding:5px 7px;border:1px solid #d1ccb9;border-radius:3px;display:inline-block;background:#eee9d9}.green-pill{background:#e4ead8;border-color:#c3ccb4}.empty-state{text-align:center;padding:80px 20px}.empty-state>svg{width:46px;height:46px;color:var(--green);fill:currentColor;margin-bottom:20px}.empty-state p{margin:20px 0;color:var(--muted)}.admin-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:24px}.admin-card{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:28px;min-width:0}.admin-card h2{margin-bottom:22px}.card-number{font:9px var(--mono);letter-spacing:1px;color:var(--muted);margin-bottom:16px}.admin-card label{display:block;font-size:12px;margin-bottom:17px}.admin-card input:not([type=checkbox]):not([type=range]),.admin-card select{display:block;width:100%;min-width:0;background:#f8f7f0;border:1px solid #d1d4c4;border-radius:4px;padding:11px 12px;margin-top:7px;font-size:13px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}.admin-card input[type=range]{width:100%;margin-top:12px;accent-color:var(--green)}.admin-card output{float:right;font:11px var(--mono)}.admin-card .check{display:flex;align-items:center;gap:10px;font-size:12px}.check input{accent-color:var(--green);width:16px;height:16px;flex:none}.admin-card .small{margin-top:13px}.admin-stack{display:grid;gap:24px}.diagnostics{margin-bottom:20px}.diag-row{display:flex;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding:9px 0;font-size:11px}.diag-row span:last-child{text-align:right;font-family:var(--mono);font-size:10px;max-width:60%;overflow-wrap:anywhere}.button-row{display:flex;flex-wrap:wrap;gap:10px}.button-row .btn{flex:1}.scenario{background:#ecefe3}.scenario .check:first-of-type{margin-top:20px}pre{white-space:pre-wrap;word-break:break-word;font:10px/1.8 var(--mono);margin-top:16px}.wide{grid-column:1/-1}.gates{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}.gates p{font-size:12px;color:var(--muted);margin:10px 0 17px}.gates strong{font-size:13px}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);max-width:min(90%,650px);padding:15px 22px;background:#303a29;color:#fffbed;box-shadow:0 6px 22px #0003;border-radius:6px;z-index:100;font-size:13px;line-height:1.5}dialog{border:1px solid var(--line);background:var(--paper);padding:36px;max-width:560px;width:calc(100% - 32px);max-height:90vh;overflow:auto;color:var(--ink);border-radius:9px;box-shadow:0 30px 90px #0004}dialog::backdrop{background:#1c261ba8;backdrop-filter:blur(4px)}dialog h2{font-size:36px;margin-bottom:24px}dialog p{font-size:13px;margin-bottom:20px}dialog video,dialog img{width:100%;max-height:50vh;background:#20271e;border-radius:4px;margin-bottom:18px}.dialog-close{position:absolute;top:12px;right:16px;background:none;border:0;font-size:26px;min-width:35px;min-height:35px}.view[hidden],[hidden]{display:none!important}.view.active{animation:appear .25s ease-out}.kiosk .site-header,.kiosk .notice,.kiosk .section-intro,.kiosk .receipt-column,.kiosk .under-row,.kiosk .workflow,.kiosk .control-strip,.kiosk .privacy-line,.kiosk footer>span{display:none}.kiosk main{padding:20px;max-width:1100px}.kiosk .booth-layout{display:block}.kiosk .television{max-width:980px;margin:auto}.kiosk footer{padding:0;justify-content:center}.kiosk .guest-actions{margin-top:20px}.kiosk #exitKiosk{display:block}.kiosk .tv-screen{max-height:70vh}.kiosk .tv-bezel{display:flex;justify-content:center}.kiosk .tv-screen{width:100%;aspect-ratio:4/3}.kiosk #screenEvent{display:none}@keyframes recblink{50%{opacity:.35}}@keyframes appear{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}@media(min-width:1500px){.screen-prompt{font-size:22px}.screen-top{font-size:12px}}@media(max-width:1100px){.site-header{padding:20px 28px}.build-tag{display:none}main{padding:0 28px}.booth-layout{grid-template-columns:minmax(0,1fr) 222px;gap:28px}.television{padding:15px 13px 0;grid-template-columns:minmax(0,1fr) 64px;gap:12px}.tv-bezel{padding:9px;border-radius:30px}.tv-screen{border-radius:23px}.tv-hardware{padding-top:7px}.dial{width:44px;height:44px;margin-top:19px}.dial i{height:28px}.small-dial{width:33px;height:33px}.small-dial i{height:20px}.speaker{width:47px;min-height:30px;margin-bottom:10px}.tv-hw-label{font-size:19px}.tv-hw-label small{font-size:6px}.screen-bottom{font-size:6px}.control-strip{flex-wrap:wrap;gap:12px}.intro-aside{max-width:260px}.gates{grid-template-columns:repeat(2,1fr)}.admin-card{padding:22px}footer{padding:24px 28px}h1{font-size:46px}.panel-heading h2{font-size:27px}}@media(max-width:760px){.site-header{padding:18px 20px;gap:16px;flex-wrap:wrap}.brand{font-size:34px}.brand span{font-size:7px}.site-header nav{gap:0;flex:1;justify-content:flex-end}.nav{padding:10px;font-size:11px}.notice{font-size:9px;align-items:flex-start;text-align:left;padding:10px 20px}.notice .dot{margin-top:4px}.notice button{margin-left:auto;white-space:nowrap}main{padding:0 20px}.section-intro{padding-top:28px;gap:20px}.intro-aside{max-width:190px}.intro-aside p{font-size:11px;line-height:1.7}.intro-aside .small{font-size:9px}h1{font-size:38px}.eyebrow{font-size:8px;letter-spacing:1px}.booth-layout{grid-template-columns:1fr;gap:20px}.television{grid-template-columns:minmax(0,1fr) 65px;padding:16px 13px 0}.tv-screen{border-radius:27px}.screen-prompt{font-size:18px}.screen-top{font-size:9px}.screen-bottom{font-size:7px}.receipt-column{max-width:340px;width:100%;margin:0 auto 25px;border-top:1px solid var(--line);padding-top:24px}.receipt-paper{max-width:250px;margin-left:auto;margin-right:auto}.printer-slot{max-width:270px;margin-left:auto;margin-right:auto}.receipt-column>.small{font-size:11px}.under-row{font-size:8px;flex-direction:column;gap:8px}.page-heading{padding:30px 0 25px;align-items:flex-start;flex-direction:column}.admin-grid{grid-template-columns:1fr}.wide{grid-column:auto}.library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-row{padding:18px 0;gap:20px 0;grid-template-columns:repeat(2,1fr)}.stats-row>div:nth-child(2){border:0}.stats-row span{font-size:27px}footer{padding:18px 20px;flex-direction:column;gap:7px}.state-title{font-size:32px}.state-title.countdown{font-size:85px}}@media(max-width:480px){.site-header nav{flex-basis:100%;justify-content:space-between;margin:0 -7px}.section-intro{display:block}.intro-aside{max-width:none;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px}.intro-aside p{margin:0;max-width:200px}.intro-aside .small{white-space:nowrap;font-size:8px}.separator{margin:0 4px}.television{padding:12px 9px 0;grid-template-columns:minmax(0,1fr) 38px;gap:8px;border-radius:12px}.tv-bezel{padding:6px;border-radius:22px}.tv-screen{border-radius:17px}.tv-hw-label{font-size:13px}.tv-hw-label small{font-size:5px;letter-spacing:.2px}.dial{width:29px;height:29px;border-width:2px;margin-top:13px}.dial i{height:17px;width:4px}.small-dial{width:24px;height:24px;margin-top:9px;margin-bottom:8px}.small-dial i{height:13px}.tv-hardware>small{font-size:5px;letter-spacing:0}.speaker{width:26px;min-height:22px;margin:3px 0 9px}.tv-bottom{font-size:5px;margin:0;padding:0 2px 10px;gap:8px}.tv-bottom span:first-child{letter-spacing:1.5px}.screen-top{font-size:7px}.screen-bottom{font-size:5px;letter-spacing:0}.screen-prompt{font-size:13px;letter-spacing:1px;padding:5px}.idle-overlay p{font-size:8px;margin-top:4px}.guest-actions{gap:8px;margin-top:18px}.guest-actions .btn{font-size:12px;padding:10px 14px}.control-strip{gap:12px}.control-strip span{flex-basis:100%;text-align:center}.workflow{gap:6px;margin-top:18px;padding-bottom:5px}.workflow>div{gap:6px}.workflow span{font-size:10px}.workflow b{font-size:9px;padding:3px 5px}.rec-bar{font-size:10px;padding-top:16%}.wave-block{top:39%}.wave-block canvas{height:42px}.wave-block p{font-size:10px;letter-spacing:1px}.wave-block small{font-size:8px}.state-overlay{padding:17px}.state-kicker{font-size:8px;margin-bottom:10px}.state-title{font-size:25px}.state-title.countdown{font-size:60px}.state-overlay p{font-size:10px;margin-top:12px}.form-row{grid-template-columns:1fr;gap:0}.library-grid{grid-template-columns:1fr}.admin-card{padding:22px 18px}.gates{gap:24px 18px}.gates strong{font-size:12px}.gates p{font-size:11px}dialog{padding:28px 22px}dialog h2{font-size:30px}.button-row .btn{font-size:11px;padding:11px 13px}.kiosk main{padding:12px}.kiosk .screen-prompt{font-size:13px}}@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+ 
+ .admin-grid{align-items:start}.kiosk .television{max-width:min(980px,calc((100dvh - 200px)*1.3333 + 150px))}.kiosk .tv-screen{max-height:none}
+@@ -242,7 +242,7 @@
+ </head>
+ <body class="kiosk" data-capture-state="idle" data-screen-style="heritage">
+ <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="phoneIcon" viewBox="0 0 24 24"><path d="M5 3 2 6c0 7 9 16 16 16l3-3-5-5-3 2c-3-1-5-3-6-6l2-3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol><symbol id="tapeIcon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="8" width="14" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="11" r="1.4"/><circle cx="16" cy="11" r="1.4"/><path d="m6 20 2-4h8l2 4" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol></svg>
+-<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.8.0 / NOT EVENT-READY</span></div></header>
++<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.9.0 / NOT EVENT-READY</span></div></header>
+ <div class="notice"><span class="dot amber"></span><span id="globalNotice">Demo mode. Camera is off. Printing and cloud are not connected.</span><button id="aboutBtn">What works?</button></div>
+ <main>
+ <section id="view-booth" class="view active">
+@@ -276,7 +276,7 @@
+   <div class="panel-hint" id="panelHint">撓一次就得</div>
+   <div class="panel-lamps" aria-hidden="true"><span data-lamp="idle"><i></i>READY</span><span data-lamp="recording"><i></i>REC</span><span data-lamp="saving"><i></i>SAVE</span></div>
+   <div class="speaker" aria-hidden="true"></div>
+-  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.8. Tap five times for staff settings">v0.8 / PREVIEW</button></div>
++  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.9. Tap five times for staff settings">v0.9 / PREVIEW</button></div>
+ </aside></div>
+ <div class="control-strip"><button id="cameraBtn">Enable camera + microphone</button><button id="kioskBtn">Kiosk preview</button><span id="inputHint">Keyboard: [ lift / ] replace</span></div>
+ <p class="privacy-line" data-i18n="privacy"></p>
+@@ -369,6 +369,15 @@
+  <p id="printerNotice" class="small" role="status"></p>
+ </section>
+ 
++<section id="desktopCard" class="admin-card wide" hidden>
++  <div class="card-number">09 / WINDOWS DESKTOP</div>
++  <h2>One app. Your own device.</h2>
++  <p id="desktopInfo" class="small mono" role="status">Checking packaged desktop host...</p>
++  <p class="small muted">Installed and portable Windows builds use the same local profile for this Windows account. Moving the EXE does not move recordings. This version has no Windows Bluetooth or USB printer driver; timed screen QR remains available.</p>
++  <div class="button-row"><button id="desktopFullscreen" type="button" class="btn secondary">Toggle full screen (F11)</button><button id="desktopStorage" type="button" class="btn secondary">Show storage location</button></div>
++  <p class="small muted">Windows cloud allowlist: add exactly <code>retrobooth://app</code> to your existing private server configuration. Do not replace keys or erase server data. Export recordings from Tape library before replacing or resetting a device.</p>
++</section>
++
+ <div class="admin-card wide designer"><div><div class="card-number">04 / RECEIPT DESIGN</div><h2>Your paper keepsake.</h2><p class="small muted">These fields are saved with the Event & Capture settings. Every captured message keeps its own receipt design snapshot.</p><label>Template<select id="receiptStyle" form="settingsForm"><option value="classic">Classic memory receipt</option><option value="ticket">Cinema ticket</option><option value="minimal">Minimal</option></select></label><label>Caption<input id="receiptCaption" form="settingsForm" maxlength="80"></label><label>Footer<input id="receiptFooter" form="settingsForm" maxlength="100"></label><label>Logo (PNG/JPEG, up to 2 MB)<input type="file" id="logoFile" accept="image/png,image/jpeg"></label><div class="button-row"><button id="removeLogo" type="button" class="btn secondary">Remove logo</button><button type="submit" form="settingsForm" class="btn primary">Save design + settings</button></div><p class="small muted">Print width: 384 dots, not yet hardware-verified. Layout preview only; no printer connection.</p></div><div class="design-preview"><canvas id="designCanvas" width="384" height="900"></canvas><small id="designDimensions"></small></div></div>
+ <div class="admin-card wide"><div class="card-number">05 / LIVE SHOW POLICY</div><h2>Keep control of the big screen.</h2><label class="check"><input type="checkbox" id="showEnabled" form="settingsForm"> Enable same-browser live show preview</label><label>Minimum hold before show<select id="showDelay" form="settingsForm"><option value="0">No added hold (testing)</option><option value="30">30 seconds</option><option value="60">60 seconds</option><option value="120">120 seconds</option></select></label><p>Every clip starts PRIVATE. It needs guest permission AND staff approval before entering this preview. Hiding is reversible. Deletion is not.</p><div class="button-row"><button class="btn secondary" data-view="library">Review tapes</button><button class="btn secondary" data-view="show">Open live show preview</button><button type="submit" form="settingsForm" class="btn primary">Save policy</button></div><p class="small muted">Local proof of interaction only. No remote projector feed, backend moderation or online guest URL is connected.</p></div>
+ <div class="admin-card wide"><div class="card-number">06 / READINESS GATES</div><div class="gates"><div><strong>Browser prototype</strong><p>Interaction, shader, recording, local library, receipt artwork.</p><span class="pill green-pill">IMPLEMENTED</span></div><div><strong>Target Android screen</strong><p>Audio routing, 60-second sync, interruptions, 3-hour soak.</p><span class="pill">NOT TESTED</span></div><div><strong>Handset + ticket printer</strong><p>Secure SPP QR-only source; paper and hardware not verified.</p><span class="pill">NOT CONNECTED</span></div><div><strong>Cloud + native shell</strong><p>Resumable uploads, private delivery, native files and signing.</p><span class="pill">NOT IMPLEMENTED</span></div></div></div></div></section>
+@@ -397,7 +406,7 @@
+ </section>
+ 
+ </main>
+-<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.8.0-alpha.1 · 19 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
++<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.0-alpha.1 · 19 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
+ 
+ <div id="toast" class="toast" role="status" hidden></div>
+ <dialog id="aboutDialog"><button class="dialog-close" data-close="aboutDialog" aria-label="Close">×</button><div class="eyebrow">PROTOTYPE BOUNDARY</div><h2>Real interactions.<br>Honest boundaries.</h2><p><b>Working:</b> demo flow, optional camera and microphone, retro canvas recording, browser-local saved clips, playback/export, pixel receipt composition, settings and failure scenarios.</p><p><b>Not connected:</b> Physical printer, physical handset, native crash-recoverable storage and remote projector. Local Control room is not authenticated; the separate Cloud Admin requires its secret key.</p><p>Demo sessions contain no guest video. Real recordings stay local unless Cloud Delivery is explicitly connected. Existing recordings are not silently enrolled. No analytics or external fonts are used.</p><p>For Android screen testing, serve the static package over HTTPS. Opening an HTML attachment inside a chat or Files preview may not execute the app.</p><button class="btn primary" data-close="aboutDialog">Explore the prototype</button></dialog>
+@@ -1898,7 +1907,7 @@
+  async function hash(text){if(!root.crypto?.subtle)throw new Error('Secure hashing is required for the printer bridge.');const b=new TextEncoder().encode(text),d=await root.crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(d),x=>x.toString(16).padStart(2,'0')).join('');}
+  class Client{
+   constructor(bridge=root.RetroPrinterNative){this.bridge=bridge;this.pending=new Map();this.available=!!bridge?.postMessage;this.status={available:this.available,connected:false,automaticEnabled:false,fastReturnArmed:false,paperStatus:'unavailable'};if(this.available)bridge.onmessage=e=>{try{const m=JSON.parse(e.data),p=this.pending.get(m.id);if(!p||m.version!==1)return;this.pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(new Error(m.error)):p.resolve(m.data);}catch{}};}
+-  call(op,values={},timeout=20000){if(!this.available)return Promise.reject(new Error('Bluetooth QR printing requires the v0.8 Android APK, not Chrome or the Hostinger web page.'));
++  call(op,values={},timeout=20000){if(!this.available)return Promise.reject(new Error('Bluetooth QR printing requires the v0.9 Android APK, not Chrome or the Hostinger web page.'));
+    const id=root.RetroCore.randomId();return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{this.pending.delete(id);if(op==='print'||op==='test')try{this.bridge.postMessage(JSON.stringify({id:root.RetroCore.randomId(),op:'cancel',requestId:id}));}catch{}reject(new Error('Native request timed out. Outcome may be unknown; do not automatically reprint.'));},timeout);this.pending.set(id,{resolve,reject,timer});try{this.bridge.postMessage(JSON.stringify({id,op,...values}));}catch{clearTimeout(timer);this.pending.delete(id);reject(new Error('Native printer channel unavailable.'));}});
+   }
+   pause(){for(const p of this.pending.values()){clearTimeout(p.timer);p.reject(new Error('Native app paused; print outcome may be unknown.'));}this.pending.clear();this.status.connected=false;this.status.automaticEnabled=false;this.status.fastReturnArmed=false;}
+@@ -1915,7 +1924,7 @@
+  }
+  root.RetroPrinter={PROFILE,guestTicket,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
+ })(typeof window==='undefined'?globalThis:window);
+-</script><script>/* RetroBooth v0.8.0-alpha.1. Pure, independently testable domain helpers. */
++</script><script>/* RetroBooth v0.9.0-alpha.1. Pure, independently testable domain helpers. */
+ (function (root) {
+   'use strict';
+   const E=root.RetroEffects || require('./effects.js');
+@@ -2982,6 +2991,18 @@
+  finally{window.RetroNative.onmessage=previous;nativeExportBusy=false;}
+ }
+ 
++/* Narrow desktop host integration; absent in browser and Android builds. */
++function setupDesktop(){
++ const host=window.RetroDesktop;if(!host||!$('desktopCard'))return;
++ $('desktopCard').hidden=false;
++ host.info().then(info=>{$('desktopInfo').textContent='Windows '+info.arch+' / app '+info.version+' / local origin '+info.origin+' / '+(info.cloudOrigin||'cloud not approved');}).catch(()=>{$('desktopInfo').textContent='Desktop host information unavailable.';});
++ const operation=async task=>{if(state!=='idle'||settingsSaving||cameraBusy){toast('Finish the current session first.');return;}try{await task();}catch(e){toast(e.message);}};
++ $('desktopFullscreen').onclick=()=>operation(()=>host.fullscreen());
++ $('desktopStorage').onclick=()=>operation(()=>host.storageLocation());
++ host.onSuspend?.(()=>window.dispatchEvent(new Event('retro-native-pause')));
++ host.onExport?.(result=>toast(result.state==='completed'?'Export saved. Verify the independent copy before deleting local recordings.':result.state==='cancelled'?'Export cancelled. Local recording retained.':'Export interrupted. Local recording retained; retry deliberately.'));
++}
++
+   /* Post-recording hand-off. Native QR transport is a separate adapter; capture and cloud ownership stay unchanged. */
+ let deliveryContext=null,deliveryTimer=null,deliveryEpoch=0,deliveryThanks='';
+ let sessionDeliveryScenario='not_connected';
+@@ -3101,6 +3122,7 @@
+   /* Controller integration: existing capture remains local-first; QR ownership is frozen per clip. */
+ let cloudClient=null,sessionCloud=null,cloudClaimBusy=false,cloudTimer=null;
+ async function authorizeNativeCloud(origin){
++ if(window.RetroDesktop?.authorizeCloud){await window.RetroDesktop.authorizeCloud(origin);return;}
+  if(!window.RetroCloudNative?.postMessage)return;
+  const id=C.randomId();await new Promise((resolve,reject)=>{
+   const timer=setTimeout(()=>reject(new Error('Native cloud approval timed out.')),60000);
+@@ -3144,7 +3166,7 @@
+ 
+   /* Only bundled Android can connect SPP. The cloud server never talks to nearby Bluetooth. */
+ let printerClient=null,printerActionBusy=false;
+-function printerText(){const s=printerClient?.status;if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.8 TEST APK for this pilot.';
++function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9 TEST APK for this pilot.';
+  return (s.connected?'CONNECTED (transport only)':'DISCONNECTED')+' / '+(s.pinned||'no pinned device')+' / automatic '+(s.automaticEnabled?'ON':'OFF')+' / fast return '+(s.fastReturnArmed?'OPERATOR RISK ACCEPTED':'OFF; screen QR retained')+' / no electronic paper confirmation'+(s.error?' / '+s.error:'');}
+ function renderPrinter(){if(!$('printerStatus'))return;$('printerStatus').textContent=printerText();const available=!!printerClient?.available;
+  for(const id of ['printerPermission','printerSettings','printerList','printerPin','printerConnect','printerTest','printerEnableAuto','printerDisableAuto','printerManual','printerReprint','printerObserve','printerFastOff','printerRefresh'])$(id).disabled=!available||printerActionBusy;
+@@ -3210,7 +3232,7 @@
+ }
+ 
+ 
+-  function exportDiagnostics(){textDownload({version:'0.8.0-alpha.1',createdAt:new Date().toISOString(),userAgent:navigator.userAgent,state,mode,renderer:renderer.mode,storageAvailable:store.available,cloud:cloudClient?.connection?'configured':'local_only',printer:'not_connected',logs:diagnosticsLog},'RetroBooth_diagnostics.json');}
++  function exportDiagnostics(){textDownload({version:'0.9.0-alpha.1',createdAt:new Date().toISOString(),userAgent:navigator.userAgent,state,mode,renderer:renderer.mode,storageAvailable:store.available,cloud:cloudClient?.connection?'configured':'local_only',printer:'not_connected',logs:diagnosticsLog},'RetroBooth_diagnostics.json');}
+ 
+   document.querySelectorAll('[data-view]').forEach(e=>e.addEventListener('click',()=>go(e.dataset.view)));
+   document.querySelectorAll('[data-close]').forEach(e=>e.addEventListener('click',()=>$(e.dataset.close).close()));
+@@ -3222,7 +3244,7 @@
+   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
+   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
+   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
+-  $('manifestBtn').onclick=()=>textDownload({version:'0.8.0-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
++  $('manifestBtn').onclick=()=>textDownload({version:'0.9.0-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+   $('settingsForm').onsubmit=async e=>{
+     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
+     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
+@@ -3269,10 +3291,10 @@
+       releaseWake();
+     }else if(mode==='real')wake();
+   });
+-  window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'Android app left foreground.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
++  window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'App left foreground or the device suspended.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
+   window.addEventListener('beforeunload',e=>{if(busy()||pending){e.preventDefault();e.returnValue='';}});
+   window.addEventListener('rendererfailure',e=>{if(state==='recording')stopRecording(true,e.detail);else showError(e.detail);});
+-  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();await setupCloud();
++  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();setupDesktop();await setupCloud();
+   if(navigator.locks&&surfaceRole==='booth'){
+     await new Promise(resolve=>{
+       navigator.locks.request('luce-retrobooth-capture',{ifAvailable:true},lock=>{
+--- v0.8/cloud/public_html/booth/index.html
++++ v0.9/cloud/public_html/booth/index.html
+@@ -4,7 +4,7 @@
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#141c16"><meta name="robots" content="noindex,nofollow">
+ <meta name="referrer" content="no-referrer">
+-<title>Retrovision | Luce Studio | Landscape Prototype v0.8</title>
++<title>Retrovision | Luce Studio | Landscape Prototype v0.9</title>
+ <style>:root{--paper:#f4f1e8;--ink:#30382c;--muted:#73786b;--line:#d9d8cb;--green:#536247;--cream:#ece2c7;--amber:#a07d41;--red:#a34534;--white:#fffdf6;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang HK','Microsoft JhengHei',sans-serif;--serif:Georgia,'Times New Roman',serif}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.6 var(--sans)}button,a,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}button,a,input,select{touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #9d7a45;outline-offset:4px}button{color:inherit}a{color:inherit}h1,h2,p{margin:0}h1{font:52px/1.08 var(--serif);font-weight:400;letter-spacing:-1.9px}h1 em{font-weight:400;color:var(--green)}h2{font:30px/1.15 var(--serif);font-weight:400;letter-spacing:-.7px}p{line-height:1.75}.site-header{max-width:1440px;margin:auto;padding:22px 48px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{text-decoration:none;font:italic 38px/.95 var(--serif);letter-spacing:-2px}.brand span{display:block;font:8px/1.5 var(--mono);letter-spacing:1.1px;margin-top:6px}.site-header nav{display:flex;gap:8px}.nav{border:0;background:transparent;padding:12px 16px;font-size:13px}.nav.active{background:#e4e6d9;border-radius:3px}#countBadge{font:10px var(--mono);background:#d3d8c6;border-radius:50%;padding:2px 5px;margin-left:6px}.build-tag{text-align:right;font:9px/1.8 var(--mono);letter-spacing:.8px}.build-tag span{display:block;color:var(--muted)}.notice{display:flex;align-items:center;justify-content:center;gap:8px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#eeebdf;padding:9px 20px;font:11px/1.5 var(--mono)}.notice button{border:0;border-bottom:1px solid currentColor;padding:0;margin-left:14px;background:none;font:inherit}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;flex:none}.amber{background:#ae833a}.green{background:#667c50}.small{font-size:12px}.muted{color:var(--muted)}.mono{font-family:var(--mono)}.separator{margin:0 10px;color:#a9ad9c}main{max-width:1370px;margin:auto;padding:0 48px}.section-intro{display:flex;align-items:flex-end;justify-content:space-between;padding:36px 0 28px;gap:40px}.eyebrow{font:10px/1.6 var(--mono);letter-spacing:1.6px;margin-bottom:12px;color:var(--green)}.intro-aside{max-width:322px;padding-bottom:3px}.intro-aside p{margin-bottom:17px;font-size:14px;letter-spacing:.4px}.booth-layout{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:44px;align-items:start}.television{background:repeating-linear-gradient(2deg,transparent 0 4px,#ffffff04 5px 7px),linear-gradient(110deg,#7a6551,#a0886b 45%,#80674f);border:2px solid #665541;border-radius:17px 17px 11px 11px;padding:22px 20px 0;display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:17px;box-shadow:inset 0 2px 0 #c6b59d,0 16px 24px #44362218}.tv-bezel{padding:12px;background:#333930;border:1px solid #252b24;border-radius:42px;box-shadow:inset 0 2px 6px #0008,0 1px 0 #b4a18b}.tv-screen{isolation:isolate;position:relative;aspect-ratio:4/3;overflow:hidden;border-radius:34px;background:#223025;color:#f5ebc9;box-shadow:inset 0 0 25px #000}#cameraCanvas{display:block;width:100%;height:100%;object-fit:contain;transform-origin:center}#cameraCanvas.mirrored{transform:scaleX(-1)}.screen-top,.screen-bottom{position:absolute;z-index:4;left:6%;right:6%;display:flex;justify-content:space-between;gap:6px;align-items:center;font:clamp(8px,.85vw,11px)/1.3 var(--mono);text-shadow:0 1px 2px #000}.screen-top{top:6%;letter-spacing:1px}.screen-top button{background:none;border:0;color:inherit;font:inherit;padding:4px 0;user-select:none;-webkit-user-select:none}.screen-top #screenEvent{max-width:55%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.screen-bottom{bottom:5%;font-size:8px;letter-spacing:.6px}.screen-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 38px #071a1c77;border-radius:inherit;z-index:4}.idle-overlay{position:absolute;bottom:12%;left:0;right:0;text-align:center;z-index:3}.screen-prompt{font-weight:600;font-size:clamp(13px,1.6vw,21px);letter-spacing:2px;text-shadow:0 2px 4px #000;padding:8px;background:#1e2c236e}.idle-overlay p{font-size:10px;margin-top:7px;color:#eee5cd}.state-overlay{position:absolute;inset:0;z-index:5;background:#18271dcc;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}.state-kicker{font:11px var(--mono);letter-spacing:2px;margin-bottom:18px}.state-title{font:clamp(30px,4vw,64px)/1.2 var(--serif)}.state-title.countdown{font:120px var(--mono)}.state-overlay p{font-size:13px;max-width:90%;margin-top:20px}.record-overlay{position:absolute;inset:0;background:#12201680;z-index:5}.rec-bar{display:flex;justify-content:space-between;padding:13% 7% 0;font:14px var(--mono)}.rec-bar i{background:#f1866a;display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;animation:recblink 1s infinite}.wave-block{position:absolute;top:43%;left:10%;width:80%;text-align:center}.wave-block canvas{width:100%;height:70px}.wave-block p{font-size:13px;margin-top:8px;letter-spacing:2px}.wave-block small{display:block;font-size:10px;margin-top:4px;color:#e8c79b}.record-progress{position:absolute;bottom:12%;left:8%;width:84%;height:3px;background:#ffffff22}.record-progress div{height:3px;background:#d9dfac;width:0}.tv-hardware{display:flex;align-items:center;flex-direction:column;padding:10px 0;min-width:0}.tv-hw-label{color:#eadcc3;font:italic 22px/.9 var(--serif);text-align:center}.tv-hw-label small{font:8px var(--mono);letter-spacing:2px}.dial{width:57px;height:57px;border-radius:50%;background:repeating-conic-gradient(#4c4c40 0 4deg,#33352e 5deg 10deg);border:3px solid #aaa28a;box-shadow:2px 4px 6px #0005;display:grid;place-items:center;margin-top:26px;margin-bottom:6px}.dial i{width:7px;height:37px;background:linear-gradient(90deg,#b3b2a0,#dddac4,#858777);transform:rotate(29deg);border-radius:3px}.small-dial{width:42px;height:42px;margin-top:15px;margin-bottom:14px}.small-dial i{height:25px;width:5px;transform:rotate(-50deg)}.tv-hardware>small{font:7px var(--mono);letter-spacing:1px;color:#eadcc3}.speaker{background:repeating-linear-gradient(#33372c 0 2px,#796f5a 3px 6px);width:65px;flex:1;min-height:42px;margin:7px 0 19px;border-radius:5px;border:1px solid #655b4b}.power-dot{height:6px;width:6px;border-radius:50%;background:#d1c986;box-shadow:0 0 6px #ebdd9c;margin-bottom:7px}.tv-bottom{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;margin-top:-4px;color:#ece2cb;font:8px var(--mono);letter-spacing:1px}.tv-bottom span:first-child{font-weight:bold;letter-spacing:3px}.tv-feet{display:flex;justify-content:space-between;padding:0 13%;height:12px}.tv-feet i{width:45px;background:#4b4a3c;clip-path:polygon(0 0,100% 0,85% 100%,15% 100%)}.guest-actions{display:flex;gap:10px;justify-content:center;margin-top:23px}.btn{min-height:46px;border:1px solid transparent;padding:12px 20px;border-radius:4px;display:inline-flex;gap:10px;align-items:center;justify-content:center;font-weight:500;font-size:13px;line-height:1.4}.btn svg{width:18px;height:18px;flex:none}.primary{background:var(--green);color:#fff9e8}.primary:hover{background:#46563b}.secondary{background:transparent;border-color:#b9beaa}.secondary:hover{background:#e7e8dd}.stop{background:#a44a36;color:#fff}.control-strip{display:flex;gap:15px;align-items:center;justify-content:center;margin:17px 0 10px;font-size:10px}.control-strip button{border:0;background:none;padding:5px 0;border-bottom:1px solid #b0b6a1;font-size:11px}.control-strip span{font:9px var(--mono);color:var(--muted)}.privacy-line{text-align:center;color:var(--muted);font-size:10px}.workflow{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);margin-top:22px;padding:17px 0;gap:10px}.workflow>div{display:flex;gap:10px;align-items:center;opacity:.45}.workflow>div.active{opacity:1}.workflow b{font:11px var(--mono);border:1px solid #afb69f;padding:4px 6px;border-radius:50%}.workflow .active b{background:#dae1c9}.workflow span{font-size:11px}.receipt-column{padding-top:4px}.panel-heading{display:flex;justify-content:space-between;align-items:center}.panel-heading .eyebrow{font-size:8px;letter-spacing:1.4px}.paper-badge{width:45px;height:45px;border:1px solid #b6baab;border-radius:50%;font:17px/1 var(--serif);display:flex;align-items:center;justify-content:center;flex-direction:column;transform:rotate(12deg)}.paper-badge small{font:8px var(--mono)}.printer-slot{height:12px;background:#606653;border-radius:6px;margin:23px 8px 0;box-shadow:inset 0 3px 5px #0004}.receipt-paper{position:relative;background:#fff;margin:-5px 17px 0;padding:11px 8px 16px;box-shadow:0 8px 19px #29251a13;transform:rotate(-1deg)}.receipt-paper:after{content:'';position:absolute;height:6px;left:0;right:0;bottom:-5px;background:linear-gradient(135deg,#fff 25%,transparent 25%) -3px 0,linear-gradient(225deg,#fff 25%,transparent 25%) -3px 0;background-size:8px 8px}.receipt-paper canvas{display:block;width:100%;height:auto;image-rendering:pixelated}.receipt-caption{display:flex;gap:8px;align-items:center;margin-top:24px;font:10px/1.5 var(--mono)}.receipt-column>.small{font-size:10px;margin-top:9px}.text-button{background:none;border:0;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 0;font-size:12px;width:100%;text-align:left}.under-row{border-top:1px solid var(--line);padding:16px 0;display:flex;gap:20px;justify-content:space-between;font:8px/1.6 var(--mono);letter-spacing:.6px;color:var(--muted)}footer{max-width:1370px;padding:24px 48px 28px;margin:auto;display:flex;justify-content:space-between;gap:20px;font:9px/1.6 var(--mono);letter-spacing:1px;color:var(--muted)}.footer-dot{margin:0 12px}footer button{border:0;background:var(--paper);text-decoration:underline;padding:7px}.page-heading{display:flex;justify-content:space-between;gap:25px;align-items:center;padding:40px 0 30px}.page-heading p{font-size:13px;margin-top:16px;color:var(--muted)}.stats-row{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:6px;margin-bottom:28px;padding:22px 0}.stats-row>div{padding:0 24px;border-right:1px solid var(--line)}.stats-row>div:last-child{border:0}.stats-row span{font:32px var(--serif)}.stats-row p{font-size:11px;color:var(--muted);margin-top:6px}.library-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.clip-card{border:1px solid var(--line);background:var(--white);padding:12px;border-radius:6px;min-width:0}.clip-card img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;display:block}.clip-card .card-info{padding:13px 4px}.clip-card h3{font:22px var(--serif);margin:8px 0}.clip-card p{font-size:11px;color:var(--muted);word-break:break-word}.clip-card .button-row{margin-top:12px}.clip-card .btn{min-height:38px;padding:9px 13px;font-size:11px}.pill{font:9px var(--mono);padding:5px 7px;border:1px solid #d1ccb9;border-radius:3px;display:inline-block;background:#eee9d9}.green-pill{background:#e4ead8;border-color:#c3ccb4}.empty-state{text-align:center;padding:80px 20px}.empty-state>svg{width:46px;height:46px;color:var(--green);fill:currentColor;margin-bottom:20px}.empty-state p{margin:20px 0;color:var(--muted)}.admin-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:24px}.admin-card{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:28px;min-width:0}.admin-card h2{margin-bottom:22px}.card-number{font:9px var(--mono);letter-spacing:1px;color:var(--muted);margin-bottom:16px}.admin-card label{display:block;font-size:12px;margin-bottom:17px}.admin-card input:not([type=checkbox]):not([type=range]),.admin-card select{display:block;width:100%;min-width:0;background:#f8f7f0;border:1px solid #d1d4c4;border-radius:4px;padding:11px 12px;margin-top:7px;font-size:13px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}.admin-card input[type=range]{width:100%;margin-top:12px;accent-color:var(--green)}.admin-card output{float:right;font:11px var(--mono)}.admin-card .check{display:flex;align-items:center;gap:10px;font-size:12px}.check input{accent-color:var(--green);width:16px;height:16px;flex:none}.admin-card .small{margin-top:13px}.admin-stack{display:grid;gap:24px}.diagnostics{margin-bottom:20px}.diag-row{display:flex;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding:9px 0;font-size:11px}.diag-row span:last-child{text-align:right;font-family:var(--mono);font-size:10px;max-width:60%;overflow-wrap:anywhere}.button-row{display:flex;flex-wrap:wrap;gap:10px}.button-row .btn{flex:1}.scenario{background:#ecefe3}.scenario .check:first-of-type{margin-top:20px}pre{white-space:pre-wrap;word-break:break-word;font:10px/1.8 var(--mono);margin-top:16px}.wide{grid-column:1/-1}.gates{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}.gates p{font-size:12px;color:var(--muted);margin:10px 0 17px}.gates strong{font-size:13px}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);max-width:min(90%,650px);padding:15px 22px;background:#303a29;color:#fffbed;box-shadow:0 6px 22px #0003;border-radius:6px;z-index:100;font-size:13px;line-height:1.5}dialog{border:1px solid var(--line);background:var(--paper);padding:36px;max-width:560px;width:calc(100% - 32px);max-height:90vh;overflow:auto;color:var(--ink);border-radius:9px;box-shadow:0 30px 90px #0004}dialog::backdrop{background:#1c261ba8;backdrop-filter:blur(4px)}dialog h2{font-size:36px;margin-bottom:24px}dialog p{font-size:13px;margin-bottom:20px}dialog video,dialog img{width:100%;max-height:50vh;background:#20271e;border-radius:4px;margin-bottom:18px}.dialog-close{position:absolute;top:12px;right:16px;background:none;border:0;font-size:26px;min-width:35px;min-height:35px}.view[hidden],[hidden]{display:none!important}.view.active{animation:appear .25s ease-out}.kiosk .site-header,.kiosk .notice,.kiosk .section-intro,.kiosk .receipt-column,.kiosk .under-row,.kiosk .workflow,.kiosk .control-strip,.kiosk .privacy-line,.kiosk footer>span{display:none}.kiosk main{padding:20px;max-width:1100px}.kiosk .booth-layout{display:block}.kiosk .television{max-width:980px;margin:auto}.kiosk footer{padding:0;justify-content:center}.kiosk .guest-actions{margin-top:20px}.kiosk #exitKiosk{display:block}.kiosk .tv-screen{max-height:70vh}.kiosk .tv-bezel{display:flex;justify-content:center}.kiosk .tv-screen{width:100%;aspect-ratio:4/3}.kiosk #screenEvent{display:none}@keyframes recblink{50%{opacity:.35}}@keyframes appear{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}@media(min-width:1500px){.screen-prompt{font-size:22px}.screen-top{font-size:12px}}@media(max-width:1100px){.site-header{padding:20px 28px}.build-tag{display:none}main{padding:0 28px}.booth-layout{grid-template-columns:minmax(0,1fr) 222px;gap:28px}.television{padding:15px 13px 0;grid-template-columns:minmax(0,1fr) 64px;gap:12px}.tv-bezel{padding:9px;border-radius:30px}.tv-screen{border-radius:23px}.tv-hardware{padding-top:7px}.dial{width:44px;height:44px;margin-top:19px}.dial i{height:28px}.small-dial{width:33px;height:33px}.small-dial i{height:20px}.speaker{width:47px;min-height:30px;margin-bottom:10px}.tv-hw-label{font-size:19px}.tv-hw-label small{font-size:6px}.screen-bottom{font-size:6px}.control-strip{flex-wrap:wrap;gap:12px}.intro-aside{max-width:260px}.gates{grid-template-columns:repeat(2,1fr)}.admin-card{padding:22px}footer{padding:24px 28px}h1{font-size:46px}.panel-heading h2{font-size:27px}}@media(max-width:760px){.site-header{padding:18px 20px;gap:16px;flex-wrap:wrap}.brand{font-size:34px}.brand span{font-size:7px}.site-header nav{gap:0;flex:1;justify-content:flex-end}.nav{padding:10px;font-size:11px}.notice{font-size:9px;align-items:flex-start;text-align:left;padding:10px 20px}.notice .dot{margin-top:4px}.notice button{margin-left:auto;white-space:nowrap}main{padding:0 20px}.section-intro{padding-top:28px;gap:20px}.intro-aside{max-width:190px}.intro-aside p{font-size:11px;line-height:1.7}.intro-aside .small{font-size:9px}h1{font-size:38px}.eyebrow{font-size:8px;letter-spacing:1px}.booth-layout{grid-template-columns:1fr;gap:20px}.television{grid-template-columns:minmax(0,1fr) 65px;padding:16px 13px 0}.tv-screen{border-radius:27px}.screen-prompt{font-size:18px}.screen-top{font-size:9px}.screen-bottom{font-size:7px}.receipt-column{max-width:340px;width:100%;margin:0 auto 25px;border-top:1px solid var(--line);padding-top:24px}.receipt-paper{max-width:250px;margin-left:auto;margin-right:auto}.printer-slot{max-width:270px;margin-left:auto;margin-right:auto}.receipt-column>.small{font-size:11px}.under-row{font-size:8px;flex-direction:column;gap:8px}.page-heading{padding:30px 0 25px;align-items:flex-start;flex-direction:column}.admin-grid{grid-template-columns:1fr}.wide{grid-column:auto}.library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-row{padding:18px 0;gap:20px 0;grid-template-columns:repeat(2,1fr)}.stats-row>div:nth-child(2){border:0}.stats-row span{font-size:27px}footer{padding:18px 20px;flex-direction:column;gap:7px}.state-title{font-size:32px}.state-title.countdown{font-size:85px}}@media(max-width:480px){.site-header nav{flex-basis:100%;justify-content:space-between;margin:0 -7px}.section-intro{display:block}.intro-aside{max-width:none;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px}.intro-aside p{margin:0;max-width:200px}.intro-aside .small{white-space:nowrap;font-size:8px}.separator{margin:0 4px}.television{padding:12px 9px 0;grid-template-columns:minmax(0,1fr) 38px;gap:8px;border-radius:12px}.tv-bezel{padding:6px;border-radius:22px}.tv-screen{border-radius:17px}.tv-hw-label{font-size:13px}.tv-hw-label small{font-size:5px;letter-spacing:.2px}.dial{width:29px;height:29px;border-width:2px;margin-top:13px}.dial i{height:17px;width:4px}.small-dial{width:24px;height:24px;margin-top:9px;margin-bottom:8px}.small-dial i{height:13px}.tv-hardware>small{font-size:5px;letter-spacing:0}.speaker{width:26px;min-height:22px;margin:3px 0 9px}.tv-bottom{font-size:5px;margin:0;padding:0 2px 10px;gap:8px}.tv-bottom span:first-child{letter-spacing:1.5px}.screen-top{font-size:7px}.screen-bottom{font-size:5px;letter-spacing:0}.screen-prompt{font-size:13px;letter-spacing:1px;padding:5px}.idle-overlay p{font-size:8px;margin-top:4px}.guest-actions{gap:8px;margin-top:18px}.guest-actions .btn{font-size:12px;padding:10px 14px}.control-strip{gap:12px}.control-strip span{flex-basis:100%;text-align:center}.workflow{gap:6px;margin-top:18px;padding-bottom:5px}.workflow>div{gap:6px}.workflow span{font-size:10px}.workflow b{font-size:9px;padding:3px 5px}.rec-bar{font-size:10px;padding-top:16%}.wave-block{top:39%}.wave-block canvas{height:42px}.wave-block p{font-size:10px;letter-spacing:1px}.wave-block small{font-size:8px}.state-overlay{padding:17px}.state-kicker{font-size:8px;margin-bottom:10px}.state-title{font-size:25px}.state-title.countdown{font-size:60px}.state-overlay p{font-size:10px;margin-top:12px}.form-row{grid-template-columns:1fr;gap:0}.library-grid{grid-template-columns:1fr}.admin-card{padding:22px 18px}.gates{gap:24px 18px}.gates strong{font-size:12px}.gates p{font-size:11px}dialog{padding:28px 22px}dialog h2{font-size:30px}.button-row .btn{font-size:11px;padding:11px 13px}.kiosk main{padding:12px}.kiosk .screen-prompt{font-size:13px}}@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+ 
+ .admin-grid{align-items:start}.kiosk .television{max-width:min(980px,calc((100dvh - 200px)*1.3333 + 150px))}.kiosk .tv-screen{max-height:none}
+@@ -242,7 +242,7 @@
+ </head>
+ <body class="kiosk" data-capture-state="idle" data-screen-style="heritage">
+ <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="phoneIcon" viewBox="0 0 24 24"><path d="M5 3 2 6c0 7 9 16 16 16l3-3-5-5-3 2c-3-1-5-3-6-6l2-3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol><symbol id="tapeIcon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="8" width="14" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="11" r="1.4"/><circle cx="16" cy="11" r="1.4"/><path d="m6 20 2-4h8l2 4" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol></svg>
+-<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.8.0 / NOT EVENT-READY</span></div></header>
++<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.9.0 / NOT EVENT-READY</span></div></header>
+ <div class="notice"><span class="dot amber"></span><span id="globalNotice">Demo mode. Camera is off. Printing and cloud are not connected.</span><button id="aboutBtn">What works?</button></div>
+ <main>
+ <section id="view-booth" class="view active">
+@@ -276,7 +276,7 @@
+   <div class="panel-hint" id="panelHint">撓一次就得</div>
+   <div class="panel-lamps" aria-hidden="true"><span data-lamp="idle"><i></i>READY</span><span data-lamp="recording"><i></i>REC</span><span data-lamp="saving"><i></i>SAVE</span></div>
+   <div class="speaker" aria-hidden="true"></div>
+-  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.8. Tap five times for staff settings">v0.8 / PREVIEW</button></div>
++  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.9. Tap five times for staff settings">v0.9 / PREVIEW</button></div>
+ </aside></div>
+ <div class="control-strip"><button id="cameraBtn">Enable camera + microphone</button><button id="kioskBtn">Kiosk preview</button><span id="inputHint">Keyboard: [ lift / ] replace</span></div>
+ <p class="privacy-line" data-i18n="privacy"></p>
+@@ -369,6 +369,15 @@
+  <p id="printerNotice" class="small" role="status"></p>
+ </section>
+ 
++<section id="desktopCard" class="admin-card wide" hidden>
++  <div class="card-number">09 / WINDOWS DESKTOP</div>
++  <h2>One app. Your own device.</h2>
++  <p id="desktopInfo" class="small mono" role="status">Checking packaged desktop host...</p>
++  <p class="small muted">Installed and portable Windows builds use the same local profile for this Windows account. Moving the EXE does not move recordings. This version has no Windows Bluetooth or USB printer driver; timed screen QR remains available.</p>
++  <div class="button-row"><button id="desktopFullscreen" type="button" class="btn secondary">Toggle full screen (F11)</button><button id="desktopStorage" type="button" class="btn secondary">Show storage location</button></div>
++  <p class="small muted">Windows cloud allowlist: add exactly <code>retrobooth://app</code> to your existing private server configuration. Do not replace keys or erase server data. Export recordings from Tape library before replacing or resetting a device.</p>
++</section>
++
+ <div class="admin-card wide designer"><div><div class="card-number">04 / RECEIPT DESIGN</div><h2>Your paper keepsake.</h2><p class="small muted">These fields are saved with the Event & Capture settings. Every captured message keeps its own receipt design snapshot.</p><label>Template<select id="receiptStyle" form="settingsForm"><option value="classic">Classic memory receipt</option><option value="ticket">Cinema ticket</option><option value="minimal">Minimal</option></select></label><label>Caption<input id="receiptCaption" form="settingsForm" maxlength="80"></label><label>Footer<input id="receiptFooter" form="settingsForm" maxlength="100"></label><label>Logo (PNG/JPEG, up to 2 MB)<input type="file" id="logoFile" accept="image/png,image/jpeg"></label><div class="button-row"><button id="removeLogo" type="button" class="btn secondary">Remove logo</button><button type="submit" form="settingsForm" class="btn primary">Save design + settings</button></div><p class="small muted">Print width: 384 dots, not yet hardware-verified. Layout preview only; no printer connection.</p></div><div class="design-preview"><canvas id="designCanvas" width="384" height="900"></canvas><small id="designDimensions"></small></div></div>
+ <div class="admin-card wide"><div class="card-number">05 / LIVE SHOW POLICY</div><h2>Keep control of the big screen.</h2><label class="check"><input type="checkbox" id="showEnabled" form="settingsForm"> Enable same-browser live show preview</label><label>Minimum hold before show<select id="showDelay" form="settingsForm"><option value="0">No added hold (testing)</option><option value="30">30 seconds</option><option value="60">60 seconds</option><option value="120">120 seconds</option></select></label><p>Every clip starts PRIVATE. It needs guest permission AND staff approval before entering this preview. Hiding is reversible. Deletion is not.</p><div class="button-row"><button class="btn secondary" data-view="library">Review tapes</button><button class="btn secondary" data-view="show">Open live show preview</button><button type="submit" form="settingsForm" class="btn primary">Save policy</button></div><p class="small muted">Local proof of interaction only. No remote projector feed, backend moderation or online guest URL is connected.</p></div>
+ <div class="admin-card wide"><div class="card-number">06 / READINESS GATES</div><div class="gates"><div><strong>Browser prototype</strong><p>Interaction, shader, recording, local library, receipt artwork.</p><span class="pill green-pill">IMPLEMENTED</span></div><div><strong>Target Android screen</strong><p>Audio routing, 60-second sync, interruptions, 3-hour soak.</p><span class="pill">NOT TESTED</span></div><div><strong>Handset + ticket printer</strong><p>Secure SPP QR-only source; paper and hardware not verified.</p><span class="pill">NOT CONNECTED</span></div><div><strong>Cloud + native shell</strong><p>Resumable uploads, private delivery, native files and signing.</p><span class="pill">NOT IMPLEMENTED</span></div></div></div></div></section>
+@@ -397,7 +406,7 @@
+ </section>
+ 
+ </main>
+-<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.8.0-alpha.1 · 19 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
++<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.0-alpha.1 · 19 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
+ 
+ <div id="toast" class="toast" role="status" hidden></div>
+ <dialog id="aboutDialog"><button class="dialog-close" data-close="aboutDialog" aria-label="Close">×</button><div class="eyebrow">PROTOTYPE BOUNDARY</div><h2>Real interactions.<br>Honest boundaries.</h2><p><b>Working:</b> demo flow, optional camera and microphone, retro canvas recording, browser-local saved clips, playback/export, pixel receipt composition, settings and failure scenarios.</p><p><b>Not connected:</b> Physical printer, physical handset, native crash-recoverable storage and remote projector. Local Control room is not authenticated; the separate Cloud Admin requires its secret key.</p><p>Demo sessions contain no guest video. Real recordings stay local unless Cloud Delivery is explicitly connected. Existing recordings are not silently enrolled. No analytics or external fonts are used.</p><p>For Android screen testing, serve the static package over HTTPS. Opening an HTML attachment inside a chat or Files preview may not execute the app.</p><button class="btn primary" data-close="aboutDialog">Explore the prototype</button></dialog>
+@@ -1898,7 +1907,7 @@
+  async function hash(text){if(!root.crypto?.subtle)throw new Error('Secure hashing is required for the printer bridge.');const b=new TextEncoder().encode(text),d=await root.crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(d),x=>x.toString(16).padStart(2,'0')).join('');}
+  class Client{
+   constructor(bridge=root.RetroPrinterNative){this.bridge=bridge;this.pending=new Map();this.available=!!bridge?.postMessage;this.status={available:this.available,connected:false,automaticEnabled:false,fastReturnArmed:false,paperStatus:'unavailable'};if(this.available)bridge.onmessage=e=>{try{const m=JSON.parse(e.data),p=this.pending.get(m.id);if(!p||m.version!==1)return;this.pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(new Error(m.error)):p.resolve(m.data);}catch{}};}
+-  call(op,values={},timeout=20000){if(!this.available)return Promise.reject(new Error('Bluetooth QR printing requires the v0.8 Android APK, not Chrome or the Hostinger web page.'));
++  call(op,values={},timeout=20000){if(!this.available)return Promise.reject(new Error('Bluetooth QR printing requires the v0.9 Android APK, not Chrome or the Hostinger web page.'));
+    const id=root.RetroCore.randomId();return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{this.pending.delete(id);if(op==='print'||op==='test')try{this.bridge.postMessage(JSON.stringify({id:root.RetroCore.randomId(),op:'cancel',requestId:id}));}catch{}reject(new Error('Native request timed out. Outcome may be unknown; do not automatically reprint.'));},timeout);this.pending.set(id,{resolve,reject,timer});try{this.bridge.postMessage(JSON.stringify({id,op,...values}));}catch{clearTimeout(timer);this.pending.delete(id);reject(new Error('Native printer channel unavailable.'));}});
+   }
+   pause(){for(const p of this.pending.values()){clearTimeout(p.timer);p.reject(new Error('Native app paused; print outcome may be unknown.'));}this.pending.clear();this.status.connected=false;this.status.automaticEnabled=false;this.status.fastReturnArmed=false;}
+@@ -1915,7 +1924,7 @@
+  }
+  root.RetroPrinter={PROFILE,guestTicket,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
+ })(typeof window==='undefined'?globalThis:window);
+-</script><script>/* RetroBooth v0.8.0-alpha.1. Pure, independently testable domain helpers. */
++</script><script>/* RetroBooth v0.9.0-alpha.1. Pure, independently testable domain helpers. */
+ (function (root) {
+   'use strict';
+   const E=root.RetroEffects || require('./effects.js');
+@@ -2982,6 +2991,18 @@
+  finally{window.RetroNative.onmessage=previous;nativeExportBusy=false;}
+ }
+ 
++/* Narrow desktop host integration; absent in browser and Android builds. */
++function setupDesktop(){
++ const host=window.RetroDesktop;if(!host||!$('desktopCard'))return;
++ $('desktopCard').hidden=false;
++ host.info().then(info=>{$('desktopInfo').textContent='Windows '+info.arch+' / app '+info.version+' / local origin '+info.origin+' / '+(info.cloudOrigin||'cloud not approved');}).catch(()=>{$('desktopInfo').textContent='Desktop host information unavailable.';});
++ const operation=async task=>{if(state!=='idle'||settingsSaving||cameraBusy){toast('Finish the current session first.');return;}try{await task();}catch(e){toast(e.message);}};
++ $('desktopFullscreen').onclick=()=>operation(()=>host.fullscreen());
++ $('desktopStorage').onclick=()=>operation(()=>host.storageLocation());
++ host.onSuspend?.(()=>window.dispatchEvent(new Event('retro-native-pause')));
++ host.onExport?.(result=>toast(result.state==='completed'?'Export saved. Verify the independent copy before deleting local recordings.':result.state==='cancelled'?'Export cancelled. Local recording retained.':'Export interrupted. Local recording retained; retry deliberately.'));
++}
++
+   /* Post-recording hand-off. Native QR transport is a separate adapter; capture and cloud ownership stay unchanged. */
+ let deliveryContext=null,deliveryTimer=null,deliveryEpoch=0,deliveryThanks='';
+ let sessionDeliveryScenario='not_connected';
+@@ -3101,6 +3122,7 @@
+   /* Controller integration: existing capture remains local-first; QR ownership is frozen per clip. */
+ let cloudClient=null,sessionCloud=null,cloudClaimBusy=false,cloudTimer=null;
+ async function authorizeNativeCloud(origin){
++ if(window.RetroDesktop?.authorizeCloud){await window.RetroDesktop.authorizeCloud(origin);return;}
+  if(!window.RetroCloudNative?.postMessage)return;
+  const id=C.randomId();await new Promise((resolve,reject)=>{
+   const timer=setTimeout(()=>reject(new Error('Native cloud approval timed out.')),60000);
+@@ -3144,7 +3166,7 @@
+ 
+   /* Only bundled Android can connect SPP. The cloud server never talks to nearby Bluetooth. */
+ let printerClient=null,printerActionBusy=false;
+-function printerText(){const s=printerClient?.status;if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.8 TEST APK for this pilot.';
++function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9 TEST APK for this pilot.';
+  return (s.connected?'CONNECTED (transport only)':'DISCONNECTED')+' / '+(s.pinned||'no pinned device')+' / automatic '+(s.automaticEnabled?'ON':'OFF')+' / fast return '+(s.fastReturnArmed?'OPERATOR RISK ACCEPTED':'OFF; screen QR retained')+' / no electronic paper confirmation'+(s.error?' / '+s.error:'');}
+ function renderPrinter(){if(!$('printerStatus'))return;$('printerStatus').textContent=printerText();const available=!!printerClient?.available;
+  for(const id of ['printerPermission','printerSettings','printerList','printerPin','printerConnect','printerTest','printerEnableAuto','printerDisableAuto','printerManual','printerReprint','printerObserve','printerFastOff','printerRefresh'])$(id).disabled=!available||printerActionBusy;
+@@ -3210,7 +3232,7 @@
+ }
+ 
+ 
+-  function exportDiagnostics(){textDownload({version:'0.8.0-alpha.1',createdAt:new Date().toISOString(),userAgent:navigator.userAgent,state,mode,renderer:renderer.mode,storageAvailable:store.available,cloud:cloudClient?.connection?'configured':'local_only',printer:'not_connected',logs:diagnosticsLog},'RetroBooth_diagnostics.json');}
++  function exportDiagnostics(){textDownload({version:'0.9.0-alpha.1',createdAt:new Date().toISOString(),userAgent:navigator.userAgent,state,mode,renderer:renderer.mode,storageAvailable:store.available,cloud:cloudClient?.connection?'configured':'local_only',printer:'not_connected',logs:diagnosticsLog},'RetroBooth_diagnostics.json');}
+ 
+   document.querySelectorAll('[data-view]').forEach(e=>e.addEventListener('click',()=>go(e.dataset.view)));
+   document.querySelectorAll('[data-close]').forEach(e=>e.addEventListener('click',()=>$(e.dataset.close).close()));
+@@ -3222,7 +3244,7 @@
+   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
+   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
+   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
+-  $('manifestBtn').onclick=()=>textDownload({version:'0.8.0-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
++  $('manifestBtn').onclick=()=>textDownload({version:'0.9.0-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+   $('settingsForm').onsubmit=async e=>{
+     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
+     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
+@@ -3269,10 +3291,10 @@
+       releaseWake();
+     }else if(mode==='real')wake();
+   });
+-  window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'Android app left foreground.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
++  window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'App left foreground or the device suspended.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
+   window.addEventListener('beforeunload',e=>{if(busy()||pending){e.preventDefault();e.returnValue='';}});
+   window.addEventListener('rendererfailure',e=>{if(state==='recording')stopRecording(true,e.detail);else showError(e.detail);});
+-  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();await setupCloud();
++  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();setupDesktop();await setupCloud();
+   if(navigator.locks&&surfaceRole==='booth'){
+     await new Promise(resolve=>{
+       navigator.locks.request('luce-retrobooth-capture',{ifAvailable:true},lock=>{
+--- v0.8/cloud/retrobooth_private/config.example.php
++++ v0.9/cloud/retrobooth_private/config.example.php
+@@ -6,6 +6,6 @@
+     'signingKey'=>'CHANGE_ME_A_DIFFERENT_RANDOM_SECRET_FOR_COOKIES',
+     'dataDir'=>__DIR__.'/data',
+     'quotaBytes'=>2147483648,
+-    'corsOrigins'=>['http://127.0.0.1:4173','https://appassets.androidplatform.net'],
++    'corsOrigins'=>['http://127.0.0.1:4173','https://appassets.androidplatform.net','retrobooth://app'],
+     'allowLoopbackHttp'=>false,
+ ];
+--- v0.8/src/app.js
++++ v0.9/src/app.js
+@@ -358,11 +358,12 @@
+   /*__APPEARANCE_JS__*/
+   /*__CAMERA_LAB_JS__*/
+   /*__NATIVE_EXPORT_JS__*/
++/*__DESKTOP_JS__*/
+   /*__DELIVERY_FLOW_JS__*/
+   /*__CLOUD_FLOW_JS__*/
+   /*__PRINTER_FLOW_JS__*/
+ 
+-  function exportDiagnostics(){textDownload({version:'0.8.0-alpha.1',createdAt:new Date().toISOString(),userAgent:navigator.userAgent,state,mode,renderer:renderer.mode,storageAvailable:store.available,cloud:cloudClient?.connection?'configured':'local_only',printer:'not_connected',logs:diagnosticsLog},'RetroBooth_diagnostics.json');}
++  function exportDiagnostics(){textDownload({version:'0.9.0-alpha.1',createdAt:new Date().toISOString(),userAgent:navigator.userAgent,state,mode,renderer:renderer.mode,storageAvailable:store.available,cloud:cloudClient?.connection?'configured':'local_only',printer:'not_connected',logs:diagnosticsLog},'RetroBooth_diagnostics.json');}
+ 
+   document.querySelectorAll('[data-view]').forEach(e=>e.addEventListener('click',()=>go(e.dataset.view)));
+   document.querySelectorAll('[data-close]').forEach(e=>e.addEventListener('click',()=>$(e.dataset.close).close()));
+@@ -374,7 +375,7 @@
+   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
+   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
+   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
+-  $('manifestBtn').onclick=()=>textDownload({version:'0.8.0-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
++  $('manifestBtn').onclick=()=>textDownload({version:'0.9.0-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+   $('settingsForm').onsubmit=async e=>{
+     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
+     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
+@@ -421,10 +422,10 @@
+       releaseWake();
+     }else if(mode==='real')wake();
+   });
+-  window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'Android app left foreground.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
++  window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'App left foreground or the device suspended.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
+   window.addEventListener('beforeunload',e=>{if(busy()||pending){e.preventDefault();e.returnValue='';}});
+   window.addEventListener('rendererfailure',e=>{if(state==='recording')stopRecording(true,e.detail);else showError(e.detail);});
+-  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();await setupCloud();
++  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();setupDesktop();await setupCloud();
+   if(navigator.locks&&surfaceRole==='booth'){
+     await new Promise(resolve=>{
+       navigator.locks.request('luce-retrobooth-capture',{ifAvailable:true},lock=>{
+--- v0.8/src/cloud-flow.js
++++ v0.9/src/cloud-flow.js
+@@ -1,6 +1,7 @@
+ /* Controller integration: existing capture remains local-first; QR ownership is frozen per clip. */
+ let cloudClient=null,sessionCloud=null,cloudClaimBusy=false,cloudTimer=null;
+ async function authorizeNativeCloud(origin){
++ if(window.RetroDesktop?.authorizeCloud){await window.RetroDesktop.authorizeCloud(origin);return;}
+  if(!window.RetroCloudNative?.postMessage)return;
+  const id=C.randomId();await new Promise((resolve,reject)=>{
+   const timer=setTimeout(()=>reject(new Error('Native cloud approval timed out.')),60000);
+--- v0.8/src/core.js
++++ v0.9/src/core.js
+@@ -1,4 +1,4 @@
+-/* RetroBooth v0.8.0-alpha.1. Pure, independently testable domain helpers. */
++/* RetroBooth v0.9.0-alpha.1. Pure, independently testable domain helpers. */
+ (function (root) {
+   'use strict';
+   const E=root.RetroEffects || require('./effects.js');
+--- v0.8/src/printer-client.js
++++ v0.9/src/printer-client.js
+@@ -15,7 +15,7 @@
+  async function hash(text){if(!root.crypto?.subtle)throw new Error('Secure hashing is required for the printer bridge.');const b=new TextEncoder().encode(text),d=await root.crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(d),x=>x.toString(16).padStart(2,'0')).join('');}
+  class Client{
+   constructor(bridge=root.RetroPrinterNative){this.bridge=bridge;this.pending=new Map();this.available=!!bridge?.postMessage;this.status={available:this.available,connected:false,automaticEnabled:false,fastReturnArmed:false,paperStatus:'unavailable'};if(this.available)bridge.onmessage=e=>{try{const m=JSON.parse(e.data),p=this.pending.get(m.id);if(!p||m.version!==1)return;this.pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(new Error(m.error)):p.resolve(m.data);}catch{}};}
+-  call(op,values={},timeout=20000){if(!this.available)return Promise.reject(new Error('Bluetooth QR printing requires the v0.8 Android APK, not Chrome or the Hostinger web page.'));
++  call(op,values={},timeout=20000){if(!this.available)return Promise.reject(new Error('Bluetooth QR printing requires the v0.9 Android APK, not Chrome or the Hostinger web page.'));
+    const id=root.RetroCore.randomId();return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{this.pending.delete(id);if(op==='print'||op==='test')try{this.bridge.postMessage(JSON.stringify({id:root.RetroCore.randomId(),op:'cancel',requestId:id}));}catch{}reject(new Error('Native request timed out. Outcome may be unknown; do not automatically reprint.'));},timeout);this.pending.set(id,{resolve,reject,timer});try{this.bridge.postMessage(JSON.stringify({id,op,...values}));}catch{clearTimeout(timer);this.pending.delete(id);reject(new Error('Native printer channel unavailable.'));}});
+   }
+   pause(){for(const p of this.pending.values()){clearTimeout(p.timer);p.reject(new Error('Native app paused; print outcome may be unknown.'));}this.pending.clear();this.status.connected=false;this.status.automaticEnabled=false;this.status.fastReturnArmed=false;}
+--- v0.8/src/printer-flow.js
++++ v0.9/src/printer-flow.js
+@@ -1,6 +1,6 @@
+ /* Only bundled Android can connect SPP. The cloud server never talks to nearby Bluetooth. */
+ let printerClient=null,printerActionBusy=false;
+-function printerText(){const s=printerClient?.status;if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.8 TEST APK for this pilot.';
++function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9 TEST APK for this pilot.';
+  return (s.connected?'CONNECTED (transport only)':'DISCONNECTED')+' / '+(s.pinned||'no pinned device')+' / automatic '+(s.automaticEnabled?'ON':'OFF')+' / fast return '+(s.fastReturnArmed?'OPERATOR RISK ACCEPTED':'OFF; screen QR retained')+' / no electronic paper confirmation'+(s.error?' / '+s.error:'');}
+ function renderPrinter(){if(!$('printerStatus'))return;$('printerStatus').textContent=printerText();const available=!!printerClient?.available;
+  for(const id of ['printerPermission','printerSettings','printerList','printerPin','printerConnect','printerTest','printerEnableAuto','printerDisableAuto','printerManual','printerReprint','printerObserve','printerFastOff','printerRefresh'])$(id).disabled=!available||printerActionBusy;
+--- v0.8/src/sw.js
++++ v0.9/src/sw.js
+@@ -1,6 +1,6 @@
+ /* Offline shell only, scoped cache. Never caches media or guest credentials. */
+ const PREFIX='luce-retrobooth-v05-'+encodeURIComponent(new URL(self.registration.scope).pathname)+'-';
+-const CACHE=PREFIX+'0.8.0-alpha.1';
++const CACHE=PREFIX+'0.9.0-alpha.1';
+ self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html']))));
+ self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(PREFIX)&&k!==CACHE).map(k=>caches.delete(k))))));
+ self.addEventListener('fetch',e=>{
+--- v0.8/src/template.html
++++ v0.9/src/template.html
+@@ -4,7 +4,7 @@
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#141c16"><meta name="robots" content="noindex,nofollow">
+ <meta name="referrer" content="no-referrer">
+-<title>Retrovision | Luce Studio | Landscape Prototype v0.8</title>
++<title>Retrovision | Luce Studio | Landscape Prototype v0.9</title>
+ <style>/*__CSS__*/
+ /*__LANDSCAPE_CSS__*/
+ /*__APPEARANCE_CSS__*/
+@@ -14,7 +14,7 @@
+ </head>
+ <body class="kiosk" data-capture-state="idle" data-screen-style="heritage">
+ <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="phoneIcon" viewBox="0 0 24 24"><path d="M5 3 2 6c0 7 9 16 16 16l3-3-5-5-3 2c-3-1-5-3-6-6l2-3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol><symbol id="tapeIcon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="8" width="14" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="11" r="1.4"/><circle cx="16" cy="11" r="1.4"/><path d="m6 20 2-4h8l2 4" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol></svg>
+-<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.8.0 / NOT EVENT-READY</span></div></header>
++<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.9.0 / NOT EVENT-READY</span></div></header>
+ <div class="notice"><span class="dot amber"></span><span id="globalNotice">Demo mode. Camera is off. Printing and cloud are not connected.</span><button id="aboutBtn">What works?</button></div>
+ <main>
+ <section id="view-booth" class="view active">
+@@ -38,7 +38,7 @@
+   <div class="panel-hint" id="panelHint">撓一次就得</div>
+   <div class="panel-lamps" aria-hidden="true"><span data-lamp="idle"><i></i>READY</span><span data-lamp="recording"><i></i>REC</span><span data-lamp="saving"><i></i>SAVE</span></div>
+   <div class="speaker" aria-hidden="true"></div>
+-  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.8. Tap five times for staff settings">v0.8 / PREVIEW</button></div>
++  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.9. Tap five times for staff settings">v0.9 / PREVIEW</button></div>
+ </aside></div>
+ <div class="control-strip"><button id="cameraBtn">Enable camera + microphone</button><button id="kioskBtn">Kiosk preview</button><span id="inputHint">Keyboard: [ lift / ] replace</span></div>
+ <p class="privacy-line" data-i18n="privacy"></p>
+@@ -80,12 +80,13 @@
+ /*__DELIVERY_ADMIN__*/
+ /*__CLOUD_ADMIN__*/
+ /*__PRINTER_ADMIN__*/
++/*__DESKTOP_ADMIN__*/
+ <div class="admin-card wide designer"><div><div class="card-number">04 / RECEIPT DESIGN</div><h2>Your paper keepsake.</h2><p class="small muted">These fields are saved with the Event & Capture settings. Every captured message keeps its own receipt design snapshot.</p><label>Template<select id="receiptStyle" form="settingsForm"><option value="classic">Classic memory receipt</option><option value="ticket">Cinema ticket</option><option value="minimal">Minimal</option></select></label><label>Caption<input id="receiptCaption" form="settingsForm" maxlength="80"></label><label>Footer<input id="receiptFooter" form="settingsForm" maxlength="100"></label><label>Logo (PNG/JPEG, up to 2 MB)<input type="file" id="logoFile" accept="image/png,image/jpeg"></label><div class="button-row"><button id="removeLogo" type="button" class="btn secondary">Remove logo</button><button type="submit" form="settingsForm" class="btn primary">Save design + settings</button></div><p class="small muted">Print width: 384 dots, not yet hardware-verified. Layout preview only; no printer connection.</p></div><div class="design-preview"><canvas id="designCanvas" width="384" height="900"></canvas><small id="designDimensions"></small></div></div>
+ <div class="admin-card wide"><div class="card-number">05 / LIVE SHOW POLICY</div><h2>Keep control of the big screen.</h2><label class="check"><input type="checkbox" id="showEnabled" form="settingsForm"> Enable same-browser live show preview</label><label>Minimum hold before show<select id="showDelay" form="settingsForm"><option value="0">No added hold (testing)</option><option value="30">30 seconds</option><option value="60">60 seconds</option><option value="120">120 seconds</option></select></label><p>Every clip starts PRIVATE. It needs guest permission AND staff approval before entering this preview. Hiding is reversible. Deletion is not.</p><div class="button-row"><button class="btn secondary" data-view="library">Review tapes</button><button class="btn secondary" data-view="show">Open live show preview</button><button type="submit" form="settingsForm" class="btn primary">Save policy</button></div><p class="small muted">Local proof of interaction only. No remote projector feed, backend moderation or online guest URL is connected.</p></div>
+ <div class="admin-card wide"><div class="card-number">06 / READINESS GATES</div><div class="gates"><div><strong>Browser prototype</strong><p>Interaction, shader, recording, local library, receipt artwork.</p><span class="pill green-pill">IMPLEMENTED</span></div><div><strong>Target Android screen</strong><p>Audio routing, 60-second sync, interruptions, 3-hour soak.</p><span class="pill">NOT TESTED</span></div><div><strong>Handset + ticket printer</strong><p>Secure SPP QR-only source; paper and hardware not verified.</p><span class="pill">NOT CONNECTED</span></div><div><strong>Cloud + native shell</strong><p>Resumable uploads, private delivery, native files and signing.</p><span class="pill">NOT IMPLEMENTED</span></div></div></div></div></section>
+ /*__NEW_VIEWS__*/
+ </main>
+-<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.8.0-alpha.1 · 19 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
++<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.0-alpha.1 · 19 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
+ 
+ <div id="toast" class="toast" role="status" hidden></div>
+ <dialog id="aboutDialog"><button class="dialog-close" data-close="aboutDialog" aria-label="Close">×</button><div class="eyebrow">PROTOTYPE BOUNDARY</div><h2>Real interactions.<br>Honest boundaries.</h2><p><b>Working:</b> demo flow, optional camera and microphone, retro canvas recording, browser-local saved clips, playback/export, pixel receipt composition, settings and failure scenarios.</p><p><b>Not connected:</b> Physical printer, physical handset, native crash-recoverable storage and remote projector. Local Control room is not authenticated; the separate Cloud Admin requires its secret key.</p><p>Demo sessions contain no guest video. Real recordings stay local unless Cloud Delivery is explicitly connected. Existing recordings are not silently enrolled. No analytics or external fonts are used.</p><p>For Android screen testing, serve the static package over HTTPS. Opening an HTML attachment inside a chat or Files preview may not execute the app.</p><button class="btn primary" data-close="aboutDialog">Explore the prototype</button></dialog>
+--- v0.8/tools/build.mjs
++++ v0.9/tools/build.mjs
+@@ -5,10 +5,10 @@
+ const mods=fs.readdirSync(path.join(root,'vendor/QRCode')).filter(x=>x.endsWith('.js')).sort().map(f=>JSON.stringify(path.basename(f,'.js'))+':function(module,exports,require){\n'+read('vendor/QRCode/'+f)+'\n}');
+ const qr='/* QRCode: Kazuhiko Arase / qrcode-terminal adaptation. See THIRD_PARTY_NOTICES. */\n(function(){const modules={'+mods.join(',\n')+'};const cache={};function req(id){id=id.replace("./","");if(cache[id])return cache[id].exports;const m={exports:{}};cache[id]=m;modules[id](m,m.exports,req);return m.exports;}window.RetroQR=req("index");})();';
+ let html=read('src/template.html');const replace=(token,value)=>{if(!html.includes(token))throw new Error('Missing marker '+token);html=html.replace(token,()=>value);};
+-for(const [tag,f] of [['NEW_VIEWS','experience-views.html'],['DELETE_DIALOG','delete-dialog.html'],['CSS','styles.css'],['LANDSCAPE_CSS','landscape.css'],['APPEARANCE_CSS','appearance.css'],['DELIVERY_CSS','delivery.css'],['DELIVERY_VIEW','delivery-view.html'],['DELIVERY_ADMIN','delivery-admin.html'],['CLOUD_ADMIN','cloud-admin.html'],['CLOUD_CSS','cloud.css'],['PRINTER_ADMIN','printer-admin.html'],['PRINTER_CSS','printer.css']])replace('/*__'+tag+'__*/',read('src/'+f));
++for(const [tag,f] of [['NEW_VIEWS','experience-views.html'],['DELETE_DIALOG','delete-dialog.html'],['CSS','styles.css'],['LANDSCAPE_CSS','landscape.css'],['APPEARANCE_CSS','appearance.css'],['DELIVERY_CSS','delivery.css'],['DELIVERY_VIEW','delivery-view.html'],['DELIVERY_ADMIN','delivery-admin.html'],['CLOUD_ADMIN','cloud-admin.html'],['CLOUD_CSS','cloud.css'],['PRINTER_ADMIN','printer-admin.html'],['PRINTER_CSS','printer.css'],['DESKTOP_ADMIN','desktop-admin.html']])replace('/*__'+tag+'__*/',read('src/'+f));
+ replace('/*__VENDOR__*/',qr);
+ for(const name of ['effects','delivery-policy','cloud-client','printer-client','core','store','renderer','receipt','app']){
+- let code=read('src/'+name+'.js');if(name==='app')for(const [tag,f] of [['EXPERIENCE','experience'],['LANDSCAPE_JS','landscape'],['APPEARANCE_JS','appearance'],['CAMERA_LAB_JS','camera-lab'],['NATIVE_EXPORT_JS','native-export'],['DELIVERY_FLOW_JS','delivery-flow'],['CLOUD_FLOW_JS','cloud-flow'],['PRINTER_FLOW_JS','printer-flow']])code=code.replace('/*__'+tag+'__*/',()=>read('src/'+f+'.js'));
++ let code=read('src/'+name+'.js');if(name==='app')for(const [tag,f] of [['EXPERIENCE','experience'],['LANDSCAPE_JS','landscape'],['APPEARANCE_JS','appearance'],['CAMERA_LAB_JS','camera-lab'],['NATIVE_EXPORT_JS','native-export'],['DESKTOP_JS','desktop'],['DELIVERY_FLOW_JS','delivery-flow'],['CLOUD_FLOW_JS','cloud-flow'],['PRINTER_FLOW_JS','printer-flow']])code=code.replace('/*__'+tag+'__*/',()=>read('src/'+f+'.js'));
+  replace('/*__'+name.toUpperCase()+'__*/',code);
+ }
+ const notice=['NOTICE.txt','MIT.txt','APACHE-2.0.txt'].map(x=>read('vendor/'+x)).join('\n\n');
+@@ -17,7 +17,7 @@
+ fs.writeFileSync(path.join(out,'index.html'),html.replace('<html lang="zh-HK">','<html lang="zh-HK" data-service-worker="true">'));
+ for(const f of ['sw.js','.htaccess'])fs.writeFileSync(path.join(out,f),read('src/'+f));
+ fs.writeFileSync(path.join(out,'THIRD_PARTY_NOTICES.txt'),notice);
+-const info={version:read('VERSION.txt').split('\n')[0],stage:'prototype - not event ready',commit:process.env.GITHUB_SHA||'local-uncommitted',run:process.env.GITHUB_RUN_ID||'local',standaloneSHA256:crypto.createHash('sha256').update(html).digest('hex'),cloud:'opt-in PHP private-delivery alpha',printer:'independent Android secure-SPP QR-only alpha; physical validation pending',android:'WebView test shell, native recording not implemented'};
++const info={version:read('VERSION.txt').split('\n')[0],stage:'prototype - not event ready',commit:process.env.GITHUB_SHA||'local-uncommitted',run:process.env.GITHUB_RUN_ID||'local',standaloneSHA256:crypto.createHash('sha256').update(html).digest('hex'),cloud:'opt-in PHP private-delivery alpha',printer:'independent Android secure-SPP QR-only alpha; physical validation pending',android:'WebView secure-SPP pilot; native recording not implemented',windows:'Electron desktop build candidate; no Windows printer adapter'};
+ fs.writeFileSync(path.join(out,'BUILD_INFO.json'),JSON.stringify(info,null,2)+'\n');
+ const assets=path.join(root,'android/app/src/main/assets/www');fs.mkdirSync(assets,{recursive:true});
+ fs.writeFileSync(path.join(assets,'index.html'),html); // no service worker in packaged shell
+--- v0.8/tools/generate-cloud-config.mjs
++++ v0.9/tools/generate-cloud-config.mjs
+@@ -4,6 +4,6 @@
+ const u=new URL(origin);if(u.protocol!=='https:'||u.pathname!=='/'||u.search||u.hash||u.username||u.password)throw new Error('Use a root HTTPS origin on a dedicated subdomain.');
+ if(fs.existsSync(output))throw new Error('Refusing to overwrite an existing private configuration.');
+ const admin=crypto.randomBytes(32).toString('hex'),sign=crypto.randomBytes(32).toString('hex');
+-const config=`<?php\nreturn [\n 'publicOrigin'=>'${u.origin}',\n 'adminKey'=>'${admin}',\n 'signingKey'=>'${sign}',\n 'dataDir'=>__DIR__.'/data',\n 'quotaBytes'=>2147483648,\n 'corsOrigins'=>['http://127.0.0.1:4173','https://appassets.androidplatform.net'],\n 'allowLoopbackHttp'=>false,\n];\n`;
++const config=`<?php\nreturn [\n 'publicOrigin'=>'${u.origin}',\n 'adminKey'=>'${admin}',\n 'signingKey'=>'${sign}',\n 'dataDir'=>__DIR__.'/data',\n 'quotaBytes'=>2147483648,\n 'corsOrigins'=>['http://127.0.0.1:4173','https://appassets.androidplatform.net','retrobooth://app'],\n 'allowLoopbackHttp'=>false,\n];\n`;
+ fs.mkdirSync(path.dirname(path.resolve(output)),{recursive:true});fs.writeFileSync(output,config,{flag:'wx',mode:0o600});
+ console.log('Private config created:',output);console.log('Cloud Admin key (keep private):',admin);console.log('Upload only beside the private app directory, NEVER into public_html or GitHub.');
+--- v0.8/tools/make_guide.py
++++ v0.9/tools/make_guide.py
+@@ -12,7 +12,7 @@
+ for n,sz in [('Title',32),('Heading 1',24),('Heading 2',14)]:
+  s=d.styles[n];s.font.name='Calibri';s.font.size=Pt(sz);s.font.bold=n!='Title';s.font.color.rgb=RGBColor.from_string('334632');s.paragraph_format.space_after=Pt(9);s.paragraph_format.space_before=Pt(10 if n=='Heading 2' else 0)
+ # Small utility footer, not a decorative header.
+-p=sec.footer.paragraphs[0];p.alignment=2;rr=p.add_run('RETROBOOTH  /  v0.8  /  ');rr.font.size=Pt(8);rr.font.color.rgb=RGBColor.from_string('777D70');f=OxmlElement('w:fldSimple');f.set(qn('w:instr'),'PAGE');p._p.append(f)
++p=sec.footer.paragraphs[0];p.alignment=2;rr=p.add_run('RETROBOOTH  /  v0.9  /  ');rr.font.size=Pt(8);rr.font.color.rgb=RGBColor.from_string('777D70');f=OxmlElement('w:fldSimple');f.set(qn('w:instr'),'PAGE');p._p.append(f)
+ for i,(title,subtitle,blocks) in enumerate(pages):
+  if i:d.add_page_break()
+  p=d.add_paragraph('LUCE STUDIO  /  OPERATOR GUIDE' if i==0 else 'SETUP & RUNNING',style='Subtitle');p.runs[0].font.size=Pt(9);p.runs[0].font.color.rgb=RGBColor.from_string('747E6D')
+@@ -48,5 +48,5 @@
+ for root in [d.element,d.styles.element]:
+  for border in root.xpath('.//w:pBdr'):
+   border.getparent().remove(border)
+-d.core_properties.title='RetroBooth v0.8 - Setup and running guide';d.core_properties.author='Luce Studio';d.core_properties.subject='Private cloud delivery alpha - operation and build guide'
+-out=R/'docs/RetroBooth_v0.8_Setup_and_Running_Guide.docx';d.save(out);print(out)
++d.core_properties.title='RetroBooth v0.9 - Setup and running guide';d.core_properties.author='Luce Studio';d.core_properties.subject='GitHub build and device operation - Android APK and Windows EXE'
++out=R/'docs/RetroBooth_v0.9_Setup_and_Running_Guide.docx';d.save(out);print(out)
+--- v0.8/tools/native_build_info.py
++++ v0.9/tools/native_build_info.py
+@@ -1,5 +1,5 @@
+ from pathlib import Path
+ import json,os
+ info=json.loads(Path('dist/BUILD_INFO.json').read_text())
+-info.update(platform='android-webview-spp-qr-pilot',versionCode=8,applicationId='studio.luce.retrobooth.preview',signing=os.environ.get('SIGNING_MODE','unknown'),release_outputs='UNSIGNED - not directly installable / not store ready',device_acceptance='NOT RUN by this workflow',warning='Uninstall or Clear storage erases local clips. Export first. Ephemeral debug keys can differ between builds.')
++info.update(platform='android-webview-spp-qr-pilot',versionCode=9,applicationId='studio.luce.retrobooth.preview',signing=os.environ.get('SIGNING_MODE','unknown'),release_outputs='UNSIGNED - not directly installable / not store ready',device_acceptance='NOT RUN by this workflow',warning='Uninstall or Clear storage erases local clips. Export first. Ephemeral debug keys can differ between builds.')
+ Path('native-artifacts/BUILD_INFO.json').write_text(json.dumps(info,indent=2)+'\n')
+--- v0.8/tools/package.mjs
++++ v0.9/tools/package.mjs
+@@ -13,11 +13,11 @@
+ const dist=path.join(root,'dist');if(!fs.existsSync(path.join(dist,'index.html')))throw new Error('Run npm run build first.');
+ const files=fs.readdirSync(dist).filter(x=>fs.statSync(path.join(dist,x)).isFile()).sort().map(x=>[x,fs.readFileSync(path.join(dist,x))]);
+ const intro=fs.readFileSync(path.join(root,'docs/QUICK_START.md'));
+-fs.writeFileSync(path.join(out,'RetroBooth_v0.8_Hostinger_Static_Preview.zip'),zip([...files,['START_HERE.md',intro]]));
++fs.writeFileSync(path.join(out,'RetroBooth_v0.9_Hostinger_Static_Preview.zip'),zip([...files,['START_HERE.md',intro]]));
+ const local=[...files.map(([n,b])=>['app/'+n,b]),['serve.mjs',fs.readFileSync('tools/serve.mjs')],['START_HERE.md',intro]];
+ for(const f of ['Start_Webcam_Windows.bat','Start_Webcam_macOS.command','Start_Webcam_Linux.sh'])local.push([f,fs.readFileSync('launchers/'+f)]);
+-fs.writeFileSync(path.join(out,'RetroBooth_v0.8_Local_Webcam_Test.zip'),zip(local));
+-fs.copyFileSync(path.join(dist,'RetroBooth_Prototype.html'),path.join(out,'RetroBooth_Prototype_v0.8_Webcam.html'));
++fs.writeFileSync(path.join(out,'RetroBooth_v0.9_Local_Webcam_Test.zip'),zip(local));
++fs.copyFileSync(path.join(dist,'RetroBooth_Prototype.html'),path.join(out,'RetroBooth_Prototype_v0.9_Webcam.html'));
+ const cloud=[];
+ function tree(dir,prefix){for(const ent of fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){
+  if(ent.name==='config.php'||ent.name==='data')continue;
+@@ -26,8 +26,9 @@
+ }}
+ tree(path.join(root,'cloud/public_html'),'public_html/');tree(path.join(root,'cloud/retrobooth_private'),'retrobooth_private/');
+ cloud.push(['tools/generate-cloud-config.mjs',fs.readFileSync('tools/generate-cloud-config.mjs')]);
++cloud.push(['history/v0.8/SETUP_AND_RUNNING_GUIDE.md',fs.readFileSync('history/v0.8/SETUP_AND_RUNNING_GUIDE.md')]);
+ cloud.push(['START_HERE.md',intro],['SETUP_AND_RUNNING_GUIDE.md',fs.readFileSync('docs/SETUP_AND_RUNNING_GUIDE.md')]);
+-fs.writeFileSync(path.join(out,'RetroBooth_v0.8_Hostinger_Cloud_Alpha.zip'),zip(cloud));
++fs.writeFileSync(path.join(out,'RetroBooth_v0.9_Hostinger_Cloud_Alpha.zip'),zip(cloud));
+ const hashes={};for(const f of fs.readdirSync(out).filter(x=>!x.endsWith('.json')).sort())hashes[f]=crypto.createHash('sha256').update(fs.readFileSync(path.join(out,f))).digest('hex');
+ fs.writeFileSync(path.join(out,'SHA256SUMS.json'),JSON.stringify(hashes,null,2)+'\n');
+ console.log('Packaged web test distributions into artifacts/');
+--- v0.8/tools/package_source.py
++++ v0.9/tools/package_source.py
+@@ -3,9 +3,9 @@
+ import hashlib, json, zipfile
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+-ALLOWED_DIRS = {'src','android','cloud','docs','history','launchers','patches','qa','tests','tools','vendor','.github'}
+-ALLOWED_FILES = {'README.md','CHANGELOG.md','VERSION.txt','package.json','.gitattributes','.gitignore','requirements-docs.txt','requirements-test.txt','SOURCE_PROVENANCE.json'}
+-SKIP_PARTS = {'node_modules','.git','.gradle','build','__pycache__','artifacts','native-artifacts','data'}
++ALLOWED_DIRS = {'src','android','cloud','docs','history','launchers','patches','qa','tests','tools','vendor','.github','desktop'}
++ALLOWED_FILES = {'README.md','CHANGELOG.md','VERSION.txt','package.json','.gitattributes','.gitignore','requirements-docs.txt','requirements-test.txt','SOURCE_PROVENANCE.json','START_HERE.md','LICENSE.txt'}
++SKIP_PARTS = {'node_modules','.git','.gradle','build','__pycache__','artifacts','native-artifacts','data','release','web','.smoke-output'}
+ 
+ def included(path: Path) -> bool:
+     relative = path.relative_to(ROOT)
+@@ -13,7 +13,7 @@
+         return False
+     if any(p in SKIP_PARTS for p in relative.parts):
+         return False
+-    if path.name in {'config.php','local.properties','.env'} or path.suffix.lower() in {'.pyc','.jks','.keystore','.p12','.pem'}:
++    if path.name in {'config.php','local.properties','.env'} or path.suffix.lower() in {'.pyc','.jks','.keystore','.p12','.pem','.pfx','.key','.b64'}:
+         return False
+     # Large synthetic encodes are reproducible test outputs, not guest media or source.
+     if relative.parts[0] == 'qa' and path.suffix.lower() in {'.mp4','.webm','.pdf'}:
+@@ -24,7 +24,7 @@
+ manifest = {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
+ manifest_bytes = (json.dumps({'version':(ROOT/'VERSION.txt').read_text().splitlines()[0], 'algorithm':'SHA-256', 'files':manifest},indent=2)+'\n').encode()
+ (ROOT/'MANIFEST_SHA256.json').write_bytes(manifest_bytes)
+-output = ROOT/'artifacts'/'RetroBooth_v0.8_GitHub_Ready.zip'
++output = ROOT/'artifacts'/'RetroBooth_v0.9_Android_Windows_GitHub_Ready.zip'
+ output.parent.mkdir(exist_ok=True)
+ with zipfile.ZipFile(output,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
+     for name, data in [(p.relative_to(ROOT).as_posix(),p.read_bytes()) for p in files] + [('MANIFEST_SHA256.json',manifest_bytes)]:

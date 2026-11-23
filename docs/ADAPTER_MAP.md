@@ -1,3 +1,9 @@
+# v0.9 additional Windows host adapter
+
+RetroDesktop in desktop/preload.cjs is deliberately separate from the Android printer/export bridge. It exposes info, authorizeCloud, fullscreen, storageLocation and event subscriptions only. The main process validates the exact bundled main frame and requires idle Admin for host changes. Native Windows exports use will-download with allowed Blob origin/filename/size and a Save dialog. No Windows Bluetooth, serial, USB or RAW printer adapter is introduced.
+
+## Retained Android and cloud map
+
 # Actual v0.7 -> v0.8 adapter map
 
 | Existing surface | Change |
