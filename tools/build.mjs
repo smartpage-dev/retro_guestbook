@@ -7,7 +7,7 @@ const qr='/* QRCode: Kazuhiko Arase / qrcode-terminal adaptation. See THIRD_PART
 let html=read('src/template.html');const replace=(token,value)=>{if(!html.includes(token))throw new Error('Missing marker '+token);html=html.replace(token,()=>value);};
 for(const [tag,f] of [['NEW_VIEWS','experience-views.html'],['DELETE_DIALOG','delete-dialog.html'],['CSS','styles.css'],['LANDSCAPE_CSS','landscape.css'],['APPEARANCE_CSS','appearance.css'],['DELIVERY_CSS','delivery.css'],['DELIVERY_VIEW','delivery-view.html'],['DELIVERY_ADMIN','delivery-admin.html'],['CLOUD_ADMIN','cloud-admin.html'],['CLOUD_CSS','cloud.css'],['PRINTER_ADMIN','printer-admin.html'],['PRINTER_CSS','printer.css'],['DESKTOP_ADMIN','desktop-admin.html']])replace('/*__'+tag+'__*/',read('src/'+f));
 replace('/*__VENDOR__*/',qr);
-for(const name of ['effects','delivery-policy','cloud-client','printer-client','core','store','renderer','receipt','app']){
+for(const name of ['effects','delivery-policy','cloud-client','printer-client','core','store','renderer','receipt','diagnostics','app']){
  let code=read('src/'+name+'.js');if(name==='app')for(const [tag,f] of [['EXPERIENCE','experience'],['LANDSCAPE_JS','landscape'],['APPEARANCE_JS','appearance'],['CAMERA_LAB_JS','camera-lab'],['NATIVE_EXPORT_JS','native-export'],['DESKTOP_JS','desktop'],['DELIVERY_FLOW_JS','delivery-flow'],['CLOUD_FLOW_JS','cloud-flow'],['PRINTER_FLOW_JS','printer-flow']])code=code.replace('/*__'+tag+'__*/',()=>read('src/'+f+'.js'));
  replace('/*__'+name.toUpperCase()+'__*/',code);
 }

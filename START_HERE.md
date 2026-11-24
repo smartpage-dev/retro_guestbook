@@ -1,3 +1,7 @@
+# v0.9.2 Android diagnostics update
+
+Admin > Device Check > Test camera only > Test microphone only > Apply camera + microphone > Export full diagnostic JSON. See docs/ANDROID_DIAGNOSTICS.md.
+
 # RetroBooth v0.9 - Independent APK and Windows EXE builds
 
 One GitHub repository; **three independent manual Actions workflows**. No platform waits for the long Full Verification workflow before it starts compiling.

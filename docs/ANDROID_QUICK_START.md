@@ -1,3 +1,5 @@
+**v0.9.2: Camera issue?** Admin > 02 / Device Check > Test camera only > Test microphone only > Apply camera + microphone > Export full diagnostic JSON. See [ANDROID_DIAGNOSTICS.md](ANDROID_DIAGNOSTICS.md).
+
 # 03 / Android APK
 
 Same application ID, versionCode 9

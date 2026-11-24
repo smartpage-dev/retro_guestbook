@@ -1,3 +1,9 @@
+## 0.9.2-alpha.1 — Android diagnostic export
+
+- Bounded in-memory app event log, camera/mic stage timings and sanitized failures.
+- Android native permission and lifecycle event snapshot, Android/WebView version, explicit export in Admin.
+- Preserves split APK and EXE workflows; no camera hardware fix claimed.
+
 # v0.9.0-alpha.1 - ANDROID_WINDOWS_GITHUB_BUILD
 
 - Adds restricted Electron desktop source, installer/portable Windows targets, native export and per-user storage profile.

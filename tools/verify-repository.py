@@ -8,7 +8,7 @@ required = [
     '.github/workflows/build-android.yml',
     '.github/workflows/build-windows.yml',
     '.github/workflows/verify-all.yml',
-    'src/.htaccess', 'src/desktop-admin.html',
+    'src/.htaccess', 'src/desktop-admin.html', 'src/diagnostics.js', 'tests/diagnostics.test.cjs',
     'tools/prepare-desktop.mjs',
     'desktop/main.cjs', 'desktop/package.json',
     'desktop/electron-builder.cjs', 'desktop/resources/icon.ico',

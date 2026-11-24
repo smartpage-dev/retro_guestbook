@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Build;
+import android.webkit.WebResourceError;
+import org.json.JSONArray;
+import java.util.ArrayDeque;
 import android.provider.DocumentsContract;
 import android.util.Base64;
 import android.view.View;
@@ -53,6 +57,26 @@ public final class MainActivity extends Activity {
     private final ExecutorService writer=Executors.newSingleThreadExecutor();
     private final Object exportLock=new Object();
     private ExportJob exportJob;
+    private final ArrayDeque<JSONObject> nativeEvents=new ArrayDeque<>();
+    private synchronized void nativeDiag(String name,String code){
+        try{JSONObject event=new JSONObject();event.put("at",System.currentTimeMillis());
+            event.put("name",name);event.put("code",code);nativeEvents.addLast(event);
+            while(nativeEvents.size()>200)nativeEvents.removeFirst();}catch(Exception ignored){}
+    }
+    private synchronized JSONArray nativeSnapshot(){JSONArray arr=new JSONArray();for(JSONObject e:nativeEvents)arr.put(e);return arr;}
+    private void sendDiagnostics(JSONObject m,JavaScriptReplyProxy reply){
+        try{String id=m.getString("id");if(!id.matches("[a-f0-9]{32}")||!"snapshot".equals(m.getString("action")))return;
+            JSONObject out=new JSONObject();out.put("id",id);out.put("available",true);
+            out.put("androidSdk",Build.VERSION.SDK_INT);out.put("androidRelease",Build.VERSION.RELEASE);
+            out.put("model",Build.MANUFACTURER+" "+Build.MODEL);
+            out.put("cameraPermission",checkSelfPermission(Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED?"granted":"not_granted");
+            out.put("micPermission",checkSelfPermission(Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED?"granted":"not_granted");
+            android.content.pm.PackageInfo pkg=WebView.getCurrentWebViewPackage();
+            out.put("webViewVersion",pkg==null?"unavailable":pkg.versionName);
+            out.put("events",nativeSnapshot());reply.postMessage(out.toString());
+        }catch(Exception ignored){}
+    }
+
 
     private static final class ExportJob {
         String id, name, mime, expectedHash;
@@ -78,6 +102,7 @@ public final class MainActivity extends Activity {
         root=new FrameLayout(this);setContentView(root);
         printer=new NativePrinter(this);
         web=new WebView(this);root.addView(web,new FrameLayout.LayoutParams(-1,-1));
+        nativeDiag("app_created","sdk_"+Build.VERSION.SDK_INT);
         WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);
         s.setAllowFileAccess(false);s.setAllowContentAccess(true); // User-selected logo content URIs only.
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);s.setMediaPlaybackRequiresUserGesture(false);
@@ -90,13 +115,16 @@ public final class MainActivity extends Activity {
                 if(!trusted(u)||!u.getPath().startsWith("/assets/www/"))return blocked();
                 WebResourceResponse response=loader.shouldInterceptRequest(u);return response!=null?response:blocked();
             }
+            @Override public void onReceivedError(WebView view,WebResourceRequest request,WebResourceError error){
+                if(request.isForMainFrame())nativeDiag("webview_mainframe_error","code_"+error.getErrorCode());
+            }
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request){
                 Uri u=request.getUrl();return !(trusted(u)&&"/assets/www/index.html".equals(u.getPath()));
             }
         });
         web.setWebChromeClient(new WebChromeClient(){
             @Override public void onPermissionRequest(PermissionRequest request){runOnUiThread(()->askMediaPermission(request));}
-            @Override public void onPermissionRequestCanceled(PermissionRequest request){if(pendingPermission==request)pendingPermission=null;}
+            @Override public void onPermissionRequestCanceled(PermissionRequest request){nativeDiag("webview_permission_cancelled","request_cancelled");if(pendingPermission==request)pendingPermission=null;}
             @Override public boolean onShowFileChooser(WebView view,ValueCallback<Uri[]> callback,FileChooserParams params){
                 if(fileCallback!=null)fileCallback.onReceiveValue(null);fileCallback=callback;
                 Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/*");
@@ -120,6 +148,11 @@ public final class MainActivity extends Activity {
                 (view,message,sourceOrigin,isMainFrame,reply)->{
                     if(!isMainFrame||!trusted(sourceOrigin))return;
                     try{approveCloud(new JSONObject(message.getData()),reply);}catch(Exception e){toast("Cloud approval rejected.");}
+                });
+            WebViewCompat.addWebMessageListener(web,"RetroDiagnosticsNative",Collections.singleton(ORIGIN),
+                (view,message,sourceOrigin,isMainFrame,reply)->{
+                    if(!isMainFrame||!trusted(sourceOrigin)||view.getUrl()==null||!"/assets/www/index.html".equals(Uri.parse(view.getUrl()).getPath()))return;
+                    try{String data=message.getData();if(data!=null&&data.length()<512)sendDiagnostics(new JSONObject(data),reply);}catch(Exception ignored){}
                 });
             WebViewCompat.addWebMessageListener(web,"RetroNative",Collections.singleton(ORIGIN),
                 (view,message,sourceOrigin,isMainFrame,reply)->{
@@ -152,17 +185,18 @@ public final class MainActivity extends Activity {
             .setOnCancelListener(d->{cloudApprovalPending=false;answer(reply,id,"Cloud origin not approved.",0);}).show();
     }
     private void askMediaPermission(PermissionRequest request){
-        if(!trusted(request.getOrigin())||pendingPermission!=null){request.deny();return;}
+        if(!trusted(request.getOrigin())||pendingPermission!=null){nativeDiag("media_permission_denied","untrusted_or_pending");request.deny();return;}
         List<String> required=new ArrayList<>();
         for(String resource:request.getResources()){
             if(PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource))required.add(Manifest.permission.CAMERA);
             else if(PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(resource))required.add(Manifest.permission.RECORD_AUDIO);
             else{request.deny();return;} // Never grant unknown web resources.
         }
-        if(required.isEmpty()){request.deny();return;}
+        if(required.isEmpty()){nativeDiag("media_permission_denied","no_known_resources");request.deny();return;}
+        nativeDiag("media_permission_requested",(required.contains(Manifest.permission.CAMERA)?"video":"")+(required.contains(Manifest.permission.RECORD_AUDIO)?"_audio":""));
         pendingPermission=request;
         List<String> missing=new ArrayList<>();for(String permission:required)if(checkSelfPermission(permission)!=PackageManager.PERMISSION_GRANTED)missing.add(permission);
-        if(missing.isEmpty()){pendingPermission=null;request.grant(request.getResources());}
+        if(missing.isEmpty()){pendingPermission=null;nativeDiag("media_permission_granted","already_granted");request.grant(request.getResources());}
         else requestPermissions(missing.toArray(new String[0]),CAMERA_REQUEST);
     }
     @Override public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grants){
@@ -174,6 +208,7 @@ public final class MainActivity extends Activity {
             String permission=PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)?Manifest.permission.CAMERA:Manifest.permission.RECORD_AUDIO;
             ok &= checkSelfPermission(permission)==PackageManager.PERMISSION_GRANTED;
         }
+        nativeDiag(ok?"media_permission_granted":"media_permission_denied",ok?"runtime_granted":"runtime_denied");
         if(ok)request.grant(request.getResources());else request.deny();
     }
     private void handleExport(JSONObject m,JavaScriptReplyProxy reply) throws Exception {
@@ -236,8 +271,8 @@ public final class MainActivity extends Activity {
     private void immersive(){getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);}
     private void toast(String text){runOnUiThread(()->Toast.makeText(this,text,Toast.LENGTH_LONG).show());}
     @Override public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);if(focus)immersive();}
-    @Override protected void onPause(){if(printer!=null)printer.pause();if(web!=null){web.evaluateJavascript("window.dispatchEvent(new Event('retro-native-pause'))",null);web.onPause();}super.onPause();}
-    @Override protected void onResume(){super.onResume();if(printer!=null)printer.resume();if(web!=null)web.onResume();immersive();}
+    @Override protected void onPause(){nativeDiag("app_lifecycle","paused");if(printer!=null)printer.pause();if(web!=null){web.evaluateJavascript("window.dispatchEvent(new Event('retro-native-pause'))",null);web.onPause();}super.onPause();}
+    @Override protected void onResume(){super.onResume();nativeDiag("app_lifecycle","resumed");if(printer!=null)printer.resume();if(web!=null)web.onResume();immersive();}
     @Override public void onBackPressed(){if(videoView!=null){hideVideo();return;}new AlertDialog.Builder(this).setTitle("Exit RetroBooth TEST?").setMessage("Export recordings before clearing data or uninstalling. This is not an event-ready recorder.").setNegativeButton("Stay",null).setPositiveButton("Exit",(d,w)->finish()).show();}
     @Override protected void onDestroy(){if(printer!=null)printer.destroy();if(pendingPermission!=null)pendingPermission.deny();if(fileCallback!=null)fileCallback.onReceiveValue(null);synchronized(exportLock){cancelExport();}writer.shutdownNow();if(web!=null){web.stopLoading();web.destroy();}super.onDestroy();}
 }

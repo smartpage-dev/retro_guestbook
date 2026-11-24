@@ -27,7 +27,11 @@
   let pending=null, recordParts=[], stopPromise=null, sessionSettings=null, sessionId='', snapshots=[], snapIndex=0;
   let selectedClip=null, lastReceipt=null, playbackURL=null, currentView='booth', wakeLock=null, cameraBusy=false;
   let settingsSaving=false;
-  let thankTime=0, stopInFlight=false, diagnosticsLog=[], tabAllowed=true, ready=false;
+  let thankTime=0, stopInFlight=false, tabAllowed=true, ready=false;
+  const diagnosticRing=new RetroDiagnostics.Ring(500);
+  const diagStorageKey='retrobooth_app_diagnostics_v1';
+  try{const previous=JSON.parse(localStorage.getItem(diagStorageKey)||'[]');if(Array.isArray(previous))for(const event of previous.slice(-250))if(event&&typeof event.name==='string')diagnosticRing.add(event.name,event.detail||{});}catch{}
+  let lastMediaFailure=null;
   const simulations={offline:false,failPrint:false,failSave:false};
   const labels={idle:'STANDBY',greeting:'GREETING',countdown:'GET READY',recording:'RECORDING',saving:'SAVING',receipt:'DELIVERY CHECK',qr:'YOUR QR',thankyou:'THANK YOU',error:'NEEDS ATTENTION'};
   const renderer=new RetroRenderer($('cameraCanvas'),$('inputVideo'),settings);
@@ -37,7 +41,8 @@
   try{await Receipt.prepare(settings);}catch(e){settings.logoData='';log('startup_logo_rejected',{error:e.message});}
   Receipt.render($('receiptCanvas'),sample,lastReceipt.source,settings);
 
-  function log(name,detail={}) {diagnosticsLog.push({at:new Date().toISOString(),name,...detail});if(diagnosticsLog.length>200)diagnosticsLog.shift();}
+  function log(name,detail={}) {diagnosticRing.add(name,detail);try{localStorage.setItem(diagStorageKey,JSON.stringify(diagnosticRing.snapshot().slice(-250)));}catch{}if(currentView==='admin')updateDiagnosticPreview();}
+  function updateDiagnosticPreview(){const node=$('diagnosticRecent');if(!node)return;const entries=diagnosticRing.snapshot().slice(-12);node.textContent=entries.map(e=>e.at.slice(11,19)+' '+e.name+' '+JSON.stringify(e.detail)).join('\n')||'No events recorded yet.';}
   function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').hidden=true,5500);}
   function download(blob,name){if(window.RetroNative?.postMessage){exportToAndroid(blob,name).catch(e=>toast('Export failed: '+e.message));return;}const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);}
   function textDownload(data,name){download(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),name);}
@@ -132,9 +137,10 @@
     if(mode==='real'){mediaStatus('Stop the active camera before testing an input separately.');return;}
     if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){mediaStatus('Camera tests require HTTPS or a trusted app origin.');return;}
     cameraBusy=true;renderState();
-    let candidate=null;
+    let candidate=null;const probeStarted=performance.now();
     try{
       const c=mediaConstraints();
+      log('media_probe_start',{kind,explicitCamera:!!$('cameraSelect').value,explicitMic:!!$('micSelect').value,direction:$('cameraDirection').value});
       const request=kind==='video'?{video:c.video,audio:false}:{video:false,audio:c.audio};
       mediaStatus('Testing '+(kind==='video'?'camera':'microphone')+' only… Android may ask for permission.');
       candidate=await navigator.mediaDevices.getUserMedia(request);
@@ -142,8 +148,8 @@
       if(!track||track.readyState!=='live')throw new Error('No active '+kind+' track returned.');
       const details=track.getSettings?.()||{};
       mediaStatus((kind==='video'?'Camera':'Microphone')+' test PASSED ('+String(track.label||'unnamed device').slice(0,72)+')'+(details.width?' / '+details.width+'x'+details.height:'')+'. Track released; now test the other input.');
-      log('media_probe_pass',{kind,label:track.label||'',settings:details});
-    }catch(e){mediaStatus((kind==='video'?'Camera':'Microphone')+' test FAILED: '+cameraErrorMessage(e));log('media_probe_failure',{kind,error:e.name||'Error',detail:e.message||''});}
+      log('media_probe_pass',{kind,elapsedMs:Math.round(performance.now()-probeStarted),trackState:track.readyState,width:details.width||null,height:details.height||null,frameRate:details.frameRate||null});
+    }catch(e){mediaStatus((kind==='video'?'Camera':'Microphone')+' test FAILED: '+cameraErrorMessage(e));lastMediaFailure={stage:'probe_'+kind,name:e.name||'Error',message:cameraErrorMessage(e)};log('media_probe_failure',{kind,elapsedMs:Math.round(performance.now()-probeStarted),error:e.name||'Error',detail:e.message||''});}
     finally{if(candidate)candidate.getTracks().forEach(t=>t.stop());cameraBusy=false;await refreshDevices();renderState();refreshDiagnostics();}
   }
   async function enableCamera(force=false){
@@ -152,7 +158,8 @@
     if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){toast('Camera testing needs HTTPS or localhost in a full browser. Demo mode still works.');return;}
     if(!window.MediaRecorder||!$('cameraCanvas').captureStream){toast('Canvas recording is unavailable here. Use demo mode; this device has not passed capture validation.');return;}
     cameraBusy=true;renderState();
-    let candidate=null;
+    let candidate=null;let cameraStage='request_media';const cameraStarted=performance.now();
+    log('camera_enable_start',{explicitCamera:!!$('cameraSelect').value,explicitMic:!!$('micSelect').value,direction:$('cameraDirection').value,secureContext:window.isSecureContext});
     try{
       disableCamera(false);
       const requested=mediaConstraints();
@@ -165,23 +172,25 @@
         if(!auto||!['NotReadableError','AbortError','OverconstrainedError'].includes(firstError.name))throw firstError;
         await new Promise(resolve=>setTimeout(resolve,300));
         mediaStatus('First request failed; trying Android basic camera + microphone constraints once…');
+        log('camera_first_request_failed',{stage:'request_media',name:firstError.name||'Error',message:firstError.message||'',elapsedMs:Math.round(performance.now()-cameraStarted)});
         log('camera_relaxed_retry',{reason:firstError.name});
         const direction=$('cameraDirection').value;
         candidate=await navigator.mediaDevices.getUserMedia({video:direction==='auto'?true:{facingMode:{ideal:direction}},audio:true});
       }
       if(candidate.getVideoTracks().length!==1||!candidate.getAudioTracks().length)throw new Error('Both camera and microphone are required. No silent fallback.');
+      cameraStage='video_play';log('camera_tracks_received',{videoTracks:candidate.getVideoTracks().length,audioTracks:candidate.getAudioTracks().length,elapsedMs:Math.round(performance.now()-cameraStarted)});
       stream=candidate;candidate=null;$('inputVideo').srcObject=stream;await $('inputVideo').play();
-      await ensureAudio();
+      cameraStage='audio_context';await ensureAudio();
       if(audioContext){analyser=audioContext.createAnalyser();analyser.fftSize=2048;audioNode=audioContext.createMediaStreamSource(stream);audioNode.connect(analyser);}
       stream.getTracks().forEach(t=>{
         t.addEventListener('ended',()=>{log('track_ended',{kind:t.kind});if(state==='recording')stopRecording(true,'Camera or microphone disconnected.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');disableCamera();toast('Camera or microphone disconnected.');}else if(state==='idle'){disableCamera();toast('Device disconnected. Returned to demo mode.');}});
       });
-      mode='real';renderer.live=true;await wake();await refreshDevices();
+      cameraStage='refresh_devices';mode='real';renderer.live=true;await wake();await refreshDevices();
       const video=stream.getVideoTracks()[0],audio=stream.getAudioTracks()[0];
       mediaStatus('LIVE: '+String(video.label||'camera').slice(0,72)+' + '+String(audio.label||'microphone').slice(0,72)+'. Ready for a test recording.');
       toast('Camera and microphone are ON. Test with a disposable recording.');
-      log('camera_enabled',{video:video.getSettings(),audio:audio.getSettings()});
-    }catch(e){if(candidate)candidate.getTracks().forEach(t=>t.stop());disableCamera(false);mediaStatus('Camera + microphone FAILED: '+cameraErrorMessage(e));toast('Camera not enabled: '+cameraErrorMessage(e));log('camera_failure',{name:e.name||'Error',error:String(e.message||e)});}
+      lastMediaFailure=null;log('camera_enabled',{elapsedMs:Math.round(performance.now()-cameraStarted),videoWidth:video.getSettings().width||null,videoHeight:video.getSettings().height||null,videoFrameRate:video.getSettings().frameRate||null,audioLive:audio.readyState==='live'});
+    }catch(e){if(candidate)candidate.getTracks().forEach(t=>t.stop());disableCamera(false);mediaStatus('Camera + microphone FAILED: '+cameraErrorMessage(e));toast('Camera not enabled: '+cameraErrorMessage(e));lastMediaFailure={stage:cameraStage,name:e.name||'Error',message:cameraErrorMessage(e)};log('camera_failure',{stage:cameraStage,elapsedMs:Math.round(performance.now()-cameraStarted),name:e.name||'Error',error:String(e.message||e)});}
     finally{cameraBusy=false;renderState();refreshDiagnostics();}
   }
   function disableCamera(render=true){
@@ -199,9 +208,9 @@
         if(Array.from(e.options).some(o=>o.value===selected))e.value=selected;
       });
       const videoCount=devices.filter(d=>d.kind==='videoinput').length,audioCount=devices.filter(d=>d.kind==='audioinput').length;
-      log('media_devices',{cameras:videoCount,microphones:audioCount});
+      log('media_devices',{cameras:videoCount,microphones:audioCount,labelsVisible:devices.some(d=>!!d.label)});
       if(!videoCount||!audioCount)mediaStatus('Detected '+videoCount+' camera(s), '+audioCount+' microphone(s). Missing devices may require Android permissions.');
-    }catch(e){mediaStatus('Device list unavailable: '+cameraErrorMessage(e));}
+    }catch(e){mediaStatus('Device list unavailable: '+cameraErrorMessage(e));log('media_devices_failure',{name:e.name||'Error',message:e.message||''});}
   }
   async function start(origin){
     if(surfaceRole!=='booth'||currentView!=='booth'||!ready||state!=='idle'||cameraBusy||settingsSaving||printerActionBusy||cloudClaimBusy||!tabAllowed)return;
@@ -413,7 +422,35 @@
   /*__CLOUD_FLOW_JS__*/
   /*__PRINTER_FLOW_JS__*/
 
-  function exportDiagnostics(){textDownload({version:'0.9.1-alpha.1',createdAt:new Date().toISOString(),userAgent:navigator.userAgent,state,mode,renderer:renderer.mode,storageAvailable:store.available,cloud:cloudClient?.connection?'configured':'local_only',printer:'not_connected',logs:diagnosticsLog},'RetroBooth_diagnostics.json');}
+  async function nativeDiagnostics(){
+    if(!window.RetroDiagnosticsNative?.postMessage)return {available:false,reason:'No Android native diagnostics bridge (browser or Windows).'};
+    const id=C.randomId();const bridge=window.RetroDiagnosticsNative;const old=bridge.onmessage;
+    return new Promise(resolve=>{
+      const timeout=setTimeout(()=>{bridge.onmessage=old;resolve({available:false,reason:'Android diagnostics response timeout'});},2200);
+      bridge.onmessage=e=>{try{const data=JSON.parse(e.data);if(data.id!==id)return;clearTimeout(timeout);bridge.onmessage=old;resolve(RetroDiagnostics.safe(data));}catch{}};
+      try{bridge.postMessage(JSON.stringify({id,action:'snapshot'}));}catch(e){clearTimeout(timeout);bridge.onmessage=old;resolve({available:false,reason:e.name||'bridge_error'});}
+    });
+  }
+  async function exportDiagnostics(){
+    $('diagExport').disabled=true;
+    try{
+      log('diagnostic_export_requested',{count:diagnosticRing.events.length});
+      const native=await nativeDiagnostics();
+      let permissions={};
+      if(navigator.permissions?.query){for(const name of ['camera','microphone']){try{permissions[name]=(await navigator.permissions.query({name})).state;}catch{permissions[name]='unavailable';}}}
+      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.2-alpha.1',generatedAt:new Date().toISOString(),
+        notice:'App-scoped diagnostic data, not Android system logcat. Up to 250 sanitized events survive app restarts where browser storage permits. No videos, snapshots, private QR URLs, credentials or device identifiers are intentionally included. Review before sharing.',
+        runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
+        media:{permissions,cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
+        native,events:diagnosticRing.snapshot()};
+      textDownload(RetroDiagnostics.safe(report),'RetroBooth_Android_Diagnostics_'+new Date().toISOString().replace(/[:.]/g,'-')+'.json');
+      mediaStatus('Diagnostic JSON export requested. Choose a save location; check Downloads/Files after saving.');
+    }catch(e){log('diagnostic_export_failed',{name:e.name||'Error',message:e.message||''});toast('Log export failed: '+e.message);}
+    finally{$('diagExport').disabled=false;}
+  }
+  window.addEventListener('error',e=>log('javascript_error',{message:e.message||'Unknown',source:'window',line:e.lineno||0}));
+  window.addEventListener('unhandledrejection',e=>log('unhandled_rejection',{name:e.reason?.name||'Error',message:String(e.reason?.message||'Promise rejection')}));
+
 
   document.querySelectorAll('[data-view]').forEach(e=>e.addEventListener('click',()=>go(e.dataset.view)));
   document.querySelectorAll('[data-close]').forEach(e=>e.addEventListener('click',()=>$(e.dataset.close).close()));
@@ -425,7 +462,7 @@
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.9.1-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.2-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
@@ -446,6 +483,7 @@
     renderState();toast(count+' simulated jobs updated. No video uploaded and no receipt physically printed.');
   };
   $('diagExport').onclick=exportDiagnostics;
+  $('diagClear').onclick=()=>{if(confirm('Clear only this session diagnostic events? Recordings and settings are not affected.')){diagnosticRing.clear();try{localStorage.removeItem(diagStorageKey);}catch{}updateDiagnosticPreview();}};
   $('persistBtn').onclick=async()=>{try{const result=await navigator.storage?.persist?.();toast(result?'Persistent browser storage granted. Keep independent exports.':'Persistence was not granted or is unavailable. Export important recordings.');refreshDiagnostics();}catch(e){toast(e.message);}};
   $('errorDialog').addEventListener('cancel',e=>e.preventDefault());
   $('retrySave').onclick=async()=>{if(state!=='error'||!pending)return;$('errorDialog').close();setState('saving');try{pending.deliverySnapshot=RetroDelivery.snapshot(pending,C.qrPayload(pending.id,pending.cloud));
@@ -484,7 +522,7 @@
       }).catch(()=>{log('tab_lock_unavailable');resolve();});
     });
   }
-  ready=true;syncForm();renderState();refreshDiagnostics();
+  ready=true;log('app_ready',{version:'0.9.2-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
   if(surfaceRole==='guest'){openGuest(location.hash.slice(7));}else if(surfaceRole==='show'){go('show');}else{go(new URLSearchParams(location.search).has('setup')?'admin':'booth');}
   if(document.documentElement.dataset.serviceWorker==='true' && location.protocol!=='file:' && 'serviceWorker'in navigator){
     navigator.serviceWorker.register('./sw.js').catch(e=>log('offline_shell_unavailable',{error:e.message}));
