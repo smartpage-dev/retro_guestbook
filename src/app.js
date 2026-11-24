@@ -358,11 +358,12 @@
   /*__APPEARANCE_JS__*/
   /*__CAMERA_LAB_JS__*/
   /*__NATIVE_EXPORT_JS__*/
+/*__DESKTOP_JS__*/
   /*__DELIVERY_FLOW_JS__*/
   /*__CLOUD_FLOW_JS__*/
   /*__PRINTER_FLOW_JS__*/
 
-  function exportDiagnostics(){textDownload({version:'0.8.0-alpha.1',createdAt:new Date().toISOString(),userAgent:navigator.userAgent,state,mode,renderer:renderer.mode,storageAvailable:store.available,cloud:cloudClient?.connection?'configured':'local_only',printer:'not_connected',logs:diagnosticsLog},'RetroBooth_diagnostics.json');}
+  function exportDiagnostics(){textDownload({version:'0.9.0-alpha.1',createdAt:new Date().toISOString(),userAgent:navigator.userAgent,state,mode,renderer:renderer.mode,storageAvailable:store.available,cloud:cloudClient?.connection?'configured':'local_only',printer:'not_connected',logs:diagnosticsLog},'RetroBooth_diagnostics.json');}
 
   document.querySelectorAll('[data-view]').forEach(e=>e.addEventListener('click',()=>go(e.dataset.view)));
   document.querySelectorAll('[data-close]').forEach(e=>e.addEventListener('click',()=>$(e.dataset.close).close()));
@@ -374,7 +375,7 @@
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.8.0-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.0-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
@@ -421,10 +422,10 @@
       releaseWake();
     }else if(mode==='real')wake();
   });
-  window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'Android app left foreground.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
+  window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'App left foreground or the device suspended.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
   window.addEventListener('beforeunload',e=>{if(busy()||pending){e.preventDefault();e.returnValue='';}});
   window.addEventListener('rendererfailure',e=>{if(state==='recording')stopRecording(true,e.detail);else showError(e.detail);});
-  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();await setupCloud();
+  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();setupDesktop();await setupCloud();
   if(navigator.locks&&surfaceRole==='booth'){
     await new Promise(resolve=>{
       navigator.locks.request('luce-retrobooth-capture',{ifAvailable:true},lock=>{

@@ -1,6 +1,7 @@
 /* Controller integration: existing capture remains local-first; QR ownership is frozen per clip. */
 let cloudClient=null,sessionCloud=null,cloudClaimBusy=false,cloudTimer=null;
 async function authorizeNativeCloud(origin){
+ if(window.RetroDesktop?.authorizeCloud){await window.RetroDesktop.authorizeCloud(origin);return;}
  if(!window.RetroCloudNative?.postMessage)return;
  const id=C.randomId();await new Promise((resolve,reject)=>{
   const timer=setTimeout(()=>reject(new Error('Native cloud approval timed out.')),60000);
