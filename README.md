@@ -59,3 +59,7 @@ Root build/tests use Node built-ins. Desktop installation needs registry access.
 - [Official platform references](docs/PLATFORM_REFERENCES.md)
 
 Detailed unchanged cloud and Android printer operation is preserved in `history/v0.8/SETUP_AND_RUNNING_GUIDE.md`; its old version/build names are historical. Current build names are in this README and the v0.9 guide.
+
+## Android camera hotfix (v0.9.1)
+
+See `docs/ANDROID_CAMERA_TROUBLESHOOTING.md`. The Android build has versionCode 10; the same application ID is retained. Both platform workflows remain independent. No real Android camera has been validated by the synthetic tests.

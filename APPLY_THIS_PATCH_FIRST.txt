@@ -1,0 +1,7 @@
+RetroBooth v0.9.1 Android camera hotfix
+
+Apply this patch to the ROOT of an otherwise complete v0.9 independent Android/Windows workflows GitHub repository. Merge folders, preserve hidden .github, commit and push to the default branch. Do NOT upload the ZIP as a file. For uncertain/incomplete repositories use the COMPLETE_REPO_ROOT ZIP instead. Do not delete local recordings or reset cloud credentials.
+
+Then Actions > RetroBooth - Build Android APK > Run workflow. Expected Android versionCode 10. See docs/ANDROID_CAMERA_FIX_START_HERE.md.
+
+This patch is source only; no compiled APK/EXE or real Android camera acceptance is claimed.

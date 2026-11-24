@@ -41,7 +41,7 @@ function setupCameraLab(){
  $('resetLook').onclick=()=>{effectDraft.lookProfiles[activeDraft().key]={...RetroEffects.defaults[activeDraft().key]};fillEffectControls();previewEffectDraft();};
  $('effectsForm').onsubmit=async e=>{e.preventDefault();try{await saveEffects();}catch(error){$('effectsSaveStatus').textContent='Not saved: '+error.message;toast(error.message);}};
  $('effectsReturn').onclick=async()=>{try{await saveEffects();go('booth');}catch(error){$('effectsSaveStatus').textContent='Not saved: '+error.message;toast(error.message);}};
- $('cameraLabEnable').onclick=()=>enableCamera(true);$('cameraLabStop').onclick=()=>{if(state==='idle')disableCamera();};
+ $('cameraLabEnable').onclick=()=>enableCamera(true);$('cameraLabStop').onclick=()=>{if(state==='idle'){disableCamera();mediaStatus('Camera and microphone stopped.');}};
  $('discardLook').onclick=()=>{syncEffects();go('booth');};
  effectPreviewTimer=setInterval(refreshCameraLab,150);syncEffects();
 }

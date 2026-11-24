@@ -18,3 +18,7 @@ One GitHub repository; **three independent manual Actions workflows**. No platfo
 No compiled APK/EXE is included in this source ZIP. Android keeps the existing secure-SPP QR-only pilot, not paper-validated. Windows native printing is not implemented. Keep stable `RETRO_TEST_*` signing secrets for upgrades, export important clips before uninstalling, and never upload private cloud keys or recordings to GitHub.
 
 See `docs/SPLIT_WORKFLOWS_SETUP.md` for the complete steps. The bundled historical Word guide describes the older combined workflow; this document supersedes its GitHub Actions instructions only.
+
+## v0.9.1 Android camera hotfix
+
+Camera/mic input selection and separate tests are now in Admin > 02 / DEVICE CHECK. For the upgraded Android APK, run the independent `RetroBooth - Build Android APK` workflow; use the versionCode 10 TEST APK. See `docs/ANDROID_CAMERA_TROUBLESHOOTING.md`. Windows EXE workflow remains independent.

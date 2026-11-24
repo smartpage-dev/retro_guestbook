@@ -124,7 +124,7 @@ with sync_playwright() as p:
  elif args.group=='camera-errors':
   page.evaluate('RetroApp.go("admin")')
   for name,expected in [('NotAllowedError','Permission denied'),('NotFoundError','No usable'),('NotReadableError','Device is busy'),('OverconstrainedError','selected device')]:
-   page.evaluate('(n)=>__fx.mediaError=n',name);page.locator('#cameraLabEnable').click();page.wait_for_timeout(160)
+   page.evaluate('(n)=>__fx.mediaError=n',name);page.locator('#cameraLabEnable').click();page.wait_for_timeout(700 if name in ('NotReadableError','OverconstrainedError') else 160)
    check(name+' actionable message',expected in page.locator('#toast').inner_text())
    check(name+' does not pretend camera is on',page.evaluate('RetroApp.status.mode==="demo"'))
   page.evaluate('__fx.mediaError="";__fx.videoOnly=true');page.locator('#cameraLabEnable').click();page.wait_for_timeout(300)

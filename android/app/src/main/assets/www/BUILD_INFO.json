@@ -1,9 +1,9 @@
 {
-  "version": "0.9.0-alpha.1",
+  "version": "0.9.1-alpha.1",
   "stage": "prototype - not event ready",
   "commit": "local-uncommitted",
   "run": "local",
-  "standaloneSHA256": "e73c2f3ccc0055e5a54631d339d4f42b973b9a0021f8f39cdc05ceebc886639b",
+  "standaloneSHA256": "eed2013c25d3bb9cb4a0197b70778fea8e2622df20abb24be7f0ea203c9f941f",
   "cloud": "opt-in PHP private-delivery alpha",
   "printer": "independent Android secure-SPP QR-only alpha; physical validation pending",
   "android": "WebView secure-SPP pilot; native recording not implemented",
