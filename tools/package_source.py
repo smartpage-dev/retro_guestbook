@@ -3,9 +3,9 @@ from pathlib import Path
 import hashlib, json, zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-ALLOWED_DIRS = {'src','android','cloud','docs','history','launchers','patches','qa','tests','tools','vendor','.github'}
-ALLOWED_FILES = {'README.md','CHANGELOG.md','VERSION.txt','package.json','.gitattributes','.gitignore','requirements-docs.txt','requirements-test.txt','SOURCE_PROVENANCE.json'}
-SKIP_PARTS = {'node_modules','.git','.gradle','build','__pycache__','artifacts','native-artifacts','data'}
+ALLOWED_DIRS = {'src','android','cloud','docs','history','launchers','patches','qa','tests','tools','vendor','.github','desktop'}
+ALLOWED_FILES = {'README.md','CHANGELOG.md','VERSION.txt','package.json','.gitattributes','.gitignore','requirements-docs.txt','requirements-test.txt','SOURCE_PROVENANCE.json','START_HERE.md','LICENSE.txt'}
+SKIP_PARTS = {'node_modules','.git','.gradle','build','__pycache__','artifacts','native-artifacts','data','release','web','.smoke-output'}
 
 def included(path: Path) -> bool:
     relative = path.relative_to(ROOT)
@@ -13,7 +13,7 @@ def included(path: Path) -> bool:
         return False
     if any(p in SKIP_PARTS for p in relative.parts):
         return False
-    if path.name in {'config.php','local.properties','.env'} or path.suffix.lower() in {'.pyc','.jks','.keystore','.p12','.pem'}:
+    if path.name in {'config.php','local.properties','.env'} or path.suffix.lower() in {'.pyc','.jks','.keystore','.p12','.pem','.pfx','.key','.b64'}:
         return False
     # Large synthetic encodes are reproducible test outputs, not guest media or source.
     if relative.parts[0] == 'qa' and path.suffix.lower() in {'.mp4','.webm','.pdf'}:
@@ -24,7 +24,7 @@ files = [p for p in sorted(ROOT.rglob('*')) if included(p)]
 manifest = {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
 manifest_bytes = (json.dumps({'version':(ROOT/'VERSION.txt').read_text().splitlines()[0], 'algorithm':'SHA-256', 'files':manifest},indent=2)+'\n').encode()
 (ROOT/'MANIFEST_SHA256.json').write_bytes(manifest_bytes)
-output = ROOT/'artifacts'/'RetroBooth_v0.8_GitHub_Ready.zip'
+output = ROOT/'artifacts'/'RetroBooth_v0.9_Android_Windows_GitHub_Ready.zip'
 output.parent.mkdir(exist_ok=True)
 with zipfile.ZipFile(output,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
     for name, data in [(p.relative_to(ROOT).as_posix(),p.read_bytes()) for p in files] + [('MANIFEST_SHA256.json',manifest_bytes)]:

@@ -12,7 +12,7 @@ normal=d.styles['Normal'];normal.font.name='Calibri';normal.font.size=Pt(11);nor
 for n,sz in [('Title',32),('Heading 1',24),('Heading 2',14)]:
  s=d.styles[n];s.font.name='Calibri';s.font.size=Pt(sz);s.font.bold=n!='Title';s.font.color.rgb=RGBColor.from_string('334632');s.paragraph_format.space_after=Pt(9);s.paragraph_format.space_before=Pt(10 if n=='Heading 2' else 0)
 # Small utility footer, not a decorative header.
-p=sec.footer.paragraphs[0];p.alignment=2;rr=p.add_run('RETROBOOTH  /  v0.8  /  ');rr.font.size=Pt(8);rr.font.color.rgb=RGBColor.from_string('777D70');f=OxmlElement('w:fldSimple');f.set(qn('w:instr'),'PAGE');p._p.append(f)
+p=sec.footer.paragraphs[0];p.alignment=2;rr=p.add_run('RETROBOOTH  /  v0.9  /  ');rr.font.size=Pt(8);rr.font.color.rgb=RGBColor.from_string('777D70');f=OxmlElement('w:fldSimple');f.set(qn('w:instr'),'PAGE');p._p.append(f)
 for i,(title,subtitle,blocks) in enumerate(pages):
  if i:d.add_page_break()
  p=d.add_paragraph('LUCE STUDIO  /  OPERATOR GUIDE' if i==0 else 'SETUP & RUNNING',style='Subtitle');p.runs[0].font.size=Pt(9);p.runs[0].font.color.rgb=RGBColor.from_string('747E6D')
@@ -48,5 +48,5 @@ for i,(title,subtitle,blocks) in enumerate(pages):
 for root in [d.element,d.styles.element]:
  for border in root.xpath('.//w:pBdr'):
   border.getparent().remove(border)
-d.core_properties.title='RetroBooth v0.8 - Setup and running guide';d.core_properties.author='Luce Studio';d.core_properties.subject='Private cloud delivery alpha - operation and build guide'
-out=R/'docs/RetroBooth_v0.8_Setup_and_Running_Guide.docx';d.save(out);print(out)
+d.core_properties.title='RetroBooth v0.9 - Setup and running guide';d.core_properties.author='Luce Studio';d.core_properties.subject='GitHub build and device operation - Android APK and Windows EXE'
+out=R/'docs/RetroBooth_v0.9_Setup_and_Running_Guide.docx';d.save(out);print(out)
