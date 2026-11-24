@@ -1,0 +1,21 @@
+PASS Desktop panel visible only with explicit bridge
+PASS Desktop platform/version rendered
+PASS Windows printer unavailability is explicit
+PASS Native printer stays disabled
+PASS Fullscreen uses narrow native method
+PASS Storage action uses narrow native method
+PASS Moving EXE does not claim to move recordings
+PASS Precise cloud allowlist shown
+PASS 1440 no horizontal overflow
+PASS 1440 native controls usable
+PASS 800 no horizontal overflow
+PASS 800 native controls usable
+PASS 390 no horizontal overflow
+PASS 390 native controls usable
+PASS 320 no horizontal overflow
+PASS 320 native controls usable
+PASS Cancelled export does not claim saved
+PASS Export completion states independent-copy requirement
+PASS Suspend callback leaves idle state intact
+PASS No JavaScript exceptions
+TOTAL 20 PASSED

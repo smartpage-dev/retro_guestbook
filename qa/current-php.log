@@ -1,0 +1,79 @@
+PASS real health endpoint
+PASS unauthenticated admin denied
+PASS wrong admin denied
+PASS unknown CORS origin denied
+PASS approved local test origin accepted
+PASS spoofed host denied
+PASS public filesystem traversal blocked
+PASS invalid title rejected
+PASS event creation
+PASS device scoped verify
+PASS device cannot administer
+PASS reserved pending identities
+PASS 192-bit separate owner and viewer secrets
+PASS guest pending before upload
+PASS view-only role enforced
+PASS view-only cannot delete
+PASS view-only cannot grant show consent
+PASS unknown guest token denied
+PASS media has no unauthenticated URL
+PASS init binds immutable media metadata
+PASS identical init is idempotent
+PASS conflicting metadata rejected
+PASS premature complete rejected
+PASS bad chunk hash rejected
+PASS oversized payload rejected
+PASS first chunk persisted
+PASS resume reports persisted indices
+PASS parallel identical chunk retries are idempotent
+PASS chunk 1 accepted
+PASS chunk 2 accepted
+PASS whole-file hash and size verified
+PASS completed file matches original bytes
+PASS duplicate complete safe
+PASS upload chunks cleaned after committed final file
+PASS viewer can read ready status
+PASS media session uses HttpOnly cookie
+PASS full media download matches hash
+PASS range bytes and headers exact
+PASS suffix range
+PASS open-ended range
+PASS invalid range is 416
+PASS multi-range intentionally rejected
+PASS mismatched If-Range returns full body
+PASS HEAD is authorized and length correct
+PASS no public media path
+PASS hide is reversible without deleting
+PASS allow does not imply staff approval
+PASS staff approval independent
+PASS delete requires reconfirmation
+PASS guest delete persists tombstone
+PASS old media cookie immediately denied on new request
+PASS deleted server media removed
+PASS remote local cleanup honestly pending
+PASS stale upload init cannot resurrect
+PASS stale upload chunk cannot resurrect
+PASS stale complete cannot resurrect
+PASS deletion remains idempotent
+PASS device acknowledges local cleanup
+PASS cross-event device read blocked
+PASS close issue does not close upload drain
+PASS new reservations fail after close
+PASS existing reservation still uploads after event close
+PASS explicit drain pause blocks writes
+PASS delete partial upload
+PASS late completion after partial delete fails
+PASS corrupt metadata fails closed
+PASS corrupt metadata is not reset
+PASS restore resumes stored records
+PASS missing initialized metadata fails closed
+PASS missing metadata not recreated
+PASS expired reserved link becomes tombstone
+PASS expired event cannot reserve new links
+PASS cleanup CLI succeeds on real private storage
+PASS cleanup keeps tombstones rather than removing identities
+PASS admin list never returns device secret hash
+PASS revoked device refused
+PASS guest ownership independent of device revocation
+PASS downloaded evidence is synthetically generated
+TOTAL 78 PASSED

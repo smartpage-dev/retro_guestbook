@@ -1,0 +1,27 @@
+{
+  "passed": 20,
+  "checks": [
+    "Desktop panel visible only with explicit bridge",
+    "Desktop platform/version rendered",
+    "Windows printer unavailability is explicit",
+    "Native printer stays disabled",
+    "Fullscreen uses narrow native method",
+    "Storage action uses narrow native method",
+    "Moving EXE does not claim to move recordings",
+    "Precise cloud allowlist shown",
+    "1440 no horizontal overflow",
+    "1440 native controls usable",
+    "800 no horizontal overflow",
+    "800 native controls usable",
+    "390 no horizontal overflow",
+    "390 native controls usable",
+    "320 no horizontal overflow",
+    "320 native controls usable",
+    "Cancelled export does not claim saved",
+    "Export completion states independent-copy requirement",
+    "Suspend callback leaves idle state intact",
+    "No JavaScript exceptions"
+  ],
+  "errors": [],
+  "scope": "Mock native bridge and store; no Electron/Windows execution"
+}
