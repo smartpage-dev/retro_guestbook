@@ -1,21 +1,20 @@
-# RetroBooth v0.9 - Build APK + Windows EXE
+# RetroBooth v0.9 - Independent APK and Windows EXE builds
 
-1. Extract this package. Copy the CONTENTS of the `RetroBooth` folder into your private GitHub repository root, including `.github`.
-2. Commit and push to the default branch. Never upload only the ZIP.
-3. Open **Actions > RetroBooth - Build APK and Windows EXE > Run workflow**.
-4. Leave Android and Windows enabled; Windows ARM64 is optional and off initially.
-5. After successful platform jobs, download their **Artifacts**, not logs or Evidence.
+One GitHub repository; **three independent manual Actions workflows**. No platform waits for the long Full Verification workflow before it starts compiling.
 
-## Install/run these files
+1. Copy the CONTENTS of this ZIP into the PRIVATE GitHub repository root (including the hidden `.github` folder). Do not add a nested `RetroBooth` folder.
+2. Confirm `.github/workflows/build-android.yml`, `build-windows.yml` and `verify-all.yml` exist on the default branch. **Delete the old `.github/workflows/build-all.yml`** if you are applying a patch instead of the complete repo.
+3. Commit and push the updated files to the default branch. Start a **new** workflow run (not Re-run of an old commit).
+4. Open **Actions** and choose either `RetroBooth - Build Android APK` or `RetroBooth - Build Windows EXE`, then select **Run workflow**. Optional ARM64 is disabled by default.
+5. For full browser, PHP and real-origin acceptance, separately run `RetroBooth - Full Verification`. A successful native build does not mean production/event acceptance.
+6. Download program files from the successful run's **Artifacts**, not the logs or Evidence artifacts.
 
-- Android: `RetroBooth-v0.9-Android-TEST.apk`.
-- Windows installer: `RetroBooth-0.9.0-alpha.1-Windows-x64-Setup.exe`.
-- Windows no-install: `RetroBooth-0.9.0-alpha.1-Windows-x64-Portable.exe`.
+## Expected installable output names
 
-The source ZIP does not contain precompiled APK/EXE files. Native compilation/runtime could not be run here; the workflow must pass on GitHub. No hardware acceptance is claimed.
+- Android: `RetroBooth-v0.9-Android-TEST.apk` (requires Android job success).
+- Windows x64 installer: `RetroBooth-0.9.0-alpha.1-Windows-x64-Setup.exe`.
+- Windows x64 portable: `RetroBooth-0.9.0-alpha.1-Windows-x64-Portable.exe`.
 
-Both CRT styles are included in both apps. Windows printing is **not implemented**; Android retains the secure-SPP QR-only pilot. Windows has webcam recording, local playback/export, cloud upload and timed screen QR.
+No compiled APK/EXE is included in this source ZIP. Android keeps the existing secure-SPP QR-only pilot, not paper-validated. Windows native printing is not implemented. Keep stable `RETRO_TEST_*` signing secrets for upgrades, export important clips before uninstalling, and never upload private cloud keys or recordings to GitHub.
 
-Use a persistent Android test signing key before keeping important recordings. Windows builds are unsigned. Moving an EXE does not move recordings. Each device needs its own cloud device identity. Existing cloud servers must explicitly allow `retrobooth://app` for Windows; do not reset server secrets.
-
-Read `docs/SETUP_AND_RUNNING_GUIDE.md` or its Word companion. See `docs/TEST_REPORT.md` for exact test limits.
+See `docs/SPLIT_WORKFLOWS_SETUP.md` for the complete steps. The bundled historical Word guide describes the older combined workflow; this document supersedes its GitHub Actions instructions only.
