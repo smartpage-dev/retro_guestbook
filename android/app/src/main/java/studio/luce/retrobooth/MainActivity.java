@@ -8,7 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Build;
-import android.webkit.WebResourceError;
+import androidx.webkit.WebResourceErrorCompat;
 import org.json.JSONArray;
 import java.util.ArrayDeque;
 import android.provider.DocumentsContract;
@@ -115,7 +115,7 @@ public final class MainActivity extends Activity {
                 if(!trusted(u)||!u.getPath().startsWith("/assets/www/"))return blocked();
                 WebResourceResponse response=loader.shouldInterceptRequest(u);return response!=null?response:blocked();
             }
-            @Override public void onReceivedError(WebView view,WebResourceRequest request,WebResourceError error){
+            @Override public void onReceivedError(WebView view,WebResourceRequest request,WebResourceErrorCompat error){
                 if(request.isForMainFrame())nativeDiag("webview_mainframe_error","code_"+error.getErrorCode());
             }
             @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request){
