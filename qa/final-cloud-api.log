@@ -3,11 +3,17 @@ PASS unauthenticated admin denied
 PASS wrong admin denied
 PASS unknown CORS origin denied
 PASS approved local test origin accepted
+PASS exact desktop CORS origin accepted
+PASS desktop authenticated preflight allowed
+PASS lookalike desktop origin denied
+PASS opaque null origin denied
 PASS spoofed host denied
 PASS public filesystem traversal blocked
 PASS invalid title rejected
 PASS event creation
 PASS device scoped verify
+PASS desktop device authorization remains required
+PASS desktop device auth and CORS together
 PASS device cannot administer
 PASS reserved pending identities
 PASS 192-bit separate owner and viewer secrets
@@ -76,4 +82,4 @@ PASS admin list never returns device secret hash
 PASS revoked device refused
 PASS guest ownership independent of device revocation
 PASS downloaded evidence is synthetically generated
-TOTAL 78 PASSED
+TOTAL 84 PASSED

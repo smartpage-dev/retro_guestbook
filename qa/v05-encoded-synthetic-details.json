@@ -2,25 +2,25 @@
   {
     "style": "edge",
     "mime": "video/mp4;codecs=vp9,opus",
-    "bytes": 1953565,
-    "durationMs": 10078,
+    "bytes": 1844395,
+    "durationMs": 10025,
     "validation": {
       "status": "metadata_readable",
       "width": 1040,
       "height": 720,
-      "durationSeconds": 9.923563
+      "durationSeconds": 9.9295
     }
   },
   {
     "style": "heritage",
     "mime": "video/mp4;codecs=vp9,opus",
-    "bytes": 2142834,
+    "bytes": 1815877,
     "durationMs": 10012,
     "validation": {
       "status": "metadata_readable",
       "width": 1074,
       "height": 720,
-      "durationSeconds": 9.942729
+      "durationSeconds": 9.942833
     }
   }
 ]

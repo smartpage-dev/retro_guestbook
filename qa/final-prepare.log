@@ -1,0 +1,6 @@
+
+> luce-retrobooth@0.9.0-alpha.1 desktop:prepare
+> node tools/prepare-desktop.mjs
+
+Built 290618 bytes e73c2f3ccc0055e5a54631d339d4f42b973b9a0021f8f39cdc05ceebc886639b
+Desktop assets prepared with 10 inline script hashes.

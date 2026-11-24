@@ -1,5 +1,5 @@
 
-RetroBooth webcam setup: http://127.0.0.1:46265/?setup=1
+RetroBooth webcam setup: http://127.0.0.1:47203/?setup=1
 This computer only. Android remote testing needs an HTTPS website or the test APK.
 Keep this terminal open. Ctrl+C stops the server.
 

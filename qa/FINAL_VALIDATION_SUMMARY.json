@@ -1,0 +1,22 @@
+{
+  "version": "0.9.0-alpha.1",
+  "standaloneSHA256": "e73c2f3ccc0055e5a54631d339d4f42b973b9a0021f8f39cdc05ceebc886639b",
+  "passed": {
+    "browserAssertions": 686,
+    "javascriptAssertions": 205,
+    "desktopNodeTests": 46,
+    "syntaxContracts": 29,
+    "jvmFakeTransportChecks": 57,
+    "phpHttpChecks": 84
+  },
+  "totalScoped": 1107,
+  "browserGroups": 25,
+  "nativeBinariesBuilt": false,
+  "nativeRuntimeExecuted": false,
+  "githubActionsExecuted": false,
+  "actualHardwareValidated": false,
+  "guidePagesVisuallyReviewed": 9,
+  "trueOriginBrowserAssertions": 0,
+  "trueOriginReason": "ERR_BLOCKED_BY_ADMINISTRATOR",
+  "desktopDependencyResolution": "first CI run required; no offline lock fabricated"
+}

@@ -13,8 +13,8 @@
   ],
   "errors": [],
   "requests": [
-    "blob:null/5d75558a-4848-45f3-980b-ab467aa60f47",
-    "blob:null/cc99bc48-fc4e-47c2-97a5-ede81bbf7d32"
+    "blob:null/929eb5a4-99c9-4e05-b3f7-55aed5c26093",
+    "blob:null/adc9a2dd-93ef-45b0-b8c5-f7488637f5a3"
   ],
   "scope": "Linux Chromium set_content; Canvas2D fallback; demo memory. Storage-contract uses a labeled adapter fixture. No hardware, real IndexedDB durability, cloud, or production acceptance."
 }

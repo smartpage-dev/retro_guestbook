@@ -1,7 +1,7 @@
 [
   {
     "style": "heritage",
-    "bytes": 151097,
+    "bytes": 173368,
     "mime": "video/mp4;codecs=vp9,opus",
     "width": 1074,
     "height": 720,
@@ -13,7 +13,7 @@
   },
   {
     "style": "edge",
-    "bytes": 38731,
+    "bytes": 133151,
     "mime": "video/mp4;codecs=vp9,opus",
     "width": 1040,
     "height": 720,
