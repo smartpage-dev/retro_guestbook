@@ -1,4 +1,4 @@
-"""Check RetroBooth v0.9.1 repository shape and three independent workflows.
+"""Check RetroBooth v0.9.4 repository shape and three independent workflows.
 This is a source-contract check, not proof of native compilation.
 """
 from pathlib import Path
@@ -8,6 +8,11 @@ required = [
     '.github/workflows/build-android.yml',
     '.github/workflows/build-windows.yml',
     '.github/workflows/verify-all.yml',
+    'cloud/retrobooth_private/app/StoredZip.php',
+    'cloud/retrobooth_private/tools/build_archives.php',
+    'cloud/public_html/client/index.html',
+    'cloud/public_html/assets/client.js',
+    'docs/V094_EVENT_CLOUD_SHARE_SETUP_ZH.md',
     'src/.htaccess', 'src/desktop-admin.html', 'src/diagnostics.js', 'tests/diagnostics.test.cjs',
     'tests/media_separation.test.cjs','tests/browser_v093_separated.py','docs/ANDROID_MEDIA_V093.md',
     'tools/prepare-desktop.mjs',

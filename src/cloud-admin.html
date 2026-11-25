@@ -1,8 +1,9 @@
 <section class="admin-card wide cloud-card" id="cloudCard">
  <div class="card-number">07 / PRIVATE CLOUD DELIVERY - ALPHA</div><h2>A real link. A private moment.</h2>
- <p>Connect a device bundle from Cloud Admin. Real recordings use pre-reserved guest links; uploads run while idle. Demo recordings remain local.</p>
+ <p><strong>Important:</strong> Without a verified Hostinger event connection, recordings are LOCAL-ONLY and the guest will not receive a usable QR. Connect Cloud BEFORE the first guest. Connect a device bundle from Cloud Admin. Real recordings use pre-reserved guest links; uploads run while idle. Demo recordings remain local.</p>
  <label for="cloudBundle">Device setup bundle (secret; do not publish)</label><textarea id="cloudBundle" rows="4" autocomplete="off" spellcheck="false" placeholder='Paste the JSON from Cloud Admin here'></textarea>
  <div class="button-row"><button id="cloudConnect" class="btn primary" type="button">Verify + connect cloud</button><button id="cloudRefill" class="btn secondary" type="button">Refill QR reserve</button><button id="cloudRetry" class="btn secondary" type="button">Retry / sync now</button><button id="cloudDisable" class="btn secondary" type="button">Local-only for new recordings</button></div>
+ <p class="small muted">Create/manage events and prepare passwordless expiring client ZIP shares at your Hostinger <strong>/admin/</strong> page. Never paste the Cloud Admin master key into this kiosk. Local-only captures cannot be retroactively assigned a guest QR.</p>
  <p id="cloudStatus" class="small mono" role="status">Cloud is off. Existing recordings are not automatically uploaded.</p>
  <div id="cloudQueue" class="cloud-queue"></div>
  <p class="small muted">Your receipt link can manage and delete that recording. Keep it private. Hide keeps the private video; Delete revokes cloud access and waits for the booth to reconnect before confirming local cleanup. Projector broadcasting and physical printing are not connected.</p>

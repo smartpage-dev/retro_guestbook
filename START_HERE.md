@@ -1,3 +1,11 @@
+# RetroBooth v0.9.4 — Real Guest QR + Private Events + Client ZIP Share
+
+This update fixes misleading QR behavior when Cloud is not connected. To produce a genuinely scannable guest video link, deploy/connect the Hostinger Cloud event BEFORE recording. Android video capture remains local-first. After the event, Cloud Admin can prepare all verified clips into private per-event ZIP bundles using the PHP Cron worker, then issue a revocable, expiring link for client downloads. Read **docs/V094_EVENT_CLOUD_SHARE_SETUP_ZH.md** and **docs/V094_CHANGELOG.md**.
+
+Android versionCode 13 (same app ID). Build APK and Windows EXE using their **separate** workflows; compiled programs are not included in this ZIP. Existing local-only recordings are NOT automatically uploaded or assigned a guest URL. Back up local tapes first.
+
+---
+
 # RetroBooth v0.9.3 - Android independent camera + microphone inputs
 
 **Android 13/12/other WebViews:** Admin > 02 / DEVICE CHECK > **1 / APPLY CAMERA - LIVE preview**. This deliberately requests VIDEO ONLY. You should see your live CRT image even when the mic fails. Then press **2 / APPLY MICROPHONE**. Audio request is independent; its failure does NOT close the camera. You may release only the microphone, or stop both. Guest Start is locked whenever exactly one input is working.

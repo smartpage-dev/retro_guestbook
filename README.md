@@ -1,3 +1,7 @@
+# RetroBooth v0.9.4 — Guest QR + Events + Client ZIP (Alpha)
+
+The Android camera/microphone v0.9.3 fix is preserved. A valid guest video QR requires an active Hostinger event connection; local-only recordings never display a scannable fake QR. New cloud events store media under private Event ID folders and Cloud Admin can prepare a private ZIP snapshot plus a revocable client share link. Server-side ZIP construction uses the private PHP Cron worker. **Read [Event + QR + ZIP Setup (Cantonese)](docs/V094_EVENT_CLOUD_SHARE_SETUP_ZH.md) and [v0.9.4 Test Report](docs/V094_TEST_REPORT.md) before deployment or event use.**
+
 # RetroBooth v0.9.3 - Independent Android Camera / Microphone recovery
 
 Android Admin Device Check now supports separate **Apply Camera (live video preview, no mic required)**, **Apply Microphone**, **Release microphone only** and **Stop both**. The combined convenience button performs two sequential independent requests. No guest recording without both working. Native manifest adds MODIFY_AUDIO_SETTINGS, and runtime permission prompts no longer pause WebView media capture prematurely. See `docs/ANDROID_MEDIA_V093.md`. Not hardware validated.
@@ -20,8 +24,8 @@ The common interface retains Edge-to-edge CRT / Heritage TV, film and soft-mono 
 
 Copy project CONTENTS including `.github` into repository root, push to default branch, then Actions > **RetroBooth - Build Android APK** OR **RetroBooth - Build Windows EXE** > Run workflow. Native builds are independent of the long **RetroBooth - Full Verification** job; run full verification separately before event use. Windows ARM64 is opt-in. Program artifacts are separate from Evidence and unsigned developer artifacts.
 
-- Android output: `RetroBooth-v0.9-Android-TEST.apk`
-- Windows output: `RetroBooth-0.9.0-alpha.1-Windows-x64-Setup.exe` and `...-Portable.exe`
+- Android output: `RetroBooth-v0.9.4-Android-TEST.apk`
+- Windows output: `RetroBooth-0.9.4-alpha.1-Windows-x64-Setup.exe` and `...-Portable.exe`
 - Workflows: `.github/workflows/build-android.yml`, `build-windows.yml`, `verify-all.yml`
 
 A successful build is not event readiness. Follow the guide's device acceptance routine. No GitHub account was accessed or deployment performed while preparing this package.

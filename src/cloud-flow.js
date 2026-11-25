@@ -12,7 +12,7 @@ async function authorizeNativeCloud(origin){
 function renderCloud(){
  if(!cloudClient||!$('cloudStatus'))return;
  const c=cloudClient.connection,rows=clips.filter(x=>x.cloud);
- $('cloudStatus').textContent=(c?'CONNECTED / '+c.serverOrigin+' / '+cloudClient.poolCount+' reserved QR links':'LOCAL-ONLY for new recordings')+' / '+rows.filter(x=>x.cloud.status==='ready').length+' cloud verified / '+rows.filter(x=>x.cloud.status!=='ready').length+' waiting'+(cloudClient.error?' / '+cloudClient.error:'');
+ $('cloudStatus').textContent=(c?'CONNECTED / Event: '+(c.eventTitle||c.eventId.slice(0,8))+' / '+c.serverOrigin+' / '+cloudClient.poolCount+' reserved QR links':'LOCAL-ONLY / No working phone QR until Hostinger event connected')+' / '+rows.filter(x=>x.cloud.status==='ready').length+' cloud verified / '+rows.filter(x=>x.cloud.status!=='ready').length+' waiting'+(cloudClient.error?' / '+cloudClient.error:'');
  $('cloudQueue').replaceChildren();
  for(const clip of rows.slice(-30).reverse()){
   const line=document.createElement('div');line.className='cloud-job';const text=document.createElement('span');text.textContent='Message '+clip.seq+' / '+clip.cloud.status+(clip.cloud.lastError?' / '+clip.cloud.lastError:'');line.append(text);

@@ -7,7 +7,7 @@
   const u=new URL(raw.serverOrigin),loop=['127.0.0.1','localhost'].includes(u.hostname);
   if((u.protocol!=='https:'&&!(loop&&u.protocol==='http:'))||u.pathname!=='/'||u.search||u.hash||u.username||u.password)throw new Error('Use a root HTTPS server origin, not a path.');
   if(!/^[a-f0-9]{32}$/.test(raw.eventId||'')||!/^[a-f0-9]{32}$/.test(raw.deviceId||'')||!new RegExp('^'+raw.deviceId+'\\.[A-Za-z0-9_-]{32}$').test(raw.deviceToken||''))throw new Error('Invalid device setup bundle.');
-  return {enabled:true,serverOrigin:u.origin,eventId:raw.eventId,deviceId:raw.deviceId,deviceToken:raw.deviceToken,expiresAt:Number(raw.expiresAt)||0};
+  return {enabled:true,serverOrigin:u.origin,eventId:raw.eventId,deviceId:raw.deviceId,deviceToken:raw.deviceToken,expiresAt:Number(raw.expiresAt)||0,eventTitle:String(raw.eventTitle||'').slice(0,80)};
  }
  const binding=c=>c?c.serverOrigin+'|'+c.eventId+'|'+c.deviceId:'';
  const tokenOK=s=>/^[a-f0-9]{32}\.[A-Za-z0-9_-]{32}$/.test(s||'');
@@ -37,7 +37,7 @@
    const c=config(raw);if(!c)throw new Error('Paste a valid setup bundle.');
    const proof=await this.call(c,'/api/device/verify');
    if(proof.deviceId!==c.deviceId||proof.event.id!==c.eventId||proof.publicOrigin!==c.serverOrigin)throw new Error('Server identity does not match this setup bundle.');
-   c.expiresAt=proof.event.expiresAt;
+   c.expiresAt=proof.event.expiresAt;c.eventTitle=String(proof.event.title||'').slice(0,80);
    const old=this.connection;await this.store.setAux('cloud-connection',c);this.connection=c;
    if(binding(old)!==binding(c))await this.store.setAux('cloud-pool',{binding:binding(c),slots:[]});
    this.error='';await this.refill();return proof;

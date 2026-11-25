@@ -17,7 +17,7 @@ fs.writeFileSync(path.join(out,'RetroBooth_Prototype.html'),html);
 fs.writeFileSync(path.join(out,'index.html'),html.replace('<html lang="zh-HK">','<html lang="zh-HK" data-service-worker="true">'));
 for(const f of ['sw.js','.htaccess'])fs.writeFileSync(path.join(out,f),read('src/'+f));
 fs.writeFileSync(path.join(out,'THIRD_PARTY_NOTICES.txt'),notice);
-const info={version:read('VERSION.txt').split('\n')[0],stage:'prototype - not event ready',commit:process.env.GITHUB_SHA||'local-uncommitted',run:process.env.GITHUB_RUN_ID||'local',standaloneSHA256:crypto.createHash('sha256').update(html).digest('hex'),cloud:'opt-in PHP private-delivery alpha',printer:'independent Android secure-SPP QR-only alpha; physical validation pending',android:'WebView secure-SPP pilot; native recording not implemented',windows:'Electron desktop build candidate; no Windows printer adapter'};
+const info={version:read('VERSION.txt').split('\n')[0],stage:'prototype - not event ready',commit:process.env.GITHUB_SHA||'local-uncommitted',run:process.env.GITHUB_RUN_ID||'local',standaloneSHA256:crypto.createHash('sha256').update(html).digest('hex'),cloud:'opt-in private events and client archive ZIP alpha',printer:'independent Android secure-SPP QR-only alpha; physical validation pending',android:'WebView secure-SPP pilot; native recording not implemented',windows:'Electron desktop build candidate; no Windows printer adapter'};
 fs.writeFileSync(path.join(out,'BUILD_INFO.json'),JSON.stringify(info,null,2)+'\n');
 const assets=path.join(root,'android/app/src/main/assets/www');fs.mkdirSync(assets,{recursive:true});
 fs.writeFileSync(path.join(assets,'index.html'),html); // no service worker in packaged shell

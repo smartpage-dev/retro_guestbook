@@ -1,6 +1,6 @@
 """Actual loopback PHP HTTP integration, real files/locks/hashes/cookies; no mocked backend."""
 from pathlib import Path
-import tempfile,subprocess,os,sys,time,json,hashlib,urllib.request,urllib.error,signal,concurrent.futures,struct,socket
+import tempfile,subprocess,os,sys,time,json,hashlib,urllib.request,urllib.error,signal,concurrent.futures,struct,socket,zipfile,io
 R=Path(__file__).resolve().parents[1];Q=R/'qa';Q.mkdir(exist_ok=True);checks=[]
 def check(n,v):
  if not v: raise AssertionError(n)
@@ -80,9 +80,9 @@ with tempfile.TemporaryDirectory(prefix='retro-cloud-api-') as tmp:
   check('parallel identical chunk retries are idempotent',all(r[0]==200 and r[1]['duplicate'] for r in duplicates))
   for i in range(1,len(chunks)):check('chunk '+str(i)+' accepted',put(i)[0]==200)
   code,complete,_=request(base+'/complete',device,{});check('whole-file hash and size verified',code==200 and complete=={'ready':True,'sha256':sha,'size':len(blob)})
-  check('completed file matches original bytes',(data/'clips'/cid/'video.bin').read_bytes()==blob)
+  check('completed file matches original bytes',(data/'events'/eid/'clips'/cid/'video.bin').read_bytes()==blob)
   check('duplicate complete safe',request(base+'/complete',device,{})[1]==complete)
-  check('upload chunks cleaned after committed final file',not list((data/'clips'/cid).glob('part-*')))
+  check('upload chunks cleaned after committed final file',not list((data/'events'/eid/'clips'/cid).glob('part-*')))
   check('viewer can read ready status',request('/api/guest/status',view)[1]['status']=='ready')
   code,g,headers=request('/api/guest/open',owner,{});cookie=headers.get('Set-Cookie','').split(';')[0]
   check('media session uses HttpOnly cookie',code==200 and 'HttpOnly' in headers.get('Set-Cookie','') and 'SameSite=Strict' in headers.get('Set-Cookie',''))
@@ -95,13 +95,53 @@ with tempfile.TemporaryDirectory(prefix='retro-cloud-api-') as tmp:
   check('mismatched If-Range returns full body',request('/api/media/'+cid,headers={'Cookie':cookie,'Range':'bytes=0-9','If-Range':'"wrong"'})[0]==200)
   check('HEAD is authorized and length correct',request('/api/media/'+cid,method='HEAD',headers={'Cookie':cookie})[2].get('Content-Length')==str(len(blob)))
   check('no public media path',request('/clips/'+cid+'/video.bin')[0]==404)
+  # v0.9.4 event isolation, private snapshot generation, short-lived client sharing.
+  archives='/api/admin/event/'+eid+'/archive'
+  check('cloud event has private storage folder',(data/'events'/eid/'clips'/cid/'video.bin').is_file())
+  check('archive requires closed event',request(archives,admin,{'action':'prepare','confirm':'SHARE_ALL_READY'})[0]==409)
+  request('/api/admin/event/'+eid,admin,{'issueOpen':False,'uploadOpen':False})
+  check('archive confirmation enforced',request(archives,admin,{'action':'prepare'})[0]==400)
+  code,job,_=request(archives,admin,{'action':'prepare','confirm':'SHARE_ALL_READY'})
+  check('archive queue contains verified clips only',code==200 and job['status']=='queued' and job['count']==1)
+  check('client link unavailable before ZIP ready',request(archives,admin,{'action':'create-link','confirm':'SHARE_ALL_READY','days':7})[0]==409)
+  worker=subprocess.run(['php',str(R/'cloud/retrobooth_private/tools/build_archives.php')],env=env,capture_output=True,text=True,timeout=30)
+  check('CLI ZIP worker builds verified archive',worker.returncode==0 and 'READY' in worker.stdout)
+  status,pack,_=request(archives,admin)
+  check('ready archive includes one ZIP part',status==200 and pack['status']=='ready' and len(pack['parts'])==1 and pack['count']==1)
+  archive_id=json.loads((data/'state.json').read_text())['events'][eid]['archive']['id']
+  archivefile=data/'events'/eid/'archives'/(archive_id+'-part-001.zip')
+  with zipfile.ZipFile(archivefile) as zipped:
+   names=zipped.namelist()
+   recorded=next(x for x in names if x.endswith('.mp4'))
+   check('ZIP contains byte-identical original video',zipped.testzip() is None and zipped.read(recorded)==blob)
+   check('ZIP includes manifest and safe relative filenames',any(x.endswith('MANIFEST.csv') for x in names) and all('..' not in x and not x.startswith('/') for x in names))
+  code,share,_=request(archives,admin,{'action':'create-link','confirm':'SHARE_ALL_READY','days':7})
+  token=share['shareUrl'].split('token=')[1]
+  check('client URL has expiring unguessable bearer token',code==200 and len(token)==65 and 'index.html?token=' in share['shareUrl'])
+  check('client login is private and authenticated',request('/api/client/status')[0]==401 and request('/api/client/status','1'*32+'.'+'Z'*32)[0]==401)
+  check('correct client token lists ZIPs only',request('/api/client/status',token)[1]['parts'][0]['bytes']==archivefile.stat().st_size)
+  code,grant,headers=request('/api/client/authorize',token,{})
+  bc=headers.get('Set-Cookie','').split(';')[0]
+  check('client download uses secure HttpOnly scoped cookie',code==200 and grant['authorized'] and 'HttpOnly' in headers.get('Set-Cookie','') and 'SameSite=Strict' in headers.get('Set-Cookie',''))
+  ziproute='/api/client/zip/'+archive_id+'/1'
+  check('no public ZIP download without client cookie',request(ziproute)[0]==401)
+  check('authenticated ZIP is byte-identical',request(ziproute,headers={'Cookie':bc})[1]==archivefile.read_bytes())
+  code,part,headers=request(ziproute,headers={'Cookie':bc,'Range':'bytes=4-43'})
+  check('ZIP supports HTTP range downloads',code==206 and part==archivefile.read_bytes()[4:44] and 'bytes 4-43/' in headers.get('Content-Range',''))
+  check('client ZIP cannot cross event or guess part',request('/api/client/zip/'+archive_id+'/2',headers={'Cookie':bc})[0]==404)
+  code,rotated,_=request(archives,admin,{'action':'create-link','confirm':'SHARE_ALL_READY','days':1})
+  check('rotating link rejects old token and old download cookie',code==200 and request('/api/client/status',token)[0]==401 and request(ziproute,headers={'Cookie':bc})[0]==410)
+  newer=rotated['shareUrl'].split('token=')[1]
+  check('explicit revoke immediately disables client link',request(archives,admin,{'action':'revoke'})[0]==200 and request('/api/client/status',newer)[0]==410)
+  request('/api/admin/event/'+eid,admin,{'issueOpen':True,'uploadOpen':True})
   check('hide is reversible without deleting',request('/api/guest/permission',owner,{'permission':'hidden'})[1]['permission']=='hidden' and request('/api/guest/status',owner)[1]['status']=='ready')
   check('allow does not imply staff approval',request('/api/guest/permission',owner,{'permission':'allow'})[0]==200 and request('/api/guest/status',owner)[1]['moderation']=='pending')
   check('staff approval independent',request('/api/admin/clip/'+cid+'/moderate',admin,{'approved':True})[0]==200 and request('/api/guest/status',owner)[1]['permission']=='allow')
   check('delete requires reconfirmation',request('/api/guest/delete',owner,{})[0]==400)
   check('guest delete persists tombstone',request('/api/guest/delete',owner,{'confirm':'DELETE'})[0]==200)
+  check('guest deletion invalidates prepared archive',request(archives,admin)[1]['status']=='stale' and not archivefile.exists())
   check('old media cookie immediately denied on new request',request('/api/media/'+cid,headers={'Cookie':cookie})[0]==410)
-  check('deleted server media removed',not (data/'clips'/cid).exists())
+  check('deleted server media removed',not (data/'events'/eid/'clips'/cid).exists())
   check('remote local cleanup honestly pending',request('/api/guest/status',owner)[1]['devicePurgeAck'] is False)
   check('stale upload init cannot resurrect',request(base+'/init',device,meta)[0]==410)
   check('stale upload chunk cannot resurrect',put(0)[0]==410)
@@ -118,7 +158,7 @@ with tempfile.TemporaryDirectory(prefix='retro-cloud-api-') as tmp:
   request('/api/admin/event/'+eid,admin,{'uploadOpen':True})
   # Delete DURING partial upload.
   base2='/api/device/clip/'+b['id'];request(base2+'/chunk/0',device,method='PUT',raw=chunks[0],headers={'X-Chunk-SHA256':digest(chunks[0])})
-  check('delete partial upload',request('/api/guest/delete',b['ownerToken'],{'confirm':'DELETE'})[0]==200 and not (data/'clips'/b['id']).exists())
+  check('delete partial upload',request('/api/guest/delete',b['ownerToken'],{'confirm':'DELETE'})[0]==200 and not (data/'events'/eid/'clips'/b['id']).exists())
   check('late completion after partial delete fails',request(base2+'/complete',device,{})[0]==410)
   # Corruption must never be mistaken for a new database.
   statefile=data/'state.json';before=statefile.read_bytes();statefile.write_text('{BROKEN')

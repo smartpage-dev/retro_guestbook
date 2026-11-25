@@ -28,7 +28,7 @@ try {
     $method=$_SERVER['REQUEST_METHOD']??'GET';$route=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH);
     if ($method==='OPTIONS') {http_response_code(204);exit;}
     if (!str_starts_with($route,'/api/')) {
-        $file=match($route) {'/','/booth','/booth/'=>__DIR__.'/booth/index.html','/guest','/guest/'=>__DIR__.'/guest/index.html','/admin','/admin/'=>__DIR__.'/admin/index.html',default=>null};
+        $file=match($route) {'/','/booth','/booth/'=>__DIR__.'/booth/index.html','/guest','/guest/'=>__DIR__.'/guest/index.html','/client','/client/'=>__DIR__.'/client/index.html','/admin','/admin/'=>__DIR__.'/admin/index.html',default=>null};
         if (!$file || !is_file($file)) rb_fail(404,'not_found');
         header('Content-Type: text/html; charset=utf-8');readfile($file);exit;
     }
@@ -52,6 +52,21 @@ try {
             while($remaining>0 && !connection_aborted()) {$bytes=fread($h,min(65536,$remaining));if ($bytes===false||$bytes==='') break;echo $bytes;$remaining-=strlen($bytes);}
         } finally {fclose($h);}exit;
     }
+    if (preg_match('#^/api/client/zip/([a-f0-9]{32})/([0-9]{1,3})$#D',$route,$m) && in_array($method,['GET','HEAD'],true)) {
+        $archive=$api->archiveDownload($m[1],(int)$m[2],$_COOKIE['retro_bundle']??'');$h=$archive['handle'];
+        try {
+            $size=$archive['size'];$range=$_SERVER['HTTP_RANGE']??null;
+            try {[$start,$end,$code]=rb_range($range,$size);}
+            catch(CloudError $e){header('Content-Range: bytes */'.$size);throw $e;}
+            http_response_code($code);header('Content-Type: application/zip');header('Accept-Ranges: bytes');header('Content-Length: '.($end-$start+1));
+            header('Content-Disposition: attachment; filename="'.$archive['name'].'"');
+            if($code===206)header('Content-Range: bytes '.$start.'-'.$end.'/'.$size);
+            if($method==='HEAD')exit;
+            if(fseek($h,$start)!==0)rb_fail(503,'archive_seek_failed');
+            $left=$end-$start+1;
+            while($left>0 && !connection_aborted()){$chunk=fread($h,min(65536,$left));if($chunk===false||$chunk==='')break;echo $chunk;$left-=strlen($chunk);}
+        } finally {fclose($h);}exit;
+    }
     $api->rateLimit($_SERVER['REMOTE_ADDR']??'unknown',$token);
     $binary='';$body=[];$limit=$method==='PUT'?524288:16384;
     if (isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH']>$limit) rb_fail(413,'request_too_large');
@@ -65,6 +80,12 @@ try {
         }
     }
     $result=$api->handle($method,$route,$token,$body,$binary,$_SERVER['HTTP_X_CHUNK_SHA256']??'');
+    if (isset($result['archiveGrant'])) {
+        if ($requestOrigin && $requestOrigin!==$origin) rb_fail(403,'archive_grants_require_same_origin');
+        $g=$result['archiveGrant'];
+        setcookie('retro_bundle',$g['value'],['expires'=>$g['expires'],'path'=>'/api/client/zip','secure'=>!$dev,'httponly'=>true,'samesite'=>'Strict']);
+        unset($result['archiveGrant']);$result['authorized']=true;
+    }
     if (isset($result['mediaGrant'])) {
         $g=$result['mediaGrant'];
         if ($requestOrigin && $requestOrigin!==$origin) rb_fail(403,'media_grants_require_same_origin');
