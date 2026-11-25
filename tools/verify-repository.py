@@ -10,6 +10,7 @@ required = [
     '.github/workflows/verify-all.yml',
     'src/.htaccess', 'src/desktop-admin.html', 'src/diagnostics.js', 'tests/diagnostics.test.cjs',
     'tests/media_separation.test.cjs','tests/browser_v093_separated.py','docs/ANDROID_MEDIA_V093.md',
+    'tests/browser_v094_style_fit.py','docs/MODERN_CRT_V094.md',
     'tools/prepare-desktop.mjs',
     'desktop/main.cjs', 'desktop/package.json',
     'desktop/electron-builder.cjs', 'desktop/resources/icon.ico',

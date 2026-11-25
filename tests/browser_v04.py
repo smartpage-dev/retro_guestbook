@@ -47,8 +47,7 @@ BrowserStore.prototype.setSettings=async function(value){await new Promise(r=>se
      for selector in ['#touchBtn','#panelTimer','.panel-footer','.panel-lamps']:
       check(prefix+selector+' not clipped by panel',inside(page,selector))
      check(prefix+'picture matches capture aspect',page.evaluate('Math.abs(cameraCanvas.width/cameraCanvas.height-document.getElementById("screen").clientWidth/document.getElementById("screen").clientHeight)<.004'))
-     if style=='edge':check(prefix+'edge screen has no frame',page.locator('.tv-bezel').evaluate('e=>getComputedStyle(e).padding==="0px"&&getComputedStyle(e).borderRadius==="0px"'))
-     else:check(prefix+'heritage has curved screen rim',page.locator('.tv-bezel').evaluate('e=>parseFloat(getComputedStyle(e).padding)>0&&parseFloat(getComputedStyle(e).borderRadius)>0'))
+     check(prefix+'curved CRT frame and picture inset',page.locator('.tv-bezel').evaluate('e=>parseFloat(getComputedStyle(e).padding)>0&&parseFloat(getComputedStyle(e).borderRadius)>0'))
     geometries.append({'style':style,'viewport':[w,h],'bounds':page.evaluate('Object.fromEntries(["#screen",".control-panel","#touchBtn"].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return [s,{x:r.x,y:r.y,width:r.width,height:r.height}]}))')})
     if (w,h) in [(1920,1080),(1280,720),(800,360),(390,844),(320,720)]:page.screenshot(path=str(Q/f'{style}-{w}.png'),full_page=True)
   page.evaluate('RetroApp.go("admin")')
@@ -61,6 +60,7 @@ BrowserStore.prototype.setSettings=async function(value){await new Promise(r=>se
   (Q/'geometries.json').write_text(json.dumps(geometries,indent=2))
  elif args.group=='appearance':
   check('new preview starts with Heritage',page.evaluate('RetroApp.status.settings.screenStyle==="heritage"'))
+  heritageBounds=page.locator('#screen').bounding_box()
   original=page.evaluate('RetroApp.status.settings')
   for i in range(5):page.locator('#staffEntry').click()
   check('five version taps open Admin',page.locator('#view-admin').is_visible())
@@ -71,7 +71,7 @@ BrowserStore.prototype.setSettings=async function(value){await new Promise(r=>se
   check('Apply switches to Edge and returns to booth',page.evaluate('RetroApp.status.settings.screenStyle==="edge"&&RetroApp.status.view==="booth"'))
   after=page.evaluate('RetroApp.status.settings');after.pop('screenStyle');original.pop('screenStyle')
   check('style switch preserves all other settings',after==original)
-  check('edge geometry equals v0.3',page.locator('#screen').evaluate('e=>{const r=e.getBoundingClientRect();return r.x===0&&r.y===0&&r.width===1560&&r.height===1080}'))
+  check('Modern CRT shares Heritage picture geometry',all(abs(page.locator('#screen').bounding_box()[k]-heritageBounds[k])<1 for k in ['x','y','width','height']))
   check('no recording created by switch',page.evaluate('RetroApp.clips.length===0'))
   page.evaluate('RetroApp.go("admin")');page.locator('#duration').select_option('30');page.locator('#receiptStyle').select_option('ticket');page.locator('#preset').select_option('mono',force=True);page.locator('#settingsForm button[type=submit]').click()
   check('event settings submit preserves selected screen style',page.evaluate('RetroApp.status.settings.screenStyle==="edge"'))

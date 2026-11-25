@@ -1,3 +1,9 @@
+# RetroBooth v0.9.4-alpha.1 — Modern CRT fit + TV cabinet
+
+**New:** 01 Modern CRT now uses the exact same viewport/cabinet/panel geometry, inset and responsive size rules as 02 Heritage television. Modern graphite casing with silver bevel and colour-film CRT treatment. Right-side five-tap Admin/version control remains inside the picture-safe area. 02 Heritage TV styling is intentionally unchanged.
+
+Android versionCode **13** (same app ID and same signing requirements). Build Android and Windows from independent GitHub Actions. Full details: `docs/MODERN_CRT_V094.md`. Test report: `docs/V094_TEST_REPORT.md`.
+
 # RetroBooth v0.9.3 - Independent Android Camera / Microphone recovery
 
 Android Admin Device Check now supports separate **Apply Camera (live video preview, no mic required)**, **Apply Microphone**, **Release microphone only** and **Stop both**. The combined convenience button performs two sequential independent requests. No guest recording without both working. Native manifest adds MODIFY_AUDIO_SETTINGS, and runtime permission prompts no longer pause WebView media capture prematurely. See `docs/ANDROID_MEDIA_V093.md`. Not hardware validated.

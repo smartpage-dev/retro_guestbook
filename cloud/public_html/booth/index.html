@@ -120,8 +120,8 @@ body[data-capture-state=recording] .panel-start .start-mark{background:#efb394;b
 @media(max-height:430px) and (orientation:landscape){.kiosk .idle-kicker{display:none}}
 @media(orientation:portrait){.kiosk .television{min-height:0}.kiosk .control-panel{min-height:max(360px,calc(var(--viewport-height) - max(65vw,270px) - 42px))}.kiosk .idle-kicker{display:none}}
 
-/* v0.5: optional Heritage TV skin. Original edge-to-edge CSS is unchanged.
-   All textures are procedural gradients; no reference photo or font is embedded. */
+/* v0.9.4: 01 Modern CRT and 02 Heritage TV share identical cabinet geometry.
+   Only material/colour treatment differs. All textures are procedural CSS gradients. */
 .cabinet-details{display:none}
 .appearance-card{margin-bottom:24px;padding:30px}
 .appearance-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:26px}
@@ -151,84 +151,234 @@ body[data-capture-state=recording] .panel-start .start-mark{background:#efb394;b
 .appearance-actions{display:flex;justify-content:space-between;align-items:center;gap:26px;margin-top:24px;padding-top:22px;border-top:1px solid var(--line)}
 .appearance-actions>div{max-width:650px}.appearance-actions p{font-size:13px}.appearance-actions .small{font-size:11px;margin-top:7px}.appearance-actions .btn{flex:none;min-height:50px}
 /* Full viewport is the television face; there is no tabletop, room or surrounding canvas. */
-body.kiosk[data-screen-style=heritage]{--panel-width:clamp(180px,18vw,368px);--cabinet-inset:clamp(12px,1.25vw,28px);--screen-rim:clamp(15px,1.65vw,36px);background:#412b1e}
-.kiosk[data-screen-style=heritage] .television{position:relative;padding:var(--cabinet-inset)!important;gap:clamp(10px,1.05vw,22px);border-radius:0;background:repeating-linear-gradient(2deg,transparent 0 2px,#1a0d0766 3px 4px,#d69c4721 4px 5px,transparent 6px 10px),repeating-linear-gradient(-1deg,#3d2419 0 18px,#74472b 19px 22px,#513120 23px 37px,#7a5131 38px 39px,#4e3021 40px 59px),linear-gradient(95deg,#71472b,#402418);box-shadow:inset 0 0 0 2px #271e15,inset 0 0 0 5px #bd945a5e,inset 0 10px 12px #f3c98822,inset 0 -9px 14px #180e0abb}
-.kiosk[data-screen-style=heritage] .cabinet-details{display:block;position:absolute;inset:0;pointer-events:none;z-index:8}
+body.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]){--panel-width:clamp(180px,18vw,368px);--cabinet-inset:clamp(12px,1.25vw,28px);--screen-rim:clamp(15px,1.65vw,36px);background:#412b1e}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .television{position:relative;padding:var(--cabinet-inset)!important;gap:clamp(10px,1.05vw,22px);border-radius:0;background:repeating-linear-gradient(2deg,transparent 0 2px,#1a0d0766 3px 4px,#d69c4721 4px 5px,transparent 6px 10px),repeating-linear-gradient(-1deg,#3d2419 0 18px,#74472b 19px 22px,#513120 23px 37px,#7a5131 38px 39px,#4e3021 40px 59px),linear-gradient(95deg,#71472b,#402418);box-shadow:inset 0 0 0 2px #271e15,inset 0 0 0 5px #bd945a5e,inset 0 10px 12px #f3c98822,inset 0 -9px 14px #180e0abb}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .cabinet-details{display:block;position:absolute;inset:0;pointer-events:none;z-index:8}
 .cabinet-details i{position:absolute;width:7px;height:7px;border-radius:50%;background:linear-gradient(130deg,#d7be90,#4c4432 43%,#10150f 47% 54%,#ac976a 59%,#4a402c);box-shadow:0 1px 2px #000}
 .cabinet-details i:nth-child(1){left:8px;top:8px}.cabinet-details i:nth-child(2){right:8px;top:8px}.cabinet-details i:nth-child(3){left:8px;bottom:8px}.cabinet-details i:nth-child(4){right:8px;bottom:8px}
-.kiosk[data-screen-style=heritage] .tv-bezel{position:relative;padding:var(--screen-rim);border-radius:clamp(25px,3.6vw,74px) / clamp(32px,5vw,96px);border:2px solid #c0a071;background:linear-gradient(115deg,#413529,#a08051 1.2%,#d1b681 1.8%,#3d3327 2.4%,#211d19 5%,#504838 6%,#1b1b16 12%,#24251e 81%,#756447 93%,#b99b67 96%,#31291f 99%);box-shadow:0 0 0 2px #301e14,0 0 0 4px #9b703e,0 0 0 7px #38251b,8px 9px 14px #190e0966,inset 0 1px 6px #f8deb461,inset 0 -4px 10px #0008;overflow:hidden}
-.kiosk[data-screen-style=heritage] .tv-screen{border-radius:7.5% / 11%;background:#0f1713;box-shadow:0 0 0 2px #0c0d09,0 2px 1px #bdab7666,0 0 0 5px #161c16,inset 0 0 30px #000}
-.kiosk[data-screen-style=heritage] .screen-vignette{border-radius:inherit;z-index:6;background:radial-gradient(ellipse at 50% 48%,transparent 40%,#00000019 67%,#00000099 100%),linear-gradient(135deg,#fff5ce16 0%,#fff3c907 17%,#ffffff00 27%,#fffbdc04 65%,#fff3d80e 70%,#fff3d800 80%);box-shadow:inset 0 15px 22px #0008,inset 0 -16px 30px #0009,inset 13px 0 25px #0007,inset -13px 0 25px #0007}
-.kiosk[data-screen-style=heritage] .screen-vignette:before{content:'';position:absolute;top:2%;left:6%;right:6%;height:14%;border-top:2px solid #fff9d927;border-radius:50%;background:radial-gradient(ellipse at 50% 0,#fff7d512,transparent 73%);opacity:.75}
-.kiosk[data-screen-style=heritage] .screen-vignette:after{border-radius:inherit;background:repeating-linear-gradient(to bottom,transparent 0 2px,#080b072e 2px 3px);opacity:.6}
-.kiosk[data-screen-style=heritage] .screen-top{top:5%;left:5%;right:5%;color:#e9c88d;text-shadow:0 0 9px #ffc45e66;letter-spacing:2px}
-.kiosk[data-screen-style=heritage] #adminCorner,.kiosk[data-screen-style=heritage] #signalLabel{border-color:#d8b46d44}
-.kiosk[data-screen-style=heritage] .idle-overlay{color:#f0d296;bottom:13%;left:5%;right:5%}
-.kiosk[data-screen-style=heritage] .screen-prompt{font-weight:500;letter-spacing:4px;text-shadow:0 0 6px #ffc55b55,0 0 20px #ffc55b38}
-.kiosk[data-screen-style=heritage] .idle-kicker{color:#d1b880;opacity:.72}
-.kiosk[data-screen-style=heritage] .idle-overlay p{color:#c3b891}
-.kiosk[data-screen-style=heritage] .screen-bottom{bottom:7.5%;left:5.5%;right:5.5%;color:#d5b985}
-.kiosk[data-screen-style=heritage] .privacy-line{left:calc(var(--cabinet-inset) + var(--screen-rim) + 4%);width:calc(100% - var(--panel-width) - 2 * var(--cabinet-inset) - 2 * var(--screen-rim) - 8%);bottom:calc(var(--cabinet-inset) + var(--screen-rim) + 2.2%);color:#d3c0959c;font-size:clamp(8px,.56vw,12px)!important}
-.kiosk[data-screen-style=heritage] .record-overlay{background:#17160f35}
-.kiosk[data-screen-style=heritage] .rec-bar{color:#f3d79c}
-.kiosk[data-screen-style=heritage] .wave-block p,.kiosk[data-screen-style=heritage] .wave-block small{color:#f1d298}
-.kiosk[data-screen-style=heritage] .record-progress div{background:#d8b97a}
-.kiosk[data-screen-style=heritage] .state-overlay{background:#191a12c9;color:#f3d394}
-.kiosk[data-screen-style=heritage] .state-title{text-shadow:0 0 18px #e0a14944}
-.kiosk[data-screen-style=heritage] .control-panel{position:relative;isolation:isolate;border:2px solid #ac8955;border-radius:8px;padding:clamp(20px,2.7vh,32px) clamp(18px,2.1vw,42px) clamp(12px,1.8vh,22px);color:#dec79c;background:repeating-linear-gradient(0deg,#b69a6520 0 1px,#0000 1px 4px),linear-gradient(105deg,#343129,#24251e 23%,#2c2c23 75%,#161b16);box-shadow:0 0 0 2px #352318,0 0 0 4px #805a36,inset 2px 2px 4px #e1ba7755,inset -4px -4px 9px #000b,5px 5px 15px #0c090755;overflow:hidden}
-.kiosk[data-screen-style=heritage] .panel-brand{border:1px solid #8b724b;background:linear-gradient(120deg,#bba074,#ddc399 44%,#9e8359);box-shadow:inset 0 1px 0 #fff3c875,0 3px 7px #0006;padding:12px 6px 11px;width:100%;text-align:center;color:#3e3828;border-radius:2px}
-.kiosk[data-screen-style=heritage] .panel-brand .maker{font-size:clamp(8px,.55vw,12px);letter-spacing:3px;margin-bottom:6px;color:#59503a}
-.kiosk[data-screen-style=heritage] .panel-brand strong{font:italic clamp(19px,1.52vw,31px)/1 var(--serif);letter-spacing:-.8px}
-.kiosk[data-screen-style=heritage] .panel-brand .registered{font:8px var(--sans);top:-8px}
-.kiosk[data-screen-style=heritage] .panel-brand .model{font-size:clamp(6px,.41vw,9px);letter-spacing:1.1px;color:#564a34;margin-top:7px}
-.kiosk[data-screen-style=heritage] .channel-display{margin-top:clamp(17px,2.1vh,25px);padding:12px 0 0;border-color:#9e855c70;color:#d0bb8d}
-.kiosk[data-screen-style=heritage] .display-label{font-size:clamp(7px,.55vw,11px);letter-spacing:1.7px;color:#bda77e}
-.kiosk[data-screen-style=heritage] .channel-number{color:#dec492;text-shadow:0 1px #000;font:clamp(33px,3vw,59px)/1 var(--serif)}
-.kiosk[data-screen-style=heritage] .channel-number span{color:#ae9870}
-.kiosk[data-screen-style=heritage] .on-air-dot{background:#d9b766;box-shadow:0 0 0 3px #1a1d16,0 0 0 4px #806b48,0 0 11px #ffc95b55}
-.kiosk[data-screen-style=heritage] .tuner-assembly{margin-top:clamp(12px,2vh,24px);color:#b8a77f}
-.kiosk[data-screen-style=heritage] .tuning-scale{color:#c1aa79;letter-spacing:2px}
-.kiosk[data-screen-style=heritage] .tuning-dial{width:clamp(65px,7.8vh,96px);height:clamp(65px,7.8vh,96px);border:3px solid #b39b70;outline:2px solid #1a1c15;outline-offset:3px;background:repeating-conic-gradient(#d6bd86 0 3deg,#675c42 3deg 6deg);box-shadow:0 4px 8px #000a,inset 0 2px 3px #fff8c875}
-.kiosk[data-screen-style=heritage] .tuning-dial:before{background:radial-gradient(ellipse at 35% 27%,#c9b48e,#8f7c58 45%,#4e4833 75%,#b9a478 78%,#4d4735 82%);box-shadow:inset 1px 2px 4px #f9e6bb55,inset -2px -3px 4px #13190e66;inset:10%;border:1px solid #3a3829}
-.kiosk[data-screen-style=heritage] .tuning-dial span{width:13%;height:65%;background:linear-gradient(90deg,#6e6246,#e3cf9d 40%,#c0a575 66%,#726043);border-radius:3px;box-shadow:2px 2px 3px #0007;transform:rotate(26deg);z-index:1}
-.kiosk[data-screen-style=heritage] .dial-caption{color:#b5a077;font-size:clamp(6px,.46vw,10px);letter-spacing:2px;margin-top:12px}
-.kiosk[data-screen-style=heritage] .panel-session{margin-top:clamp(18px,2.3vh,29px);background:linear-gradient(150deg,#0b120e,#1a2117);border:2px solid #90764b;border-radius:4px;padding:clamp(11px,1.4vh,17px) 14px;box-shadow:0 0 0 2px #181a14,inset 0 3px 12px #000,inset 0 -1px #c0a57244;color:#f3c76f}
-.kiosk[data-screen-style=heritage] .session-label{color:#b7a47a;font-size:clamp(6px,.47vw,10px);letter-spacing:1px}
-.kiosk[data-screen-style=heritage] .panel-time{color:#efc676;text-shadow:0 0 9px #ffb32255;font-size:clamp(30px,3.5vw,68px);letter-spacing:-2px;line-height:1.15;margin:7px 0}
-.kiosk[data-screen-style=heritage] .panel-progress{background:#5a513731;height:2px;margin-top:7px}
-.kiosk[data-screen-style=heritage] .panel-progress i{background:#cba85b}
-.kiosk[data-screen-style=heritage] .guest-actions{margin-top:clamp(27px,3.6vh,43px);min-height:0}
-.kiosk[data-screen-style=heritage] .panel-start{--button-size:clamp(102px,13.7vh,159px);width:var(--button-size);height:var(--button-size);border:7px solid #bca26f;outline:2px solid #4d402a;outline-offset:4px;border-radius:50%;background:radial-gradient(ellipse at 39% 27%,#55533d,#303627 57%,#1d251a 82%);box-shadow:0 0 0 4px #302d21,0 0 0 7px #d0b87b,0 0 0 10px #5c4d33,0 7px 0 9px #11170f,0 12px 18px 8px #0007,inset 0 2px 3px #fff5c156,inset 0 -5px 6px #090e08;color:#f1d9a6;gap:7px;flex:none}
-.kiosk[data-screen-style=heritage] .panel-start:not(:disabled):hover{background:radial-gradient(ellipse at 39% 27%,#666247,#3f442e 57%,#232b1b 82%)}
-.kiosk[data-screen-style=heritage] .panel-start:not(:disabled):active{transform:translateY(3px);box-shadow:0 0 0 4px #302d21,0 0 0 7px #d0b87b,0 0 0 10px #5c4d33,0 4px 0 8px #11170f,inset 0 5px 9px #0008}
-.kiosk[data-screen-style=heritage] .panel-start:disabled{opacity:1;filter:saturate(.65);cursor:default}
-.kiosk[data-screen-style=heritage] #panelStartLabel{font:700 clamp(23px,1.85vw,38px)/1 var(--mono);letter-spacing:2px;text-shadow:0 1px 2px #000}
-.kiosk[data-screen-style=heritage] .panel-start small{font-size:clamp(10px,.75vw,15px);font-weight:400;color:#d4c59c;letter-spacing:1px}
-.kiosk[data-screen-style=heritage] .start-mark{width:8px;height:8px;background:#f0c079;box-shadow:0 0 0 2px #1d2418,0 0 7px #ecb45355}
-.kiosk[data-screen-style=heritage] .panel-hint{color:#dcc695;font-size:clamp(11px,.83vw,17px);margin-top:clamp(20px,2.7vh,32px);letter-spacing:1.5px}
-.kiosk[data-screen-style=heritage] .panel-lamps{color:#bda67e;margin-top:clamp(15px,2vh,23px);font-size:clamp(7px,.49vw,10px);gap:clamp(12px,1.5vw,25px)}
-.kiosk[data-screen-style=heritage] .panel-lamps i{background:#191e14;box-shadow:0 0 0 2px #88744e}
-.kiosk[data-screen-style=heritage] .panel-lamps .lit i{background:#d6c589;box-shadow:0 0 0 2px #88744e,0 0 9px #e4b65577}
-.kiosk[data-screen-style=heritage] .panel-lamps [data-lamp=recording].lit i{background:#ce7450;box-shadow:0 0 0 2px #88744e,0 0 9px #ee6d3855}
-.kiosk[data-screen-style=heritage] .control-panel .speaker{width:100%;flex:1;min-height:20px;max-height:18vh;margin:clamp(15px,2.5vh,29px) 0 0;border:2px solid #90754d;border-radius:3px;opacity:1;background:repeating-linear-gradient(0deg,#161c15 0 3px,#b294604c 3px 4px,#6d5b3b 4px 5px,#171d15 5px 8px);box-shadow:inset 0 2px 8px #000,0 0 0 2px #171d15}
-.kiosk[data-screen-style=heritage] .panel-footer{margin-top:clamp(14px,1.6vh,18px);gap:4px}
-.kiosk[data-screen-style=heritage] #panelBoundary{color:#beac87;font-size:clamp(6px,.46vw,10px)}
-.kiosk[data-screen-style=heritage] .control-panel .staff-entry{color:#c3b490;font-size:clamp(8px,.53vw,11px);min-height:28px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tv-bezel{position:relative;padding:var(--screen-rim);border-radius:clamp(25px,3.6vw,74px) / clamp(32px,5vw,96px);border:2px solid #c0a071;background:linear-gradient(115deg,#413529,#a08051 1.2%,#d1b681 1.8%,#3d3327 2.4%,#211d19 5%,#504838 6%,#1b1b16 12%,#24251e 81%,#756447 93%,#b99b67 96%,#31291f 99%);box-shadow:0 0 0 2px #301e14,0 0 0 4px #9b703e,0 0 0 7px #38251b,8px 9px 14px #190e0966,inset 0 1px 6px #f8deb461,inset 0 -4px 10px #0008;overflow:hidden}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tv-screen{border-radius:7.5% / 11%;background:#0f1713;box-shadow:0 0 0 2px #0c0d09,0 2px 1px #bdab7666,0 0 0 5px #161c16,inset 0 0 30px #000}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-vignette{border-radius:inherit;z-index:6;background:radial-gradient(ellipse at 50% 48%,transparent 40%,#00000019 67%,#00000099 100%),linear-gradient(135deg,#fff5ce16 0%,#fff3c907 17%,#ffffff00 27%,#fffbdc04 65%,#fff3d80e 70%,#fff3d800 80%);box-shadow:inset 0 15px 22px #0008,inset 0 -16px 30px #0009,inset 13px 0 25px #0007,inset -13px 0 25px #0007}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-vignette:before{content:'';position:absolute;top:2%;left:6%;right:6%;height:14%;border-top:2px solid #fff9d927;border-radius:50%;background:radial-gradient(ellipse at 50% 0,#fff7d512,transparent 73%);opacity:.75}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-vignette:after{border-radius:inherit;background:repeating-linear-gradient(to bottom,transparent 0 2px,#080b072e 2px 3px);opacity:.6}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-top{top:5%;left:5%;right:5%;color:#e9c88d;text-shadow:0 0 9px #ffc45e66;letter-spacing:2px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) #adminCorner,.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) #signalLabel{border-color:#d8b46d44}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .idle-overlay{color:#f0d296;bottom:13%;left:5%;right:5%}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-prompt{font-weight:500;letter-spacing:4px;text-shadow:0 0 6px #ffc55b55,0 0 20px #ffc55b38}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .idle-kicker{color:#d1b880;opacity:.72}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .idle-overlay p{color:#c3b891}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-bottom{bottom:7.5%;left:5.5%;right:5.5%;color:#d5b985}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .privacy-line{left:calc(var(--cabinet-inset) + var(--screen-rim) + 4%);width:calc(100% - var(--panel-width) - 2 * var(--cabinet-inset) - 2 * var(--screen-rim) - 8%);bottom:calc(var(--cabinet-inset) + var(--screen-rim) + 2.2%);color:#d3c0959c;font-size:clamp(8px,.56vw,12px)!important}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .record-overlay{background:#17160f35}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .rec-bar{color:#f3d79c}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .wave-block p,.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .wave-block small{color:#f1d298}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .record-progress div{background:#d8b97a}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .state-overlay{background:#191a12c9;color:#f3d394}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .state-title{text-shadow:0 0 18px #e0a14944}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel{position:relative;isolation:isolate;border:2px solid #ac8955;border-radius:8px;padding:clamp(20px,2.7vh,32px) clamp(18px,2.1vw,42px) clamp(12px,1.8vh,22px);color:#dec79c;background:repeating-linear-gradient(0deg,#b69a6520 0 1px,#0000 1px 4px),linear-gradient(105deg,#343129,#24251e 23%,#2c2c23 75%,#161b16);box-shadow:0 0 0 2px #352318,0 0 0 4px #805a36,inset 2px 2px 4px #e1ba7755,inset -4px -4px 9px #000b,5px 5px 15px #0c090755;overflow:hidden}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand{border:1px solid #8b724b;background:linear-gradient(120deg,#bba074,#ddc399 44%,#9e8359);box-shadow:inset 0 1px 0 #fff3c875,0 3px 7px #0006;padding:12px 6px 11px;width:100%;text-align:center;color:#3e3828;border-radius:2px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand .maker{font-size:clamp(8px,.55vw,12px);letter-spacing:3px;margin-bottom:6px;color:#59503a}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand strong{font:italic clamp(19px,1.52vw,31px)/1 var(--serif);letter-spacing:-.8px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand .registered{font:8px var(--sans);top:-8px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand .model{font-size:clamp(6px,.41vw,9px);letter-spacing:1.1px;color:#564a34;margin-top:7px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .channel-display{margin-top:clamp(17px,2.1vh,25px);padding:12px 0 0;border-color:#9e855c70;color:#d0bb8d}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .display-label{font-size:clamp(7px,.55vw,11px);letter-spacing:1.7px;color:#bda77e}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .channel-number{color:#dec492;text-shadow:0 1px #000;font:clamp(33px,3vw,59px)/1 var(--serif)}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .channel-number span{color:#ae9870}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .on-air-dot{background:#d9b766;box-shadow:0 0 0 3px #1a1d16,0 0 0 4px #806b48,0 0 11px #ffc95b55}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tuner-assembly{margin-top:clamp(12px,2vh,24px);color:#b8a77f}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tuning-scale{color:#c1aa79;letter-spacing:2px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tuning-dial{width:clamp(65px,7.8vh,96px);height:clamp(65px,7.8vh,96px);border:3px solid #b39b70;outline:2px solid #1a1c15;outline-offset:3px;background:repeating-conic-gradient(#d6bd86 0 3deg,#675c42 3deg 6deg);box-shadow:0 4px 8px #000a,inset 0 2px 3px #fff8c875}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tuning-dial:before{background:radial-gradient(ellipse at 35% 27%,#c9b48e,#8f7c58 45%,#4e4833 75%,#b9a478 78%,#4d4735 82%);box-shadow:inset 1px 2px 4px #f9e6bb55,inset -2px -3px 4px #13190e66;inset:10%;border:1px solid #3a3829}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tuning-dial span{width:13%;height:65%;background:linear-gradient(90deg,#6e6246,#e3cf9d 40%,#c0a575 66%,#726043);border-radius:3px;box-shadow:2px 2px 3px #0007;transform:rotate(26deg);z-index:1}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .dial-caption{color:#b5a077;font-size:clamp(6px,.46vw,10px);letter-spacing:2px;margin-top:12px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-session{margin-top:clamp(18px,2.3vh,29px);background:linear-gradient(150deg,#0b120e,#1a2117);border:2px solid #90764b;border-radius:4px;padding:clamp(11px,1.4vh,17px) 14px;box-shadow:0 0 0 2px #181a14,inset 0 3px 12px #000,inset 0 -1px #c0a57244;color:#f3c76f}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .session-label{color:#b7a47a;font-size:clamp(6px,.47vw,10px);letter-spacing:1px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-time{color:#efc676;text-shadow:0 0 9px #ffb32255;font-size:clamp(30px,3.5vw,68px);letter-spacing:-2px;line-height:1.15;margin:7px 0}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-progress{background:#5a513731;height:2px;margin-top:7px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-progress i{background:#cba85b}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .guest-actions{margin-top:clamp(27px,3.6vh,43px);min-height:0}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start{--button-size:clamp(102px,13.7vh,159px);width:var(--button-size);height:var(--button-size);border:7px solid #bca26f;outline:2px solid #4d402a;outline-offset:4px;border-radius:50%;background:radial-gradient(ellipse at 39% 27%,#55533d,#303627 57%,#1d251a 82%);box-shadow:0 0 0 4px #302d21,0 0 0 7px #d0b87b,0 0 0 10px #5c4d33,0 7px 0 9px #11170f,0 12px 18px 8px #0007,inset 0 2px 3px #fff5c156,inset 0 -5px 6px #090e08;color:#f1d9a6;gap:7px;flex:none}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start:not(:disabled):hover{background:radial-gradient(ellipse at 39% 27%,#666247,#3f442e 57%,#232b1b 82%)}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start:not(:disabled):active{transform:translateY(3px);box-shadow:0 0 0 4px #302d21,0 0 0 7px #d0b87b,0 0 0 10px #5c4d33,0 4px 0 8px #11170f,inset 0 5px 9px #0008}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start:disabled{opacity:1;filter:saturate(.65);cursor:default}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) #panelStartLabel{font:700 clamp(23px,1.85vw,38px)/1 var(--mono);letter-spacing:2px;text-shadow:0 1px 2px #000}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start small{font-size:clamp(10px,.75vw,15px);font-weight:400;color:#d4c59c;letter-spacing:1px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .start-mark{width:8px;height:8px;background:#f0c079;box-shadow:0 0 0 2px #1d2418,0 0 7px #ecb45355}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-hint{color:#dcc695;font-size:clamp(11px,.83vw,17px);margin-top:clamp(20px,2.7vh,32px);letter-spacing:1.5px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-lamps{color:#bda67e;margin-top:clamp(15px,2vh,23px);font-size:clamp(7px,.49vw,10px);gap:clamp(12px,1.5vw,25px)}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-lamps i{background:#191e14;box-shadow:0 0 0 2px #88744e}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-lamps .lit i{background:#d6c589;box-shadow:0 0 0 2px #88744e,0 0 9px #e4b65577}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-lamps [data-lamp=recording].lit i{background:#ce7450;box-shadow:0 0 0 2px #88744e,0 0 9px #ee6d3855}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel .speaker{width:100%;flex:1;min-height:20px;max-height:18vh;margin:clamp(15px,2.5vh,29px) 0 0;border:2px solid #90754d;border-radius:3px;opacity:1;background:repeating-linear-gradient(0deg,#161c15 0 3px,#b294604c 3px 4px,#6d5b3b 4px 5px,#171d15 5px 8px);box-shadow:inset 0 2px 8px #000,0 0 0 2px #171d15}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-footer{margin-top:clamp(14px,1.6vh,18px);gap:4px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) #panelBoundary{color:#beac87;font-size:clamp(6px,.46vw,10px)}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel .staff-entry{color:#c3b490;font-size:clamp(8px,.53vw,11px);min-height:28px}
 /* Compact landscape keeps the primary Start action and timer; decorative tuning can disappear. */
 @media(max-height:850px) and (orientation:landscape){
-.kiosk[data-screen-style=heritage] .control-panel{padding:17px 24px 12px}.kiosk[data-screen-style=heritage] .panel-brand{padding:8px 4px}.kiosk[data-screen-style=heritage] .panel-brand .maker{margin-bottom:4px}.kiosk[data-screen-style=heritage] .panel-brand .model{margin-top:5px}.kiosk[data-screen-style=heritage] .channel-display{margin-top:14px;padding-top:9px}.kiosk[data-screen-style=heritage] .channel-number{font-size:35px}.kiosk[data-screen-style=heritage] .tuner-assembly{margin-top:11px}.kiosk[data-screen-style=heritage] .tuning-dial{width:60px;height:60px}.kiosk[data-screen-style=heritage] .dial-caption{margin-top:9px}.kiosk[data-screen-style=heritage] .panel-session{margin-top:16px;padding:9px 12px}.kiosk[data-screen-style=heritage] .panel-time{font-size:37px;margin:4px 0}.kiosk[data-screen-style=heritage] .guest-actions{margin-top:28px}.kiosk[data-screen-style=heritage] .panel-start{--button-size:110px;border-width:5px;gap:5px}.kiosk[data-screen-style=heritage] .panel-hint{margin-top:23px}.kiosk[data-screen-style=heritage] .panel-lamps{margin-top:16px}.kiosk[data-screen-style=heritage] .control-panel .speaker{margin-top:16px}.kiosk[data-screen-style=heritage] .panel-footer{margin-top:12px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel{padding:17px 24px 12px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand{padding:8px 4px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand .maker{margin-bottom:4px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand .model{margin-top:5px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .channel-display{margin-top:14px;padding-top:9px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .channel-number{font-size:35px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tuner-assembly{margin-top:11px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tuning-dial{width:60px;height:60px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .dial-caption{margin-top:9px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-session{margin-top:16px;padding:9px 12px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-time{font-size:37px;margin:4px 0}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .guest-actions{margin-top:28px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start{--button-size:110px;border-width:5px;gap:5px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-hint{margin-top:23px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-lamps{margin-top:16px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel .speaker{margin-top:16px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-footer{margin-top:12px}
 }
 @media(max-height:650px) and (orientation:landscape){
-.kiosk[data-screen-style=heritage] .tuner-assembly{display:none}.kiosk[data-screen-style=heritage] .panel-brand strong{font-size:20px}.kiosk[data-screen-style=heritage] .channel-display{margin-top:13px}.kiosk[data-screen-style=heritage] .panel-session{margin-top:14px}.kiosk[data-screen-style=heritage] .guest-actions{margin-top:27px}.kiosk[data-screen-style=heritage] .panel-start{--button-size:98px}.kiosk[data-screen-style=heritage] .panel-hint{margin-top:21px}.kiosk[data-screen-style=heritage] .control-panel .speaker{min-height:10px}.kiosk[data-screen-style=heritage] .panel-footer{margin-top:10px}
+.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tuner-assembly{display:none}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand strong{font-size:20px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .channel-display{margin-top:13px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-session{margin-top:14px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .guest-actions{margin-top:27px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start{--button-size:98px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-hint{margin-top:21px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel .speaker{min-height:10px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-footer{margin-top:10px}
 }
 @media(max-height:460px) and (orientation:landscape){
-body.kiosk[data-screen-style=heritage]{--panel-width:176px;--cabinet-inset:9px;--screen-rim:12px}.kiosk[data-screen-style=heritage] .television{gap:10px}.kiosk[data-screen-style=heritage] .control-panel{padding:9px 15px 5px}.kiosk[data-screen-style=heritage] .panel-brand{padding:6px 3px}.kiosk[data-screen-style=heritage] .panel-brand strong{font-size:18px}.kiosk[data-screen-style=heritage] .panel-brand .maker{font-size:6px;margin-bottom:3px;letter-spacing:2px}.kiosk[data-screen-style=heritage] .panel-brand .model,.kiosk[data-screen-style=heritage] .channel-display,.kiosk[data-screen-style=heritage] .tuner-assembly{display:none}.kiosk[data-screen-style=heritage] .panel-session{margin-top:10px;padding:5px 9px}.kiosk[data-screen-style=heritage] .panel-time{font-size:27px;line-height:1;margin:3px 0}.kiosk[data-screen-style=heritage] .session-label{font-size:5px}.kiosk[data-screen-style=heritage] .guest-actions{margin-top:21px}.kiosk[data-screen-style=heritage] .panel-start{--button-size:72px;border-width:4px;gap:4px;outline-width:1px;box-shadow:0 0 0 3px #302d21,0 0 0 5px #c1a36c,0 0 0 7px #5c4d33,0 6px 8px 6px #0007}.kiosk[data-screen-style=heritage] #panelStartLabel{font-size:17px;letter-spacing:1px}.kiosk[data-screen-style=heritage] .panel-start small{font-size:8px}.kiosk[data-screen-style=heritage] .start-mark{width:5px;height:5px}.kiosk[data-screen-style=heritage] .panel-hint{font-size:9px;margin-top:17px}.kiosk[data-screen-style=heritage] .panel-lamps{font-size:6px;margin-top:9px;gap:17px}.kiosk[data-screen-style=heritage] .control-panel .speaker{min-height:6px;margin-top:9px;border-width:1px}.kiosk[data-screen-style=heritage] .panel-footer{margin-top:7px;gap:0}.kiosk[data-screen-style=heritage] #panelBoundary{font-size:5px}.kiosk[data-screen-style=heritage] .control-panel .staff-entry{font-size:6px;min-height:22px;padding:4px 0;margin-bottom:0}.kiosk[data-screen-style=heritage] .screen-top{font-size:9px}.kiosk[data-screen-style=heritage] .screen-prompt{font-size:19px;letter-spacing:1px}.kiosk[data-screen-style=heritage] .screen-bottom{font-size:6px}.kiosk[data-screen-style=heritage] .privacy-line{font-size:5px!important}
+body.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]){--panel-width:176px;--cabinet-inset:9px;--screen-rim:12px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .television{gap:10px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel{padding:9px 15px 5px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand{padding:6px 3px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand strong{font-size:18px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand .maker{font-size:6px;margin-bottom:3px;letter-spacing:2px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand .model,.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .channel-display,.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tuner-assembly{display:none}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-session{margin-top:10px;padding:5px 9px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-time{font-size:27px;line-height:1;margin:3px 0}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .session-label{font-size:5px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .guest-actions{margin-top:21px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start{--button-size:72px;border-width:4px;gap:4px;outline-width:1px;box-shadow:0 0 0 3px #302d21,0 0 0 5px #c1a36c,0 0 0 7px #5c4d33,0 6px 8px 6px #0007}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) #panelStartLabel{font-size:17px;letter-spacing:1px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start small{font-size:8px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .start-mark{width:5px;height:5px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-hint{font-size:9px;margin-top:17px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-lamps{font-size:6px;margin-top:9px;gap:17px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel .speaker{min-height:6px;margin-top:9px;border-width:1px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-footer{margin-top:7px;gap:0}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) #panelBoundary{font-size:5px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel .staff-entry{font-size:6px;min-height:22px;padding:4px 0;margin-bottom:0}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-top{font-size:9px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-prompt{font-size:19px;letter-spacing:1px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-bottom{font-size:6px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .privacy-line{font-size:5px!important}
 }
 @media(orientation:portrait){
-body.kiosk[data-screen-style=heritage]{--cabinet-inset:12px;--screen-rim:12px}.kiosk[data-screen-style=heritage] .television{gap:18px;padding-bottom:18px!important}.kiosk[data-screen-style=heritage] .tv-bezel{height:70vw;min-height:270px;overflow:hidden;flex:none}.kiosk[data-screen-style=heritage] .control-panel{padding:20px 20px 15px;grid-template-columns:minmax(0,1fr) 115px;gap:15px 20px;min-height:350px;overflow:visible}.kiosk[data-screen-style=heritage] .panel-brand{padding:11px 4px;grid-column:1/-1;grid-row:1}.kiosk[data-screen-style=heritage] .panel-brand strong{font-size:28px}.kiosk[data-screen-style=heritage] .panel-brand .maker{font-size:8px}.kiosk[data-screen-style=heritage] .panel-brand .model{font-size:7px}.kiosk[data-screen-style=heritage] .channel-display{grid-column:1;grid-row:2;margin:0;padding-top:0;border:0}.kiosk[data-screen-style=heritage] .channel-number{font-size:35px}.kiosk[data-screen-style=heritage] .panel-session{grid-column:1;grid-row:3;margin:0;padding:8px 10px}.kiosk[data-screen-style=heritage] .panel-time{font-size:31px}.kiosk[data-screen-style=heritage] .guest-actions{grid-column:2;grid-row:2/4;margin:0}.kiosk[data-screen-style=heritage] .panel-start{--button-size:91px;border-width:5px}.kiosk[data-screen-style=heritage] #panelStartLabel{font-size:22px}.kiosk[data-screen-style=heritage] .panel-start small{font-size:9px}.kiosk[data-screen-style=heritage] .panel-hint{grid-column:2;grid-row:4;margin:0;font-size:10px;letter-spacing:0}.kiosk[data-screen-style=heritage] .panel-lamps{grid-column:1;grid-row:4;margin:0;gap:15px;font-size:7px}.kiosk[data-screen-style=heritage] .control-panel .speaker{grid-column:1/-1;grid-row:5;height:32px;margin:0;min-height:0}.kiosk[data-screen-style=heritage] .panel-footer{grid-row:6;margin:0;gap:5px}.kiosk[data-screen-style=heritage] #panelBoundary{font-size:6px}.kiosk[data-screen-style=heritage] .control-panel .staff-entry{font-size:7px;padding:7px 0}.kiosk[data-screen-style=heritage] .privacy-line{position:static!important;width:auto;padding:12px 20px!important;background:#282c21;color:#b8a982;font-size:8px!important}.kiosk[data-screen-style=heritage] .screen-prompt{font-size:17px;letter-spacing:1px}.kiosk[data-screen-style=heritage] .screen-top{font-size:8px}.kiosk[data-screen-style=heritage] .screen-bottom{font-size:6px}
+body.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]){--cabinet-inset:12px;--screen-rim:12px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .television{gap:18px;padding-bottom:18px!important}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .tv-bezel{height:70vw;min-height:270px;overflow:hidden;flex:none}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel{padding:20px 20px 15px;grid-template-columns:minmax(0,1fr) 115px;gap:15px 20px;min-height:350px;overflow:visible}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand{padding:11px 4px;grid-column:1/-1;grid-row:1}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand strong{font-size:28px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand .maker{font-size:8px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-brand .model{font-size:7px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .channel-display{grid-column:1;grid-row:2;margin:0;padding-top:0;border:0}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .channel-number{font-size:35px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-session{grid-column:1;grid-row:3;margin:0;padding:8px 10px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-time{font-size:31px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .guest-actions{grid-column:2;grid-row:2/4;margin:0}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start{--button-size:91px;border-width:5px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) #panelStartLabel{font-size:22px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-start small{font-size:9px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-hint{grid-column:2;grid-row:4;margin:0;font-size:10px;letter-spacing:0}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-lamps{grid-column:1;grid-row:4;margin:0;gap:15px;font-size:7px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel .speaker{grid-column:1/-1;grid-row:5;height:32px;margin:0;min-height:0}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .panel-footer{grid-row:6;margin:0;gap:5px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) #panelBoundary{font-size:6px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .control-panel .staff-entry{font-size:7px;padding:7px 0}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .privacy-line{position:static!important;width:auto;padding:12px 20px!important;background:#282c21;color:#b8a982;font-size:8px!important}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-prompt{font-size:17px;letter-spacing:1px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-top{font-size:8px}.kiosk:is([data-screen-style=heritage],[data-screen-style=edge]) .screen-bottom{font-size:6px}
 }
 @media(max-width:760px){.appearance-card{padding:22px 18px}.appearance-intro{flex-direction:column;gap:16px}.style-options{gap:14px}.admin-card .style-option{padding:12px}.style-swatch{height:145px}.mini-picture i{font-size:26px}.mini-panel{padding:10px 6px}.style-option-title{font-size:12px}.style-option-desc{font-size:11px}.appearance-actions{align-items:stretch;flex-direction:column;gap:16px}.style-current{white-space:normal}}
 @media(max-width:520px){.style-options{grid-template-columns:1fr}.style-swatch{height:175px}.mini-panel{padding:12px 13px}.mini-picture i{font-size:35px}}
+
+/* ---------------------------------------------------------------------------
+ * 01 / Modern CRT (1990s graphite cabinet)
+ * Shares every viewport/cabinet/panel dimension and responsive breakpoint
+ * with 02 Heritage TV above.  Do not let shell geometry drift between styles.
+ * --------------------------------------------------------------------------- */
+.swatch-edge{padding:9px;gap:8px;background:linear-gradient(135deg,#656c70,#242b2f 12%,#3a4144 89%,#11181c);border:1px solid #222b31;box-shadow:inset 0 0 0 2px #8c93972e}
+.swatch-edge .mini-picture{border:8px solid #2b3439;border-radius:22px / 25px;box-shadow:0 0 0 1px #8d999d,inset 0 0 28px #0009;color:#e6f1e3;background:radial-gradient(ellipse at center,#344b48,#0c2022)}
+.swatch-edge .mini-panel{width:22%;padding:12px 9px;gap:9px;border:1px solid #7f929b;border-radius:4px;background:linear-gradient(100deg,#333f46,#1a252a 45%,#343f44)}
+.swatch-edge .mini-panel em{border-color:#a6b8b9}
+.swatch-edge .mini-panel i{background:radial-gradient(circle,#aebfc3 35%,#2d383e 40%,#72848a 50%,#1a252b 60%,#9dacb3 66%,#29353b 72%)}
+.swatch-edge .mini-panel strong{border-color:#7f9197;background:radial-gradient(circle at 38% 30%,#ef9e79,#bf573c 63%,#773426)}
+.swatch-edge .mini-panel small{background:repeating-linear-gradient(#a0b3bc33 0 1px,#10191f 1px 4px)}
+body.kiosk[data-screen-style=edge]{background:#20262a}
+.kiosk[data-screen-style=edge] .television{
+ background:repeating-linear-gradient(90deg,#fff1 0 1px,#0000 1px 5px),
+ linear-gradient(145deg,#454f56 0%,#262f35 6%,#30383e 45%,#181e24 93%,#39434b 100%);
+ box-shadow:inset 0 0 0 2px #0c1116,inset 0 0 0 5px #8b989d42,
+ inset 0 9px 15px #bac4c622,inset 0 -10px 17px #04080a80;
+}
+.kiosk[data-screen-style=edge] .cabinet-details i{
+ background:radial-gradient(circle at 33% 30%,#c0cbd0 0 14%,#59656d 28%,#0e151a 45%,#86959b 57%,#192329 77%);
+ box-shadow:0 1px 2px #000c;
+}
+.kiosk[data-screen-style=edge] .tv-bezel{
+ border:2px solid #89979f;
+ background:linear-gradient(118deg,#080d12 0%,#7c8b93 1.2%,#aebcc1 1.8%,#465059 2.6%,#141a20 4.8%,#3e4a51 6.4%,#0b1217 10%,#151b20 82%,#526068 93%,#9eacb2 96%,#20282d 99%);
+ box-shadow:0 0 0 2px #10181c,0 0 0 4px #5c6972,0 0 0 7px #11171b,
+ 7px 9px 16px #05090c70,inset 0 1px 5px #e2edf075,inset 0 -5px 12px #000a;
+}
+.kiosk[data-screen-style=edge] .tv-screen{
+ background:#0d1c1b;
+ box-shadow:0 0 0 2px #050c0f,0 2px 2px #aabcc33b,0 0 0 5px #141c20,inset 0 0 34px #000;
+}
+.kiosk[data-screen-style=edge] .screen-vignette{
+ background:radial-gradient(ellipse at 50% 45%,transparent 43%,#00000016 65%,#000000b0 100%),
+ linear-gradient(136deg,#e2f9fd14 1%,#b8d5d707 19%,transparent 28%,#cdeaf004 65%,#e9fcfc10 75%,transparent 82%);
+ box-shadow:inset 0 12px 24px #0009,inset 0 -17px 32px #000a,inset 11px 0 23px #0007,inset -11px 0 23px #0007;
+}
+.kiosk[data-screen-style=edge] .screen-vignette:before{border-color:#d8f2f52c;background:radial-gradient(ellipse at 50% 0,#c3f4ff14,transparent 73%)}
+.kiosk[data-screen-style=edge] .screen-vignette:after{background:repeating-linear-gradient(to bottom,transparent 0 2px,#06181b2f 2px 3px);opacity:.56}
+.kiosk[data-screen-style=edge] .screen-top{color:#dcebe7;text-shadow:0 0 9px #a5f6da60}
+.kiosk[data-screen-style=edge] #adminCorner,.kiosk[data-screen-style=edge] #signalLabel{border-color:#b2d5d059}
+.kiosk[data-screen-style=edge] .idle-overlay{color:#e3eee0}
+.kiosk[data-screen-style=edge] .screen-prompt{text-shadow:0 0 7px #bdf8d22f,0 0 21px #bdf8d22a}
+.kiosk[data-screen-style=edge] .idle-kicker{color:#aecabd}
+.kiosk[data-screen-style=edge] .idle-overlay p{color:#c3d3c7}
+.kiosk[data-screen-style=edge] .screen-bottom{color:#bed4c8}
+.kiosk[data-screen-style=edge] .privacy-line{color:#bdd0c099}
+.kiosk[data-screen-style=edge] .rec-bar,.kiosk[data-screen-style=edge] .wave-block p,.kiosk[data-screen-style=edge] .wave-block small{color:#e5eeda}
+.kiosk[data-screen-style=edge] .record-progress div{background:#9fcbb4}
+.kiosk[data-screen-style=edge] .state-overlay{background:#101e20ce;color:#e6f0e6}
+.kiosk[data-screen-style=edge] .state-title{text-shadow:0 0 18px #99dcd844}
+.kiosk[data-screen-style=edge] .control-panel{
+ color:#d2dbdc;border:2px solid #82949b;
+ background:repeating-linear-gradient(0deg,#b6d9e115 0 1px,transparent 1px 4px),
+ linear-gradient(104deg,#3c474f,#222b32 24%,#29333a 76%,#111a21);
+ box-shadow:0 0 0 2px #10161b,0 0 0 4px #54636c,
+ inset 2px 2px 5px #d3e2eb38,inset -4px -4px 9px #03070bba,5px 5px 15px #01050766;
+}
+.kiosk[data-screen-style=edge] .panel-brand{
+ border-color:#8598a1;background:linear-gradient(125deg,#8e9da4,#dce3e2 44%,#87979e);
+ color:#27353a;box-shadow:inset 0 1px 0 #fff9,0 3px 8px #0007;
+}
+.kiosk[data-screen-style=edge] .panel-brand .maker{color:#3e5158}
+.kiosk[data-screen-style=edge] .panel-brand strong{
+ font:700 clamp(18px,1.5vw,30px)/1 var(--sans);letter-spacing:-.8px;color:#26333a;
+}
+.kiosk[data-screen-style=edge] .panel-brand .registered{font-size:8px}
+.kiosk[data-screen-style=edge] .panel-brand .model{color:#4a5b62}
+.kiosk[data-screen-style=edge] .channel-display{border-color:#879ca45b}
+.kiosk[data-screen-style=edge] .display-label{color:#a8bdc6}
+.kiosk[data-screen-style=edge] .channel-number{
+ font:700 clamp(32px,2.9vw,56px)/1 var(--mono);color:#c0d9d3;text-shadow:0 0 11px #75b3a46e;
+}
+.kiosk[data-screen-style=edge] .channel-number span{color:#849da2}
+.kiosk[data-screen-style=edge] .on-air-dot{background:#78b7a3;box-shadow:0 0 0 3px #10191c,0 0 0 4px #697e84,0 0 10px #8ce4b97c}
+.kiosk[data-screen-style=edge] .tuner-assembly,.kiosk[data-screen-style=edge] .tuning-scale{color:#afbec1}
+.kiosk[data-screen-style=edge] .tuning-dial{
+ border:3px solid #82959d;outline-color:#171e24;
+ background:repeating-conic-gradient(#bbcbcf 0 3deg,#53616a 3deg 6deg);
+ box-shadow:0 4px 8px #000b,inset 0 2px 3px #dde7e577;
+}
+.kiosk[data-screen-style=edge] .tuning-dial:before{
+ background:radial-gradient(ellipse at 35% 27%,#c6d0d4,#7e9299 45%,#344047 75%,#97a7ad 78%,#37414a 82%);
+ box-shadow:inset 1px 2px 4px #d9ecf055,inset -2px -3px 4px #111b2066;border-color:#263239;
+}
+.kiosk[data-screen-style=edge] .tuning-dial span{
+ background:linear-gradient(90deg,#5a6871,#e0ebea 40%,#b1c1c7 66%,#56636a);
+}
+.kiosk[data-screen-style=edge] .dial-caption{color:#a1b5bc}
+.kiosk[data-screen-style=edge] .panel-session{
+ background:linear-gradient(145deg,#071216,#1a3030);border-color:#687e83;
+ box-shadow:0 0 0 2px #11191f,inset 0 3px 12px #000,inset 0 -1px #a7c4c344;color:#c0f0d5;
+}
+.kiosk[data-screen-style=edge] .session-label{color:#9db9b8}
+.kiosk[data-screen-style=edge] .panel-time{color:#b7ebd3;text-shadow:0 0 9px #91e4c46b}
+.kiosk[data-screen-style=edge] .panel-progress{background:#8cb9b131}
+.kiosk[data-screen-style=edge] .panel-progress i{background:#8bcbb2}
+.kiosk[data-screen-style=edge] .panel-start{
+ border-color:#acbac0;outline-color:#1f3035;
+ background:radial-gradient(ellipse at 36% 25%,#f5a781,#b85c43 55%,#642b27 82%);
+ box-shadow:0 0 0 4px #263238,0 0 0 7px #92a4aa,0 0 0 10px #253037,
+ 0 7px 0 9px #0b1118,0 12px 18px 8px #0009,inset 0 2px 3px #ffe0ba80,inset 0 -5px 6px #2e1119;
+ color:#fff2e3;
+}
+.kiosk[data-screen-style=edge] .panel-start:not(:disabled):hover{background:radial-gradient(ellipse at 36% 25%,#ffc29d,#ce7650 56%,#763831 82%)}
+.kiosk[data-screen-style=edge] .panel-start:not(:disabled):active{
+ box-shadow:0 0 0 4px #263238,0 0 0 7px #92a4aa,0 0 0 10px #253037,
+ 0 4px 0 8px #0b1118,inset 0 5px 9px #0008;
+}
+.kiosk[data-screen-style=edge] .panel-start:disabled{filter:saturate(.57)}
+.kiosk[data-screen-style=edge] .panel-start small{color:#fff2e4}
+.kiosk[data-screen-style=edge] .start-mark{background:#ffdbb5;box-shadow:0 0 0 2px #51231d,0 0 10px #ffd5ac7c}
+.kiosk[data-screen-style=edge] .panel-hint{color:#b6cbd0}
+.kiosk[data-screen-style=edge] .panel-lamps{color:#a4b9bd}
+.kiosk[data-screen-style=edge] .panel-lamps i{background:#111c21;box-shadow:0 0 0 2px #637881}
+.kiosk[data-screen-style=edge] .panel-lamps .lit i{background:#9accb6;box-shadow:0 0 0 2px #637881,0 0 9px #9de3b17d}
+.kiosk[data-screen-style=edge] .panel-lamps [data-lamp=recording].lit i{background:#ec8067;box-shadow:0 0 0 2px #637881,0 0 9px #ee836a9d}
+.kiosk[data-screen-style=edge] .control-panel .speaker{
+ border:2px solid #73888e;background:repeating-linear-gradient(0deg,#10191e 0 3px,#8fabb34c 3px 4px,#394e55 4px 5px,#111d24 5px 8px);
+ box-shadow:inset 0 2px 8px #000b,0 0 0 2px #10191e;
+}
+.kiosk[data-screen-style=edge] #panelBoundary{color:#b5c8c8}
+.kiosk[data-screen-style=edge] .control-panel .staff-entry{
+ position:relative;transform:none;display:flex;align-items:center;justify-content:center;
+ width:100%;padding:5px 12px;margin-bottom:8px;min-height:clamp(22px,3.3vh,36px);
+ font-size:clamp(8px,.54vw,11px);letter-spacing:1.3px;
+ color:#d5eceb;background:#101d24e8;border:1px solid #8ba2a958;border-radius:3px;
+ -webkit-tap-highlight-color:#a6cbd144;touch-action:manipulation;
+}
+.kiosk[data-screen-style=edge] .control-panel .staff-entry:focus-visible{outline:2px solid #bce0d6;outline-offset:1px}
+/* The version/admin button must be an available touch target even with
+ * Android WebView's short landscape CSS viewport and display overscan. */
+@media(max-height:650px) and (orientation:landscape){
+ .kiosk[data-screen-style=edge] .control-panel .speaker{margin-top:8px;min-height:0}
+ .kiosk[data-screen-style=edge] .panel-footer{margin-top:5px}
+ .kiosk[data-screen-style=edge] .control-panel .staff-entry{min-height:24px;margin-bottom:7px;padding:3px 10px}
+}
+@media(max-height:460px) and (orientation:landscape){
+ .kiosk[data-screen-style=edge] .panel-session{margin-top:8px}
+ .kiosk[data-screen-style=edge] .guest-actions{margin-top:14px}
+ .kiosk[data-screen-style=edge] .panel-hint{margin-top:10px}
+ .kiosk[data-screen-style=edge] .panel-lamps{margin-top:7px}
+ .kiosk[data-screen-style=edge] .control-panel .staff-entry{min-height:22px;margin-bottom:4px;padding:2px 10px}
+}
+@media(orientation:portrait){
+ .kiosk[data-screen-style=edge] .privacy-line{background:#15252b;color:#b4d3cc}
+ .kiosk[data-screen-style=edge] .control-panel .staff-entry{margin-bottom:0;min-height:36px}
+}
 
 /* QR remains outside the CRT/video compositor: crisp, unmirrored, no snow. */
 .delivery-overlay{position:absolute;inset:0;z-index:12;background:#18281f;color:#f4e8c9;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:4%;padding:6%;text-shadow:none;filter:none;transform:none;overflow:hidden}
@@ -248,7 +398,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 </head>
 <body class="kiosk" data-capture-state="idle" data-screen-style="heritage">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="phoneIcon" viewBox="0 0 24 24"><path d="M5 3 2 6c0 7 9 16 16 16l3-3-5-5-3 2c-3-1-5-3-6-6l2-3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol><symbol id="tapeIcon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="8" width="14" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="11" r="1.4"/><circle cx="16" cy="11" r="1.4"/><path d="m6 20 2-4h8l2 4" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol></svg>
-<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.9.0 / NOT EVENT-READY</span></div></header>
+<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.9.4 / NOT EVENT-READY</span></div></header>
 <div class="notice"><span class="dot amber"></span><span id="globalNotice">Demo mode. Camera is off. Printing and cloud are not connected.</span><button id="aboutBtn">What works?</button></div>
 <main>
 <section id="view-booth" class="view active">
@@ -282,7 +432,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
   <div class="panel-hint" id="panelHint">撓一次就得</div>
   <div class="panel-lamps" aria-hidden="true"><span data-lamp="idle"><i></i>READY</span><span data-lamp="recording"><i></i>REC</span><span data-lamp="saving"><i></i>SAVE</span></div>
   <div class="speaker" aria-hidden="true"></div>
-  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.9. Tap five times for staff settings">v0.9 / PREVIEW</button></div>
+  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.9.4. Tap five times for staff settings">v0.9.4 / PREVIEW</button></div>
 </aside></div>
 <div class="control-strip"><button id="cameraBtn">Enable camera + microphone</button><button id="kioskBtn">Kiosk preview</button><span id="inputHint">Keyboard: [ lift / ] replace</span></div>
 <p class="privacy-line" data-i18n="privacy"></p>
@@ -299,7 +449,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 <div class="appearance-intro"><div><div class="card-number">DISPLAY / TWO SCREEN STYLES</div><h2 id="appearanceHeading">Same booth. A different era.</h2><p>Choose the screen design in Admin. Guests still only press Start.</p></div><span id="currentStyleBadge" class="style-current">CURRENT / HERITAGE TV</span></div>
 <form id="screenStyleForm">
 <div class="style-options">
-<label class="style-option"><input type="radio" name="screenStyle" value="edge" id="styleEdge"><span class="style-swatch swatch-edge" aria-hidden="true"><span class="mini-picture"><i>Love,<br>on tape.</i><b>CH 03</b></span><span class="mini-panel"><em></em><i></i><strong></strong><small></small></span></span><span class="style-option-title">01 / Edge-to-edge CRT</span><span class="style-option-desc">Original v0.3 look. Maximum picture area, ivory panel, terracotta Start button.</span></label>
+<label class="style-option"><input type="radio" name="screenStyle" value="edge" id="styleEdge"><span class="style-swatch swatch-edge" aria-hidden="true"><span class="mini-picture"><i>Love,<br>on tape.</i><b>CH 03</b></span><span class="mini-panel"><em></em><i></i><strong></strong><small></small></span></span><span class="style-option-title">01 / Modern CRT television</span><span class="style-option-desc">1990s-inspired graphite CRT cabinet, curved glass, brushed-metal controls. Same fit and safe margins as Heritage TV.</span></label>
 <label class="style-option"><input type="radio" name="screenStyle" value="heritage" id="styleHeritage" checked><span class="style-swatch swatch-heritage" aria-hidden="true"><span class="mini-picture"><i>Love,<br>on tape.</i><b>CH 03</b></span><span class="mini-panel"><em></em><i></i><strong></strong><small></small></span></span><span class="style-option-title">02 / Heritage television</span><span class="style-option-desc">Walnut cabinet, aged brass, sculpted glass and amber lettering. Full-display, no room scene.</span></label>
 </div>
 <div class="appearance-actions"><div><p id="styleSaveStatus" role="status" aria-live="polite">Choose a style, then apply to preview.</p><p class="small muted">Follow screen style links the camera look to this design. Recording duration, receipt and privacy stay unchanged. Save other form edits separately before switching.</p></div><button type="submit" id="screenStyleSave" class="btn primary">Apply style + preview booth</button></div>
@@ -307,7 +457,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 </section>
 <div class="display-admin admin-card"><div><div class="card-number">DISPLAY / ANDROID LANDSCAPE</div><h2>32-inch landscape.</h2><p>Landscape touchscreen target. Android 12 is provisional, not hardware-verified. Camera look follows the screen style by default. Use Camera Lab below to preview and tune each look.</p><p id="viewportInfo" class="small mono"></p></div><div class="display-admin-actions"><button id="fullscreenBtn" class="btn primary">Full screen + return to booth</button><button id="cameraSetupBtn" class="btn secondary">Enable camera + microphone</button><p class="small muted">Browser full screen is not an Android kiosk lock. Camera, microphone and real printing need device testing. Camera Lab below is a staff-only preview.</p></div></div><form id="effectsForm" class="admin-card camera-lab">
 <div class="card-number">CAMERA LAB / LIVE PREVIEW &amp; ENCODED LOOK</div><h2>A real camera. An analogue feeling.</h2>
-<p class="small muted">Colour Film CRT for Edge; yellow-grey Heritage Soft Mono for the old television. Effects are encoded into the video, without the TV cabinet or guest buttons.</p>
+<p class="small muted">Colour Film CRT for Modern; yellow-grey Heritage Soft Mono for the old television. Effects are encoded into the video, without the TV cabinet or guest buttons.</p>
 <div class="lab-grid"><div><div class="lab-preview"><canvas id="effectsPreview" width="640" height="430"></canvas><span id="cameraLabState">DEMO ARTWORK / CAMERA OFF</span></div>
 <p id="cameraLabStats" class="small mono"></p><label class="check"><input id="compareRaw" type="checkbox"> Compare unprocessed camera (this preview only)</label>
 <div class="mic-test"><meter id="micMeter" min="0" max="1" value="0"></meter><span id="micMeterLabel">Microphone is off</span></div>
@@ -422,7 +572,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 </section>
 
 </main>
-<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.3-alpha.1 · 24 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
+<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.4-alpha.1 · 25 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="aboutDialog"><button class="dialog-close" data-close="aboutDialog" aria-label="Close">×</button><div class="eyebrow">PROTOTYPE BOUNDARY</div><h2>Real interactions.<br>Honest boundaries.</h2><p><b>Working:</b> demo flow, optional camera and microphone, retro canvas recording, browser-local saved clips, playback/export, pixel receipt composition, settings and failure scenarios.</p><p><b>Not connected:</b> Physical printer, physical handset, native crash-recoverable storage and remote projector. Local Control room is not authenticated; the separate Cloud Admin requires its secret key.</p><p>Demo sessions contain no guest video. Real recordings stay local unless Cloud Delivery is explicitly connected. Existing recordings are not silently enrolled. No analytics or external fonts are used.</p><p>For Android screen testing, serve the static package over HTTPS. Opening an HTML attachment inside a chat or Files preview may not execute the app.</p><button class="btn primary" data-close="aboutDialog">Explore the prototype</button></dialog>
@@ -1940,7 +2090,7 @@ module.exports = QRCode;
  }
  root.RetroPrinter={PROFILE,guestTicket,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
 })(typeof window==='undefined'?globalThis:window);
-</script><script>/* RetroBooth v0.9.3-alpha.1. Pure, independently testable domain helpers. */
+</script><script>/* RetroBooth v0.9.4-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -3046,7 +3196,7 @@ function setupLandscape(){
 }
 
   /* Appearance is a saved operator preference, not a capture or privacy mode. */
-function styleName(style){return style==='edge'?'Edge-to-edge CRT':'Heritage television';}
+function styleName(style){return style==='edge'?'Modern CRT television':'Heritage television';}
 function applyScreenAppearance(){
   const previous=document.body.dataset.screenStyle;
   document.body.dataset.screenStyle=settings.screenStyle;
@@ -3429,7 +3579,7 @@ function setupPrinter(){
       const native=await nativeDiagnostics();
       let permissions={};
       if(navigator.permissions?.query){for(const name of ['camera','microphone']){try{permissions[name]=(await navigator.permissions.query({name})).state;}catch{permissions[name]='unavailable';}}}
-      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.3-alpha.1',generatedAt:new Date().toISOString(),
+      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.4-alpha.1',generatedAt:new Date().toISOString(),
         notice:'App-scoped diagnostic data, not Android system logcat. Up to 250 sanitized events survive app restarts where browser storage permits. No videos, snapshots, private QR URLs, credentials or device identifiers are intentionally included. Review before sharing.',
         runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
         media:{permissions,cameraReady:cameraReady(),microphoneReady:microphoneReady(),partialPreview:mediaPartiallyReady(),cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
@@ -3453,7 +3603,7 @@ function setupPrinter(){
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.9.3-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.4-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
@@ -3513,7 +3663,7 @@ function setupPrinter(){
       }).catch(()=>{log('tab_lock_unavailable');resolve();});
     });
   }
-  ready=true;log('app_ready',{version:'0.9.3-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
+  ready=true;log('app_ready',{version:'0.9.4-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
   if(surfaceRole==='guest'){openGuest(location.hash.slice(7));}else if(surfaceRole==='show'){go('show');}else{go(new URLSearchParams(location.search).has('setup')?'admin':'booth');}
   if(document.documentElement.dataset.serviceWorker==='true' && location.protocol!=='file:' && 'serviceWorker'in navigator){
     navigator.serviceWorker.register('./sw.js').catch(e=>log('offline_shell_unavailable',{error:e.message}));

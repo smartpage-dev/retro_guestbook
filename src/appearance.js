@@ -1,5 +1,5 @@
 /* Appearance is a saved operator preference, not a capture or privacy mode. */
-function styleName(style){return style==='edge'?'Edge-to-edge CRT':'Heritage television';}
+function styleName(style){return style==='edge'?'Modern CRT television':'Heritage television';}
 function applyScreenAppearance(){
   const previous=document.body.dataset.screenStyle;
   document.body.dataset.screenStyle=settings.screenStyle;

@@ -1,3 +1,11 @@
+## v0.9.4-alpha.1 — Modern CRT framing and kiosk-safe UI (25 Nov 2026)
+- Both screen styles now share the *same physical cabinet layout* and responsive breakpoints, derived from the working Heritage TV design.
+- Replaced the exposed edge-to-edge style 01 with graphite/brushed metal 1990s CRT housing and modern side panel; retains the existing Colour Film effect on recorded frames.
+- Raised 01 bottom-right five-tap Version/Admin affordance into a touch-safe bordered area; short-landscape CSS viewport reductions.
+- Kept 02 Heritage TV and camera/microphone media logic unchanged.
+- Bumped Android versionCode 13, unified release names and independent APK/EXE CI workflow artifact labels.
+- Added viewport/regression verification; see docs/MODERN_CRT_V094.md.
+
 ## v0.9.3-alpha.1 - 25 Nov 2026 - Android camera-only live preview + separate microphone
 
 - Camera-only live CRT preview (video:true,audio:false) operates when mic initialization fails; microphone separately requested (video:false,audio:true) and can later be attached or released without losing camera.
