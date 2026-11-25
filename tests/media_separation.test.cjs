@@ -1,0 +1,18 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const R=path.resolve(__dirname,'..');
+const app=fs.readFileSync(path.join(R,'src/app.js'),'utf8');
+const ui=fs.readFileSync(path.join(R,'src/template.html'),'utf8');
+const manifest=fs.readFileSync(path.join(R,'android/app/src/main/AndroidManifest.xml'),'utf8');
+const native=fs.readFileSync(path.join(R,'android/app/src/main/java/studio/luce/retrobooth/MainActivity.java'),'utf8');
+for(const id of ['applyCameraOnly','applyMicOnly','releaseMicOnly','stopMediaInputs'])assert(ui.includes(`id="${id}"`),id);
+assert(app.includes('getUserMedia({video:c.video,audio:false})'),'camera must not request audio');
+assert(app.includes('getUserMedia({video:false,audio:c.audio})'),'mic must not request video');
+assert(app.includes("mode=video?(audio?'real':'preview'):'demo'"),'partial preview must remain separate');
+assert(app.includes('mediaPartiallyReady()'),'guest recording must reject partial media');
+assert(app.includes('microphone_apply_failure'),'specific mic error must be logged');
+assert(manifest.includes('android.permission.MODIFY_AUDIO_SETTINGS'),'audio routing permission needed');
+assert(native.includes('webview_media_pause_suppressed'),'runtime permission prompt must not pause media');
+assert(native.includes('if(!activityResumed)'),'grant must defer until native resume');
+assert(native.includes('protected void onStop()')&&native.includes('web.onPause();'),'full native stop must suspend WebView media');
+console.log('Independent media controls and native lifecycle safety contracts PASSED. Not APK/hardware validation.');

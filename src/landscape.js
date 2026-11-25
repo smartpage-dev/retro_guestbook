@@ -10,7 +10,7 @@ function refreshPanel(){
   $('touchBtn').setAttribute('aria-label',state==='idle'?'Start recording / \u958b\u59cb\u9304\u5f71':p[1]);
   if(settings.trigger==='handset'&&state==='idle'){$('panelStartLabel').textContent='LIFT';$('panelStartSub').textContent='\u62ce\u8d77\u807d\u7b52';$('panelHint').textContent='\u807d\u7b52\u555f\u52d5\u6a21\u5f0f';}
   document.querySelectorAll('[data-lamp]').forEach(e=>e.classList.toggle('lit',e.dataset.lamp==='idle'?state==='idle':e.dataset.lamp==='recording'?state==='recording':['saving','receipt','qr','thankyou'].includes(state)));
-  $('panelBoundary').textContent=mode==='real'?(cloudClient?.connection?'CAMERA ON / CLOUD ENABLED':'CAMERA ON / LOCAL ONLY'):'DEMO / CAMERA OFF';
+  $('panelBoundary').textContent=mode==='real'?(cloudClient?.connection?'CAMERA ON / CLOUD ENABLED':'CAMERA ON / LOCAL ONLY'):mode==='preview'?'CAMERA LIVE / MIC OFF / PREVIEW ONLY':microphoneReady()?'MIC ON / CAMERA OFF / NO RECORDING':'DEMO / CAMERA OFF';
   if(state==='idle'&&!(offHook&&settings.trigger!=='touch')){
     document.querySelector('[data-i18n=idle]').textContent=settings.trigger==='handset'?'\u62ce\u8d77\u807d\u7b52\uff0c\u7559\u4f4e\u795d\u798f':'\u64b3\u53f3\u908a START\uff0c\u7559\u4f4e\u795d\u798f';
     document.querySelector('[data-i18n=idleHint]').textContent=settings.duration+' \u79d2\u9304\u5f71 \u00b7 \u81ea\u52d5\u5b8c\u6210 \u00b7 \u4e00\u5f35\u56de\u61b6\u5e36\u8d70';

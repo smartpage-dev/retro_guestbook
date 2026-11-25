@@ -23,6 +23,9 @@
 /* v0.9.2 mobile media diagnostics */
 #mediaDeviceStatus{overflow-wrap:anywhere;word-break:break-word;line-height:1.7}
 
+/* v0.9.3 independent media controls: readable on 32-inch kiosk and mobile Admin. */
+.media-apply-row{padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);gap:10px}.media-apply-row button{min-height:48px;white-space:normal}#mediaDeviceStatus{padding:12px;background:#eae8dd;border-radius:7px;color:#30382c}@media(max-width:520px){.media-apply-row{flex-direction:column;align-items:stretch}.media-apply-row button{width:100%}}
+
 /* v0.7: viewport-filling CRT picture and a single integrated control panel. */
 :root{--viewport-height:100vh;--panel-width:clamp(176px,18.75vw,380px);--phosphor:#e9e8bf;--panel-paper:#d5cfbb}
 body.kiosk{background:#17221c;overflow:hidden;height:var(--viewport-height);width:100%;overscroll-behavior:none}
@@ -308,8 +311,8 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 <div class="lab-grid"><div><div class="lab-preview"><canvas id="effectsPreview" width="640" height="430"></canvas><span id="cameraLabState">DEMO ARTWORK / CAMERA OFF</span></div>
 <p id="cameraLabStats" class="small mono"></p><label class="check"><input id="compareRaw" type="checkbox"> Compare unprocessed camera (this preview only)</label>
 <div class="mic-test"><meter id="micMeter" min="0" max="1" value="0"></meter><span id="micMeterLabel">Microphone is off</span></div>
-<div class="button-row"><button type="button" id="cameraLabEnable" class="btn primary">Enable webcam + microphone</button><button type="button" id="cameraLabStop" class="btn secondary">Stop camera</button></div>
-<p class="small muted">Allow both permissions. Choose the webcam and microphone in Device Check, then Apply + enable. Real recording needs browser storage; no silent or unsaved-video fallback.</p>
+<div class="button-row"><button type="button" id="cameraLabEnable" class="btn primary">Apply camera + mic (sequential)</button><button type="button" id="cameraLabStop" class="btn secondary">Stop camera</button></div>
+<p class="small muted">Camera-only preview remains live if microphone fails. Device Check now applies each input independently. Guest recording still requires working camera, microphone, and local storage.</p>
 </div><div><label>Camera look<select id="lookMode"><option value="follow">Follow screen style (recommended)</option><option value="film">Always Colour Film CRT</option><option value="heritage">Always Heritage Soft Mono</option><option value="bw">Always neutral black &amp; white</option></select></label>
 <p class="look-name" id="lookProfileName"></p>
 <label>Moving snow / fine grain<output id="fx_grainValue"></output><input id="fx_grain" type="range" min="0" max="12" step="1"></label><label>Scanlines<output id="fx_scanValue"></output><input id="fx_scan" type="range" min="0" max="30" step="1"></label><label>Colour saturation<output id="fx_saturationValue"></output><input id="fx_saturation" type="range" min="0" max="125" step="1"></label><label>Warm yellow / olive tint<output id="fx_warmthValue"></output><input id="fx_warmth" type="range" min="0" max="100" step="1"></label><label>Analogue softness<output id="fx_softnessValue"></output><input id="fx_softness" type="range" min="0" max="100" step="1"></label><p class="small muted">Each look keeps its own settings. Neutral black &amp; white locks tint and saturation at zero. Snow is quieter while recording. No flashing or tracking tears.</p>
@@ -318,12 +321,14 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 </div></div></form><div class="admin-grid"><form id="settingsForm" class="admin-card"><div class="card-number">01 / EVENT & CAPTURE</div><h2>Set the scene.</h2><label>Event title<input id="eventTitle" maxlength="60" required value="ALEX & SAM"></label><div class="form-row"><label>Event date<input type="date" id="eventDate" value="2026-12-20" required></label><label>Fixed recording duration<select id="duration"><option value="10">10 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option></select></label></div><label>Start control<select id="trigger"><option value="both">Handset + touch</option><option value="handset">Handset only</option><option value="touch">Touch only</option></select></label><label>Receipt layout<select id="receiptMode"><option value="both">Pixel photo + demo QR</option><option value="qr">Demo QR only</option><option value="photo">Pixel photo only</option></select></label><div class="form-row"><label>Countdown<select id="countdownSetting"><option value="3">3 seconds</option><option value="0">No countdown</option></select></label><label>After confirmed print: thank-you time<select id="returnSeconds"><option value="0">0 seconds / return immediately</option><option value="1">1 second</option><option value="2">2 seconds</option><option value="3">3 seconds</option><option value="5">5 seconds</option></select></label></div><p class="small muted">Fixed-time flow: no guest Stop, playback, approval or retake screen.</p><div hidden class="legacy-treatment"><label>Retro treatment<select id="preset"><option value="warm">Warm VHS</option><option value="soft">Soft analogue</option><option value="mono">Black & white television</option></select></label><label>Grain <output id="grainValue">4%</output><input id="grain" type="range" min="0" max="15" value="4"></label></div><label class="check"><input type="checkbox" id="mirror" checked> Mirror preview only (not the saved video)</label><label class="check"><input type="checkbox" id="osd" checked> Burn device-local date/time into video</label><button class="btn primary" type="submit">Save settings</button><p class="small muted">Changes apply to the next session. Current recordings cannot be reconfigured.</p></form>
 <div class="admin-stack"><div class="admin-card"><div class="card-number">02 / DEVICE CHECK</div><h2>Know what is connected.</h2><div id="diagnostics" class="diagnostics"></div><div class="form-row"><label>Camera<select id="cameraSelect"><option value="">System default</option></select></label><label>Microphone<select id="micSelect"><option value="">System default</option></select></label></div>
 <label>Default camera direction (when no specific camera is selected)<select id="cameraDirection"><option value="user">Front / selfie camera</option><option value="environment">Rear / back camera</option><option value="auto">Android system default</option></select></label>
-<div class="button-row"><button type="button" id="deviceRefresh" class="btn secondary">Refresh devices</button><button type="button" id="testCameraOnly" class="btn secondary">Test camera only</button><button type="button" id="testMicOnly" class="btn secondary">Test microphone only</button><button type="button" id="applyDevices" class="btn primary">Apply camera + microphone</button></div>
-<p id="mediaDeviceStatus" class="small mono" role="status" aria-live="polite">Camera and microphone are off. Test each input separately if Android reports a busy device.</p>
+<div class="button-row"><button type="button" id="deviceRefresh" class="btn secondary">Refresh device list</button><button type="button" id="testCameraOnly" class="btn secondary">Quick camera test</button><button type="button" id="testMicOnly" class="btn secondary">Quick microphone test</button></div>
+<div class="button-row media-apply-row"><button type="button" id="applyCameraOnly" class="btn primary">1 / APPLY CAMERA - LIVE preview</button><button type="button" id="applyMicOnly" class="btn secondary">2 / APPLY MICROPHONE</button><button type="button" id="releaseMicOnly" class="btn secondary">Release mic ONLY</button></div>
+<div class="button-row"><button type="button" id="applyDevices" class="btn secondary">Apply BOTH sequentially</button><button type="button" id="stopMediaInputs" class="btn secondary">Stop BOTH</button></div>
+<p id="mediaDeviceStatus" class="small mono" role="status" aria-live="polite">Camera and microphone are off. Apply camera separately first; camera preview does NOT require microphone.</p>
 <div class="button-row"><button type="button" id="diagExport" class="btn primary">Export full diagnostic JSON</button><button type="button" id="diagClear" class="btn secondary">Clear diagnostic history</button></div>
 <p class="small muted">App and Android permission logs, camera/mic stages, WebView version and recent events (500 in session, 250 retained across restarts). Not system logcat; no videos or private QR links. Review before sharing.</p>
 <pre id="diagnosticRecent" style="max-height:170px;overflow:auto;white-space:pre-wrap;font-size:11px">No events recorded yet.</pre>
-<p class="small muted">Grant Android Camera and Microphone permissions. Device names may only appear after granting access. Tests release their tracks and never save a guest recording. A successful camera-only test does not enable recording without a microphone.</p>
+<p class="small muted">Grant Android Camera and Microphone permissions. Device names may only appear after granting access. Quick tests release their tracks. Apply camera keeps LIVE CRT preview even if mic fails. Guest recording is blocked until both are live.</p>
 <div class="button-row"><button type="button" id="handsetBtn" class="btn secondary"><span data-i18n="pickup"></span> (simulate)</button></div><button id="persistBtn" class="text-button">Request persistent browser storage</button><p class="small muted">Permission and actual routing require device testing. A browser storage quota is not free device disk space.</p></div>
 <div class="admin-card scenario"><div class="card-number">03 / SCENARIO LAB</div><h2>Test the unhappy paths.</h2><p class="small">These switches are simulations. They do not connect to a server or printer.</p><label class="check"><input type="checkbox" id="failSave"> Fail the next local save (one-shot)</label><label class="check"><input type="checkbox" id="failPrint"> Receipt printer unavailable (simulation)</label><label class="check"><input type="checkbox" id="offlineSim"> Internet unavailable (simulation)</label><div class="button-row"><button id="retryQueue" class="btn secondary">Retry simulated queue</button></div><pre id="queueSummary">No simulated jobs yet.</pre></div></div>
 <form id="deliveryForm" class="admin-card wide delivery-admin">
@@ -417,7 +422,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 </section>
 
 </main>
-<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.2-alpha.1 · 24 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
+<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.3-alpha.1 · 24 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="aboutDialog"><button class="dialog-close" data-close="aboutDialog" aria-label="Close">×</button><div class="eyebrow">PROTOTYPE BOUNDARY</div><h2>Real interactions.<br>Honest boundaries.</h2><p><b>Working:</b> demo flow, optional camera and microphone, retro canvas recording, browser-local saved clips, playback/export, pixel receipt composition, settings and failure scenarios.</p><p><b>Not connected:</b> Physical printer, physical handset, native crash-recoverable storage and remote projector. Local Control room is not authenticated; the separate Cloud Admin requires its secret key.</p><p>Demo sessions contain no guest video. Real recordings stay local unless Cloud Delivery is explicitly connected. Existing recordings are not silently enrolled. No analytics or external fonts are used.</p><p>For Android screen testing, serve the static package over HTTPS. Opening an HTML attachment inside a chat or Files preview may not execute the app.</p><button class="btn primary" data-close="aboutDialog">Explore the prototype</button></dialog>
@@ -1935,7 +1940,7 @@ module.exports = QRCode;
  }
  root.RetroPrinter={PROFILE,guestTicket,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
 })(typeof window==='undefined'?globalThis:window);
-</script><script>/* RetroBooth v0.9.2-alpha.1. Pure, independently testable domain helpers. */
+</script><script>/* RetroBooth v0.9.3-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -2365,7 +2370,7 @@ return {Ring,safe};
     try {const saved=await store.getSettings();if(saved?.value) settings=C.safeSettings(saved.value); clips=(await store.list()).filter(c=>c.lifecycle!=='deleted');nextSequence=Math.max(clips.reduce((n,c)=>Math.max(n,c.seq+1),1),typeof store.getSequence==='function'?(await store.getSequence())?.next||1:1);}
     catch(e){toast('Stored data could not be loaded: '+e.message);}
   }
-  let state='idle', mode='demo', offHook=false, session=0, stream=null, recorder=null, recordStream=null;
+  let state='idle', mode='demo', offHook=false, session=0, stream=null, cameraInput=null, microphoneInput=null, recorder=null, recordStream=null;
   let audioContext=null, analyser=null, audioNode=null, elapsed=0, started=0, interval=null;
   let pending=null, recordParts=[], stopPromise=null, sessionSettings=null, sessionId='', snapshots=[], snapIndex=0;
   let selectedClip=null, lastReceipt=null, playbackURL=null, currentView='booth', wakeLock=null, cameraBusy=false;
@@ -2421,7 +2426,7 @@ return {Ring,safe};
     if(messages[state]){ $('stateTitle').textContent=messages[state][0];$('stateSubtitle').textContent=messages[state][1]; }
     $('handsetBtn').querySelector('span').textContent=offHook?zh.hangup:zh.pickup;
     $('handsetBtn').disabled=(settings.trigger==='touch' && !offHook)||state==='error';
-    $('touchBtn').hidden=false;$('touchBtn').disabled=state!=='idle'||settings.trigger==='handset'||cameraBusy||settingsSaving||printerActionBusy||cloudClaimBusy||!tabAllowed;
+    $('touchBtn').hidden=false;$('touchBtn').disabled=state!=='idle'||settings.trigger==='handset'||cameraBusy||settingsSaving||printerActionBusy||cloudClaimBusy||!tabAllowed||mediaPartiallyReady();
     $('stopBtn').hidden=true;
     $('touchBtn').hidden=false;
     $('touchBtn').className='panel-start';
@@ -2432,10 +2437,10 @@ return {Ring,safe};
     document.querySelector('[data-i18n="idleHint"]').textContent=settings.duration+' \u79d2\u9304\u5f71 \u00b7 \u81ea\u52d5\u5b8c\u6210 \u00b7 \u8acb\u53d6\u8d70\u7d00\u5ff5\u55ae';
     if(state==='idle'&&offHook&&settings.trigger!=='touch'){document.querySelector('[data-i18n="idle"]').textContent=zh.hold;document.querySelector('[data-i18n="idleHint"]').textContent='Replace the handset, then lift again for the next message.';}
     $('screenEvent').textContent=settings.title;$('durationTag').textContent=settings.duration+' SEC';
-    $('modeTag').textContent=mode==='real'?'CAMERA + MIC ON':'DEMO SIGNAL';$('signalLabel').textContent=mode==='real'?'CAMERA':'DEMO';
-    $('globalNotice').textContent=mode==='real'?(cloudClient?.connection?'Camera + microphone enabled. Local-first cloud delivery is configured. Physical printing is disconnected.':'Camera + microphone enabled. Local-only; no new cloud upload configured.'):'Demo mode. Camera is off. Printing and cloud are not connected.';
-    $('cameraCanvas').classList.toggle('mirrored',mode==='real'&&settings.mirror);
-    $('cameraBtn').textContent=mode==='real'?'Turn off camera + microphone':'Enable camera + microphone';$('cameraSetupBtn').textContent=$('cameraBtn').textContent;$('cameraSetupBtn').disabled=state!=='idle'||cameraBusy;
+    $('modeTag').textContent=mode==='real'?'CAMERA + MIC ON':mode==='preview'?'CAMERA PREVIEW ONLY':microphoneReady()?'MIC ON / NO CAMERA':'DEMO SIGNAL';$('signalLabel').textContent=cameraReady()?'CAMERA':microphoneReady()?'AUDIO':'DEMO';
+    $('globalNotice').textContent=mode==='real'?(cloudClient?.connection?'Camera + microphone enabled. Local-first cloud delivery is configured. Physical printing is disconnected.':'Camera + microphone enabled. Local-only; no new cloud upload configured.'):mode==='preview'?'LIVE CAMERA PREVIEW ONLY. Microphone unavailable; guest Start is disabled until audio is ready.':microphoneReady()?'Microphone ready; select and apply a camera before recording. Guest Start is disabled.':'Demo mode. Camera is off. Printing and cloud are not connected.';
+    $('cameraCanvas').classList.toggle('mirrored',cameraReady()&&settings.mirror);
+    $('cameraBtn').textContent=cameraReady()||microphoneReady()?'Stop active media':'Apply camera + mic separately';$('cameraSetupBtn').textContent=$('cameraBtn').textContent;$('cameraSetupBtn').disabled=state!=='idle'||cameraBusy;
     const step=['greeting','countdown'].includes(state)?'greeting':['saving','receipt','qr','thankyou'].includes(state)?'saving':state;
     document.querySelectorAll('[data-step]').forEach(e=>e.classList.toggle('active',e.dataset.step===step));
     $('countBadge').textContent=clips.length;
@@ -2475,72 +2480,155 @@ return {Ring,safe};
     if(audioId)audio.deviceId={exact:audioId};
     return {video,audio};
   }
-  async function probeInput(kind){
-    if(state!=='idle'||cameraBusy||settingsSaving)return;
-    if(mode==='real'){mediaStatus('Stop the active camera before testing an input separately.');return;}
-    if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){mediaStatus('Camera tests require HTTPS or a trusted app origin.');return;}
-    cameraBusy=true;renderState();
-    let candidate=null;const probeStarted=performance.now();
-    try{
-      const c=mediaConstraints();
-      log('media_probe_start',{kind,explicitCamera:!!$('cameraSelect').value,explicitMic:!!$('micSelect').value,direction:$('cameraDirection').value});
-      const request=kind==='video'?{video:c.video,audio:false}:{video:false,audio:c.audio};
-      mediaStatus('Testing '+(kind==='video'?'camera':'microphone')+' only… Android may ask for permission.');
-      candidate=await navigator.mediaDevices.getUserMedia(request);
-      const track=kind==='video'?candidate.getVideoTracks()[0]:candidate.getAudioTracks()[0];
-      if(!track||track.readyState!=='live')throw new Error('No active '+kind+' track returned.');
-      const details=track.getSettings?.()||{};
-      mediaStatus((kind==='video'?'Camera':'Microphone')+' test PASSED ('+String(track.label||'unnamed device').slice(0,72)+')'+(details.width?' / '+details.width+'x'+details.height:'')+'. Track released; now test the other input.');
-      log('media_probe_pass',{kind,elapsedMs:Math.round(performance.now()-probeStarted),trackState:track.readyState,width:details.width||null,height:details.height||null,frameRate:details.frameRate||null});
-    }catch(e){mediaStatus((kind==='video'?'Camera':'Microphone')+' test FAILED: '+cameraErrorMessage(e));lastMediaFailure={stage:'probe_'+kind,name:e.name||'Error',message:cameraErrorMessage(e)};log('media_probe_failure',{kind,elapsedMs:Math.round(performance.now()-probeStarted),error:e.name||'Error',detail:e.message||''});}
-    finally{if(candidate)candidate.getTracks().forEach(t=>t.stop());cameraBusy=false;await refreshDevices();renderState();refreshDiagnostics();}
+  // v0.9.3: independent input ownership. A broken microphone must never tear down a
+  // working camera preview. Partial media is diagnostic-only and cannot record guests.
+  const inputTrack=(input,kind)=>input?.getTracks().find(t=>t.kind===kind&&t.readyState==='live')||null;
+  const cameraReady=()=>!!inputTrack(cameraInput,'video');
+  const microphoneReady=()=>!!inputTrack(microphoneInput,'audio');
+  const mediaPartiallyReady=()=>cameraReady()!==microphoneReady();
+  function syncMediaState(){
+    const video=inputTrack(cameraInput,'video'),audio=inputTrack(microphoneInput,'audio');
+    stream=video||audio?new MediaStream([...(video?[video]:[]),...(audio?[audio]:[])]):null;
+    mode=video?(audio?'real':'preview'):'demo';
+    renderer.live=!!video;
+    if(!video)releaseWake();
+    renderState();
   }
-  async function enableCamera(force=false){
-    if(state!=='idle'||cameraBusy||settingsSaving)return;
-    if(mode==='real'&&!force){disableCamera();mediaStatus('Camera and microphone stopped.');return;}
-    if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){toast('Camera testing needs HTTPS or localhost in a full browser. Demo mode still works.');return;}
-    if(!window.MediaRecorder||!$('cameraCanvas').captureStream){toast('Canvas recording is unavailable here. Use demo mode; this device has not passed capture validation.');return;}
+  function releaseCameraInput(render=true){
+    const old=cameraInput;cameraInput=null;
+    if(old)old.getTracks().forEach(t=>t.stop());
+    $('inputVideo').srcObject=null;
+    syncMediaState();if(render)log('camera_released',{microphoneStillLive:microphoneReady()});
+  }
+  function releaseMicrophoneInput(render=true){
+    const old=microphoneInput;microphoneInput=null;
+    if(audioNode){audioNode.disconnect();audioNode=null;}analyser=null;
+    if(old)old.getTracks().forEach(t=>t.stop());
+    syncMediaState();if(render)log('microphone_released',{cameraStillLive:cameraReady()});
+  }
+  function inputEnded(kind,track){
+    const expected=kind==='video'?cameraInput:microphoneInput;
+    if(!expected?.getTracks().includes(track))return;
+    log('media_track_ended',{kind,state});
+    if(state==='recording'){stopRecording(true,kind==='audio'?'Microphone disconnected.':'Camera disconnected.');return;}
+    if(['greeting','countdown'].includes(state)){session++;setState('idle');toast('Input disconnected before recording.');}
+    if(kind==='video')releaseCameraInput();else releaseMicrophoneInput();
+    mediaStatus((kind==='audio'?'Microphone':'Camera')+' disconnected. '+(cameraReady()?'Camera preview remains active.':'Reconnect media in Device Check.'));
+  }
+  function attachInputEnd(input,kind){const track=inputTrack(input,kind);if(track)track.addEventListener('ended',()=>inputEnded(kind,track));}
+  async function mediaOperation(label,task){
+    if(state!=='idle'||cameraBusy||settingsSaving)return false;
+    if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){mediaStatus('Media devices require HTTPS, localhost or a trusted app origin.');return false;}
     cameraBusy=true;renderState();
-    let candidate=null;let cameraStage='request_media';const cameraStarted=performance.now();
-    log('camera_enable_start',{explicitCamera:!!$('cameraSelect').value,explicitMic:!!$('micSelect').value,direction:$('cameraDirection').value,secureContext:window.isSecureContext});
-    try{
-      disableCamera(false);
-      const requested=mediaConstraints();
-      mediaStatus('Opening selected camera + microphone…');
-      try{candidate=await navigator.mediaDevices.getUserMedia(requested);}
-      catch(firstError){
-        // Some Android WebViews reject ideal resolution/processing constraints. Retry ONCE
-        // only for default devices; never silently replace an explicitly selected input.
-        const auto=$('cameraSelect').value===''&&$('micSelect').value==='';
-        if(!auto||!['NotReadableError','AbortError','OverconstrainedError'].includes(firstError.name))throw firstError;
-        await new Promise(resolve=>setTimeout(resolve,300));
-        mediaStatus('First request failed; trying Android basic camera + microphone constraints once…');
-        log('camera_first_request_failed',{stage:'request_media',name:firstError.name||'Error',message:firstError.message||'',elapsedMs:Math.round(performance.now()-cameraStarted)});
-        log('camera_relaxed_retry',{reason:firstError.name});
-        const direction=$('cameraDirection').value;
-        candidate=await navigator.mediaDevices.getUserMedia({video:direction==='auto'?true:{facingMode:{ideal:direction}},audio:true});
-      }
-      if(candidate.getVideoTracks().length!==1||!candidate.getAudioTracks().length)throw new Error('Both camera and microphone are required. No silent fallback.');
-      cameraStage='video_play';log('camera_tracks_received',{videoTracks:candidate.getVideoTracks().length,audioTracks:candidate.getAudioTracks().length,elapsedMs:Math.round(performance.now()-cameraStarted)});
-      stream=candidate;candidate=null;$('inputVideo').srcObject=stream;await $('inputVideo').play();
-      cameraStage='audio_context';await ensureAudio();
-      if(audioContext){analyser=audioContext.createAnalyser();analyser.fftSize=2048;audioNode=audioContext.createMediaStreamSource(stream);audioNode.connect(analyser);}
-      stream.getTracks().forEach(t=>{
-        t.addEventListener('ended',()=>{log('track_ended',{kind:t.kind});if(state==='recording')stopRecording(true,'Camera or microphone disconnected.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');disableCamera();toast('Camera or microphone disconnected.');}else if(state==='idle'){disableCamera();toast('Device disconnected. Returned to demo mode.');}});
-      });
-      cameraStage='refresh_devices';mode='real';renderer.live=true;await wake();await refreshDevices();
-      const video=stream.getVideoTracks()[0],audio=stream.getAudioTracks()[0];
-      mediaStatus('LIVE: '+String(video.label||'camera').slice(0,72)+' + '+String(audio.label||'microphone').slice(0,72)+'. Ready for a test recording.');
-      toast('Camera and microphone are ON. Test with a disposable recording.');
-      lastMediaFailure=null;log('camera_enabled',{elapsedMs:Math.round(performance.now()-cameraStarted),videoWidth:video.getSettings().width||null,videoHeight:video.getSettings().height||null,videoFrameRate:video.getSettings().frameRate||null,audioLive:audio.readyState==='live'});
-    }catch(e){if(candidate)candidate.getTracks().forEach(t=>t.stop());disableCamera(false);mediaStatus('Camera + microphone FAILED: '+cameraErrorMessage(e));toast('Camera not enabled: '+cameraErrorMessage(e));lastMediaFailure={stage:cameraStage,name:e.name||'Error',message:cameraErrorMessage(e)};log('camera_failure',{stage:cameraStage,elapsedMs:Math.round(performance.now()-cameraStarted),name:e.name||'Error',error:String(e.message||e)});}
+    try{return await task();}
     finally{cameraBusy=false;renderState();refreshDiagnostics();}
   }
+  async function probeInput(kind){
+    return mediaOperation('probe_'+kind,async()=>{
+      const live=kind==='video'?cameraReady():microphoneReady();
+      if(live){mediaStatus((kind==='video'?'Camera':'Microphone')+' is already LIVE. Use Release / Stop before testing it again.');log('media_probe_already_active',{kind});return true;}
+      let candidate=null;const started=performance.now();
+      try{
+        const c=mediaConstraints();const request=kind==='video'?{video:c.video,audio:false}:{video:false,audio:c.audio};
+        log('media_probe_start',{kind,explicitCamera:!!$('cameraSelect').value,explicitMic:!!$('micSelect').value,direction:$('cameraDirection').value});
+        mediaStatus('Quick testing '+(kind==='video'?'camera':'microphone')+' (track will be released)…');
+        candidate=await navigator.mediaDevices.getUserMedia(request);
+        const track=inputTrack(candidate,kind);if(!track)throw new Error('No active '+kind+' track returned.');
+        const details=track.getSettings?.()||{};
+        mediaStatus((kind==='video'?'Camera':'Microphone')+' test PASSED. Use Apply '+(kind==='video'?'camera':'microphone')+' to keep it running.');
+        log('media_probe_pass',{kind,elapsedMs:Math.round(performance.now()-started),trackState:track.readyState,width:details.width||null,height:details.height||null});return true;
+      }catch(e){
+        mediaStatus((kind==='video'?'Camera':'Microphone')+' test FAILED: '+cameraErrorMessage(e));
+        lastMediaFailure={stage:'probe_'+kind,name:e.name||'Error',message:cameraErrorMessage(e)};
+        log('media_probe_failure',{kind,elapsedMs:Math.round(performance.now()-started),error:e.name||'Error',detail:e.message||''});return false;
+      }finally{if(candidate)candidate.getTracks().forEach(t=>t.stop());await refreshDevices();}
+    });
+  }
+  async function openCameraInput(){
+    releaseCameraInput(false);
+    const c=mediaConstraints(),cameraStarted=performance.now();let candidate=null;
+    log('camera_apply_start',{explicitCamera:!!$('cameraSelect').value,direction:$('cameraDirection').value,requestAudio:false});
+    try{
+      mediaStatus('Opening CAMERA ONLY (no microphone request)…');
+      try{candidate=await navigator.mediaDevices.getUserMedia({video:c.video,audio:false});}
+      catch(first){
+        if($('cameraSelect').value||!['NotReadableError','AbortError','OverconstrainedError'].includes(first.name))throw first;
+        log('camera_basic_retry',{error:first.name,message:first.message||''});
+        await wait(300);const dir=$('cameraDirection').value;
+        candidate=await navigator.mediaDevices.getUserMedia({video:dir==='auto'?true:{facingMode:{ideal:dir}},audio:false});
+      }
+      const track=inputTrack(candidate,'video');if(!track)throw new Error('Camera returned no active video track.');
+      // A provider that returns unrequested tracks must not accidentally enable audio.
+      candidate.getAudioTracks().forEach(t=>{candidate.removeTrack(t);t.stop();});
+      cameraInput=candidate;candidate=null;attachInputEnd(cameraInput,'video');
+      $('inputVideo').srcObject=cameraInput;await $('inputVideo').play();
+      syncMediaState();await wake();await refreshDevices();
+      const d=track.getSettings?.()||{};
+      log('camera_apply_success',{elapsedMs:Math.round(performance.now()-cameraStarted),width:d.width||null,height:d.height||null,microphoneStillLive:microphoneReady()});
+      mediaStatus('CAMERA LIVE'+(microphoneReady()?' + MICROPHONE LIVE. Ready to record.':' / PREVIEW ONLY. Microphone not ready; guest Start disabled.')+' Use Camera Lab for the CRT preview.');
+      lastMediaFailure=null;return true;
+    }catch(e){
+      if(candidate)candidate.getTracks().forEach(t=>t.stop());releaseCameraInput(false);
+      lastMediaFailure={stage:'apply_camera_only',name:e.name||'Error',message:e.message||String(e)};
+      log('camera_apply_failure',{stage:'apply_camera_only',elapsedMs:Math.round(performance.now()-cameraStarted),name:e.name||'Error',error:String(e.message||e)});
+      mediaStatus('CAMERA FAILED: '+cameraErrorMessage(e)+(microphoneReady()?' Microphone remains active.':''));return false;
+    }
+  }
+  async function openMicrophoneInput(){
+    releaseMicrophoneInput(false);
+    const c=mediaConstraints(),micStarted=performance.now();let candidate=null;
+    log('microphone_apply_start',{explicitMic:!!$('micSelect').value,requestVideo:false,cameraStillLive:cameraReady()});
+    try{
+      mediaStatus('Opening MICROPHONE ONLY; existing camera preview stays on…');
+      try{candidate=await navigator.mediaDevices.getUserMedia({video:false,audio:c.audio});}
+      catch(first){
+        if($('micSelect').value||!['NotReadableError','AbortError','OverconstrainedError'].includes(first.name))throw first;
+        log('microphone_basic_retry',{error:first.name,message:first.message||'',elapsedMs:Math.round(performance.now()-micStarted)});
+        await wait(300);candidate=await navigator.mediaDevices.getUserMedia({video:false,audio:true});
+      }
+      const track=inputTrack(candidate,'audio');if(!track)throw new Error('Microphone returned no active audio track.');
+      candidate.getVideoTracks().forEach(t=>{candidate.removeTrack(t);t.stop();});
+      microphoneInput=candidate;candidate=null;attachInputEnd(microphoneInput,'audio');
+      try{
+        await ensureAudio();
+        if(audioContext){analyser=audioContext.createAnalyser();analyser.fftSize=2048;
+          audioNode=audioContext.createMediaStreamSource(microphoneInput);audioNode.connect(analyser);}
+      }catch(e){log('microphone_meter_unavailable',{name:e.name||'Error',error:e.message||''});}
+      syncMediaState();await refreshDevices();
+      log('microphone_apply_success',{elapsedMs:Math.round(performance.now()-micStarted),cameraStillLive:cameraReady(),audioLive:track.readyState==='live'});
+      mediaStatus('MICROPHONE LIVE'+(cameraReady()?' + CAMERA LIVE. Ready to record.':' / Camera not applied yet. Guest Start disabled.'));
+      lastMediaFailure=null;return true;
+    }catch(e){
+      if(candidate)candidate.getTracks().forEach(t=>t.stop());releaseMicrophoneInput(false);
+      lastMediaFailure={stage:'apply_microphone_only',name:e.name||'Error',message:e.message||String(e)};
+      log('microphone_apply_failure',{stage:'apply_microphone_only',elapsedMs:Math.round(performance.now()-micStarted),name:e.name||'Error',error:String(e.message||e),cameraStillLive:cameraReady()});
+      mediaStatus('MICROPHONE FAILED: '+cameraErrorMessage(e)+(cameraReady()?' CAMERA PREVIEW REMAINS LIVE.':' Camera is off.'));
+      return false;
+    }
+  }
+  async function applyCameraOnly(){return mediaOperation('camera',openCameraInput);}
+  async function applyMicrophoneOnly(){return mediaOperation('microphone',openMicrophoneInput);}
+  async function releaseMicrophoneOnly(){return mediaOperation('release_mic',async()=>{releaseMicrophoneInput();mediaStatus(cameraReady()?'Microphone OFF. CAMERA PREVIEW still LIVE; guest Start disabled.':'Microphone OFF. Camera OFF.');return true;});}
+  async function enableCamera(force=false){
+    if(!force&&(cameraReady()||microphoneReady())){
+      return mediaOperation('stop_all',async()=>{disableCamera();mediaStatus('Camera and microphone stopped.');return true;});
+    }
+    return mediaOperation('combined_sequential',async()=>{
+      // Never request both sources together: microphone failure must not destroy a live camera.
+      // Preserve a healthy video preview while recovering failed audio.
+      // When BOTH were already active, re-apply intentionally refreshes selected devices.
+      const alreadyComplete=mode==='real';
+      const camOk=!alreadyComplete&&cameraReady()?true:await openCameraInput();
+      const micOk=!alreadyComplete&&microphoneReady()?true:await openMicrophoneInput();
+      if(camOk&&micOk){toast('Camera + microphone enabled. Ready for a disposable recording.');return true;}
+      if(camOk){toast('Camera preview LIVE; microphone failed. You can test CRT effects safely.');return false;}
+      toast('Media setup incomplete. Use separate Apply buttons in Device Check.');return false;
+    });
+  }
   function disableCamera(render=true){
-    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
-    if(audioNode){audioNode.disconnect();audioNode=null;}analyser=null;
-    $('inputVideo').srcObject=null;renderer.live=false;mode='demo';releaseWake();
+    releaseMicrophoneInput(false);releaseCameraInput(false);
     if(render)renderState();
+    log('media_all_released');
   }
   async function refreshDevices(){
     if(!navigator.mediaDevices?.enumerateDevices)return;
@@ -2559,6 +2647,7 @@ return {Ring,safe};
     if(surfaceRole!=='booth'||currentView!=='booth'||!ready||state!=='idle'||cameraBusy||settingsSaving||printerActionBusy||cloudClaimBusy||!tabAllowed)return;
     if(origin==='touch'&&settings.trigger==='handset')return;
     if(origin==='handset'&&settings.trigger==='touch')return;
+    if(mediaPartiallyReady()){toast('Camera-only / microphone-only is preview mode. Apply BOTH inputs before recording.');return;}
     fitPicture();
     if(!renderer.running){showError('Graphics renderer stopped. Reload after exporting any saved clips.');return;}
     if(mode==='real'&&!store.available){showError('Browser storage is unavailable. Real capture is blocked to avoid losing guest recordings.');return;}
@@ -2719,7 +2808,7 @@ return {Ring,safe};
     let usage='Not available',persistent='Not requested';
     try{if(navigator.storage?.estimate){const e=await navigator.storage.estimate();usage=((e.usage||0)/1048576).toFixed(1)+' MB / browser quota '+((e.quota||0)/1073741824).toFixed(1)+' GB';}
       if(navigator.storage?.persisted)persistent=(await navigator.storage.persisted())?'Granted (still not a backup)':'Best effort / not granted';}catch{}
-    const rows=[['Display profile','32-inch landscape / Android target unverified'],['Screen style',styleName(settings.screenStyle)],['Viewport',innerWidth+' x '+innerHeight+' CSS px'],['Capture canvas',$('cameraCanvas').width+' x '+$('cameraCanvas').height],['Capture mode',mode==='real'?'CAMERA + MIC ON':'DEMO / CAMERA OFF'],['Renderer',renderer.mode],['Camera look',RetroEffects.resolve(settings).name],['Render rate',renderer.fps.toFixed(1)+' fps (not encoded fps)'],['GPU fallback warning',renderer.backendWarning||'None'],['Browser storage',store.available?'IndexedDB available':'Unavailable / demo only'],['Storage estimate',usage],['Persistence',persistent],['Canvas MediaRecorder',!!window.MediaRecorder&&!!$('cameraCanvas').captureStream?'API present / device test required':'Unavailable'],['Secure context',window.isSecureContext?'Yes':'No'],['Wake lock',wakeLock&&!wakeLock.released?'Acquired':'Not held'],['Single-tab lock',!tabAllowed?'Another booth tab active':navigator.locks?'Exclusive lock acquired':'Unavailable: use one tab only'],['Handset',offHook?'Lifted (keyboard/UI signal)':'On hook (keyboard/UI signal)'],['Printer',printerText()],['Cloud',cloudClient?.connection?'Configured / '+cloudClient.poolCount+' reserved links':'Local-only / no new cloud uploads']];
+    const rows=[['Display profile','32-inch landscape / Android target unverified'],['Screen style',styleName(settings.screenStyle)],['Viewport',innerWidth+' x '+innerHeight+' CSS px'],['Capture canvas',$('cameraCanvas').width+' x '+$('cameraCanvas').height],['Capture mode',mode==='real'?'CAMERA + MIC ON':mode==='preview'?'CAMERA-ONLY LIVE PREVIEW':microphoneReady()?'MICROPHONE LIVE / CAMERA OFF':'DEMO / CAMERA OFF'],['Renderer',renderer.mode],['Camera look',RetroEffects.resolve(settings).name],['Render rate',renderer.fps.toFixed(1)+' fps (not encoded fps)'],['GPU fallback warning',renderer.backendWarning||'None'],['Browser storage',store.available?'IndexedDB available':'Unavailable / demo only'],['Storage estimate',usage],['Persistence',persistent],['Canvas MediaRecorder',!!window.MediaRecorder&&!!$('cameraCanvas').captureStream?'API present / device test required':'Unavailable'],['Secure context',window.isSecureContext?'Yes':'No'],['Wake lock',wakeLock&&!wakeLock.released?'Acquired':'Not held'],['Single-tab lock',!tabAllowed?'Another booth tab active':navigator.locks?'Exclusive lock acquired':'Unavailable: use one tab only'],['Handset',offHook?'Lifted (keyboard/UI signal)':'On hook (keyboard/UI signal)'],['Printer',printerText()],['Cloud',cloudClient?.connection?'Configured / '+cloudClient.poolCount+' reserved links':'Local-only / no new cloud uploads']];
     $('diagnostics').replaceChildren(...rows.map(([name,value])=>{const div=document.createElement('div');div.className='diag-row';const a=document.createElement('span'),b=document.createElement('span');a.textContent=name;b.textContent=value;div.append(a,b);return div;}));
   }
   function renderLibrary(){
@@ -2924,7 +3013,7 @@ function refreshPanel(){
   $('touchBtn').setAttribute('aria-label',state==='idle'?'Start recording / \u958b\u59cb\u9304\u5f71':p[1]);
   if(settings.trigger==='handset'&&state==='idle'){$('panelStartLabel').textContent='LIFT';$('panelStartSub').textContent='\u62ce\u8d77\u807d\u7b52';$('panelHint').textContent='\u807d\u7b52\u555f\u52d5\u6a21\u5f0f';}
   document.querySelectorAll('[data-lamp]').forEach(e=>e.classList.toggle('lit',e.dataset.lamp==='idle'?state==='idle':e.dataset.lamp==='recording'?state==='recording':['saving','receipt','qr','thankyou'].includes(state)));
-  $('panelBoundary').textContent=mode==='real'?(cloudClient?.connection?'CAMERA ON / CLOUD ENABLED':'CAMERA ON / LOCAL ONLY'):'DEMO / CAMERA OFF';
+  $('panelBoundary').textContent=mode==='real'?(cloudClient?.connection?'CAMERA ON / CLOUD ENABLED':'CAMERA ON / LOCAL ONLY'):mode==='preview'?'CAMERA LIVE / MIC OFF / PREVIEW ONLY':microphoneReady()?'MIC ON / CAMERA OFF / NO RECORDING':'DEMO / CAMERA OFF';
   if(state==='idle'&&!(offHook&&settings.trigger!=='touch')){
     document.querySelector('[data-i18n=idle]').textContent=settings.trigger==='handset'?'\u62ce\u8d77\u807d\u7b52\uff0c\u7559\u4f4e\u795d\u798f':'\u64b3\u53f3\u908a START\uff0c\u7559\u4f4e\u795d\u798f';
     document.querySelector('[data-i18n=idleHint]').textContent=settings.duration+' \u79d2\u9304\u5f71 \u00b7 \u81ea\u52d5\u5b8c\u6210 \u00b7 \u4e00\u5f35\u56de\u61b6\u5e36\u8d70';
@@ -3038,11 +3127,11 @@ function refreshCameraLab(){
  const target=$('effectsPreview'),source=$('compareRaw').checked?renderer.raw:renderer.canvas;
  if(target.width!==640||target.height!==Math.round(640*source.height/source.width)){target.width=640;target.height=Math.round(640*source.height/source.width);}
  target.getContext('2d').drawImage(source,0,0,target.width,target.height);
- $('cameraLabState').textContent=(mode==='real'?'LIVE CAMERA + MIC':'DEMO ARTWORK / CAMERA OFF')+' / '+($('compareRaw').checked?'RAW COMPARISON ONLY':activeDraft().name);
+ $('cameraLabState').textContent=(mode==='real'?'LIVE CAMERA + MIC':mode==='preview'?'CAMERA-ONLY CRT PREVIEW / NO MIC':microphoneReady()?'MICROPHONE LIVE / CAMERA OFF':'DEMO ARTWORK / CAMERA OFF')+' / '+($('compareRaw').checked?'RAW COMPARISON ONLY':activeDraft().name);
  $('cameraLabStats').textContent=renderer.mode+' / render '+renderer.fps.toFixed(1)+' fps (not camera or encoded fps) / '+renderer.w+' x '+renderer.h;
- $('cameraLabEnable').disabled=cameraBusy||state!=='idle';$('cameraLabStop').disabled=cameraBusy||mode!=='real'||state!=='idle';
+ $('cameraLabEnable').disabled=cameraBusy||state!=='idle';$('cameraLabStop').disabled=cameraBusy||(!cameraReady()&&!microphoneReady())||state!=='idle';
  let rms=0;if(analyser){const d=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(d);for(const n of d)rms+=(n-128)*(n-128);rms=Math.sqrt(rms/d.length)/128;}
- $('micMeter').value=Math.min(1,rms*4);$('micMeterLabel').textContent=mode==='real'?(rms>.006?'Audio input detected':'Quiet input / speak or check the selected microphone'):'Microphone is off';
+ $('micMeter').value=Math.min(1,rms*4);$('micMeterLabel').textContent=microphoneReady()?(rms>.006?'Audio input detected':'Mic connected, quiet input / check route'):'Microphone OFF - camera preview does not require audio';
 }
 function setupCameraLab(){
  $('lookMode').onchange=()=>{effectDraft.lookMode=$('lookMode').value;fillEffectControls();previewEffectDraft();};
@@ -3340,10 +3429,10 @@ function setupPrinter(){
       const native=await nativeDiagnostics();
       let permissions={};
       if(navigator.permissions?.query){for(const name of ['camera','microphone']){try{permissions[name]=(await navigator.permissions.query({name})).state;}catch{permissions[name]='unavailable';}}}
-      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.2-alpha.1',generatedAt:new Date().toISOString(),
+      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.3-alpha.1',generatedAt:new Date().toISOString(),
         notice:'App-scoped diagnostic data, not Android system logcat. Up to 250 sanitized events survive app restarts where browser storage permits. No videos, snapshots, private QR URLs, credentials or device identifiers are intentionally included. Review before sharing.',
         runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
-        media:{permissions,cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
+        media:{permissions,cameraReady:cameraReady(),microphoneReady:microphoneReady(),partialPreview:mediaPartiallyReady(),cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
         native,events:diagnosticRing.snapshot()};
       textDownload(RetroDiagnostics.safe(report),'RetroBooth_Android_Diagnostics_'+new Date().toISOString().replace(/[:.]/g,'-')+'.json');
       mediaStatus('Diagnostic JSON export requested. Choose a save location; check Downloads/Files after saving.');
@@ -3358,13 +3447,13 @@ function setupPrinter(){
   document.querySelectorAll('[data-close]').forEach(e=>e.addEventListener('click',()=>$(e.dataset.close).close()));
   $('aboutBtn').onclick=()=>$('aboutDialog').showModal();
   $('handsetBtn').onclick=()=>hook(!offHook);$('touchBtn').onclick=()=>start('touch');$('stopBtn').onclick=()=>stopRecording(false);
-  $('cameraBtn').onclick=()=>enableCamera();$('applyDevices').onclick=()=>enableCamera(true);$('deviceRefresh').onclick=refreshDevices;$('testCameraOnly').onclick=()=>probeInput('video');$('testMicOnly').onclick=()=>probeInput('audio');
+  $('cameraBtn').onclick=()=>enableCamera();$('applyDevices').onclick=()=>enableCamera(true);$('deviceRefresh').onclick=refreshDevices;$('testCameraOnly').onclick=()=>probeInput('video');$('testMicOnly').onclick=()=>probeInput('audio');$('applyCameraOnly').onclick=applyCameraOnly;$('applyMicOnly').onclick=applyMicrophoneOnly;$('releaseMicOnly').onclick=releaseMicrophoneOnly;$('stopMediaInputs').onclick=()=>mediaOperation('stop_all',async()=>{disableCamera();mediaStatus('Both inputs released.');return true;});
   $('kioskBtn').onclick=()=>{document.body.classList.add('kiosk');$('exitKiosk').hidden=false;window.scrollTo(0,0);wake();};$('exitKiosk').onclick=exitKiosk;
   $('videoDownload').onclick=()=>downloadClip(selectedClip);
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.9.2-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.3-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
@@ -3410,7 +3499,7 @@ function setupPrinter(){
       if(state==='recording')stopRecording(true,'Page became hidden or the device was locked.');
       else if(['greeting','countdown'].includes(state)){session++;setState('idle');toast('Preparation cancelled because the page was hidden.');}
       releaseWake();
-    }else if(mode==='real')wake();
+    }else if(cameraReady())wake();
   });
   window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'App left foreground or the device suspended.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
   window.addEventListener('beforeunload',e=>{if(busy()||pending){e.preventDefault();e.returnValue='';}});
@@ -3424,7 +3513,7 @@ function setupPrinter(){
       }).catch(()=>{log('tab_lock_unavailable');resolve();});
     });
   }
-  ready=true;log('app_ready',{version:'0.9.2-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
+  ready=true;log('app_ready',{version:'0.9.3-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
   if(surfaceRole==='guest'){openGuest(location.hash.slice(7));}else if(surfaceRole==='show'){go('show');}else{go(new URLSearchParams(location.search).has('setup')?'admin':'booth');}
   if(document.documentElement.dataset.serviceWorker==='true' && location.protocol!=='file:' && 'serviceWorker'in navigator){
     navigator.serviceWorker.register('./sw.js').catch(e=>log('offline_shell_unavailable',{error:e.message}));

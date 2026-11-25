@@ -15,3 +15,6 @@
 
 /* v0.9.2 mobile media diagnostics */
 #mediaDeviceStatus{overflow-wrap:anywhere;word-break:break-word;line-height:1.7}
+
+/* v0.9.3 independent media controls: readable on 32-inch kiosk and mobile Admin. */
+.media-apply-row{padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);gap:10px}.media-apply-row button{min-height:48px;white-space:normal}#mediaDeviceStatus{padding:12px;background:#eae8dd;border-radius:7px;color:#30382c}@media(max-width:520px){.media-apply-row{flex-direction:column;align-items:stretch}.media-apply-row button{width:100%}}

@@ -24,11 +24,11 @@ files = [p for p in sorted(ROOT.rglob('*')) if included(p)]
 manifest = {p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
 manifest_bytes = (json.dumps({'version':(ROOT/'VERSION.txt').read_text().splitlines()[0], 'algorithm':'SHA-256', 'files':manifest},indent=2)+'\n').encode()
 (ROOT/'MANIFEST_SHA256.json').write_bytes(manifest_bytes)
-output = ROOT/'artifacts'/'RetroBooth_v0.9.2_Android_Windows_GitHub_Ready.zip'
+output = ROOT/'artifacts'/'RetroBooth_v0.9.3_Android_Windows_GitHub_Ready.zip'
 output.parent.mkdir(exist_ok=True)
 with zipfile.ZipFile(output,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
     for name, data in [(p.relative_to(ROOT).as_posix(),p.read_bytes()) for p in files] + [('MANIFEST_SHA256.json',manifest_bytes)]:
-        info=zipfile.ZipInfo('RetroBooth/'+name,(2026,11,23,0,0,0))
+        info=zipfile.ZipInfo(name,(2026,11,25,0,0,0))
         info.compress_type=zipfile.ZIP_DEFLATED;info.create_system=3;info.external_attr=0o100644<<16
         archive.writestr(info,data,compresslevel=9)
 print(json.dumps({'file':str(output),'manifest_files':len(files),'bytes':output.stat().st_size,'sha256':hashlib.sha256(output.read_bytes()).hexdigest()},indent=2))

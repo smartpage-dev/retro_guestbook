@@ -13,7 +13,7 @@ def check(name,ok):
 def state(p,value):p.wait_for_function('(s)=>RetroApp.status.state===s',arg=value,timeout=25000)
 fixture=r'''
 // TEST FIXTURES ONLY: no IDB durability or hardware permission evidence.
-window.__fx={settings:RetroCore.safeSettings({countdown:0,returnSeconds:1,osd:false}),clips:[],next:1,fail:false,delay:0,mediaError:'',videoOnly:false,streams:[],constraints:[]};
+window.__fx={settings:RetroCore.safeSettings({countdown:0,returnSeconds:1,osd:false}),clips:[],next:1,fail:false,delay:0,mediaError:'',videoOnly:false,streams:[],constraints:[],failMic:false,failCam:false};
 BrowserStore.prototype.open=async function(){this.available=true;return true;};
 BrowserStore.prototype.getSettings=async()=>({value:structuredClone(__fx.settings)});
 BrowserStore.prototype.setSettings=async value=>{await new Promise(r=>setTimeout(r,__fx.delay));if(__fx.fail)throw new Error('Fixture storage failure');__fx.settings=structuredClone(value);};
@@ -27,11 +27,18 @@ Object.defineProperty(navigator,'mediaDevices',{value:{
  enumerateDevices:async()=>[{kind:'videoinput',deviceId:'fixture-camera',label:'Synthetic test input (NOT hardware)'},{kind:'audioinput',deviceId:'fixture-mic',label:'Synthetic 330 Hz audio (NOT microphone)'}],
  getUserMedia:async constraints=>{
   __fx.constraints.push(constraints);if(__fx.mediaError)throw new DOMException('Fixture rejection',__fx.mediaError);
+  if(constraints.audio!==false&&__fx.failMic)throw new DOMException('Could not start audio source','NotReadableError');
+  if(constraints.video!==false&&__fx.failCam)throw new DOMException('Could not start video source','NotReadableError');
   const c=document.createElement('canvas');c.width=1280;c.height=720;const x=c.getContext('2d');let step=0;
   const draw=()=>{x.fillStyle='#ddd8c8';x.fillRect(0,0,1280,720);const cols=['#bd6358','#d3af68','#75997e','#578992','#d4a88b','#8a7898'];cols.forEach((v,i)=>{x.fillStyle=v;x.fillRect(i*214,0,214,410)});for(let i=0;i<16;i++){x.fillStyle=`rgb(${i*17},${i*17},${i*17})`;x.fillRect(i*80,410,80,120);}x.fillStyle='#17281f';x.font='bold 32px monospace';x.fillText('SYNTHETIC INPUT / NOT A REAL WEBCAM',120,600);x.font='24px monospace';x.fillText('LIVE PIPELINE + AUDIO FIXTURE',120,650);x.fillStyle='#fff7dd';x.fillRect(80+(step++%100)*9,350,80,36);};draw();
-  const stream=c.captureStream(24);const timer=setInterval(draw,45);stream.getVideoTracks()[0].addEventListener('ended',()=>clearInterval(timer));
-  const ac=new AudioContext();await ac.resume();const osc=ac.createOscillator(),dest=ac.createMediaStreamDestination();osc.frequency.value=330;osc.connect(dest);osc.start();
-  if(!__fx.videoOnly)stream.addTrack(dest.stream.getAudioTracks()[0]);
+  const stream=c.captureStream(24);let timer=null;
+  if(constraints.video===false){stream.getVideoTracks().forEach(t=>{stream.removeTrack(t);t.stop();});}
+  else{timer=setInterval(draw,45);stream.getVideoTracks()[0].addEventListener('ended',()=>clearInterval(timer));}
+  let ac=null,osc=null;
+  if(constraints.audio!==false&&!__fx.videoOnly){
+    ac=new AudioContext();await ac.resume();osc=ac.createOscillator();const dest=ac.createMediaStreamDestination();
+    osc.frequency.value=330;osc.connect(dest);osc.start();stream.addTrack(dest.stream.getAudioTracks()[0]);
+  }
   __fx.streams.push({stream,ac,osc,timer});return stream;
  }
 },configurable:true});
@@ -125,14 +132,15 @@ with sync_playwright() as p:
   page.evaluate('RetroApp.go("admin")')
   for name,expected in [('NotAllowedError','Permission denied'),('NotFoundError','No usable'),('NotReadableError','Device is busy'),('OverconstrainedError','selected device')]:
    page.evaluate('(n)=>__fx.mediaError=n',name);page.locator('#cameraLabEnable').click();page.wait_for_timeout(700 if name in ('NotReadableError','OverconstrainedError') else 160)
-   check(name+' actionable message',expected in page.locator('#toast').inner_text())
+   check(name+' actionable message',expected in page.locator('#mediaDeviceStatus').inner_text())
    check(name+' does not pretend camera is on',page.evaluate('RetroApp.status.mode==="demo"'))
   page.evaluate('__fx.mediaError="";__fx.videoOnly=true');page.locator('#cameraLabEnable').click();page.wait_for_timeout(300)
-  check('missing audio is rejected instead of silent recording',page.evaluate('RetroApp.status.mode==="demo"') and 'Both camera and microphone' in page.locator('#toast').inner_text())
-  check('rejected video track is stopped',page.evaluate('__fx.streams.at(-1).stream.getTracks().every(t=>t.readyState==="ended")'))
+  check('missing audio leaves camera PREVIEW ONLY',page.evaluate('RetroApp.status.mode==="preview"') and 'microphone failed' in page.locator('#toast').inner_text())
+  check('no silent guest Start while camera preview active',page.locator('#touchBtn').is_disabled())
+  check('audio candidate does not leak extra video',page.evaluate('__fx.streams.at(-1).stream.getTracks().every(t=>t.readyState==="ended")'))
   page.evaluate('__fx.videoOnly=false');page.locator('#cameraLabEnable').click();page.wait_for_function('RetroApp.status.mode==="real"')
   page.locator('#cameraSelect').select_option('fixture-camera');page.locator('#micSelect').select_option('fixture-mic');page.locator('#applyDevices').click();page.wait_for_timeout(300)
-  check('selected webcam and microphone passed to media request',page.evaluate('__fx.constraints.at(-1).video.deviceId.exact==="fixture-camera"&&__fx.constraints.at(-1).audio.deviceId.exact==="fixture-mic"'))
+  check('selected webcam and microphone requested separately',page.evaluate('__fx.constraints.at(-2).video.deviceId.exact==="fixture-camera"&&__fx.constraints.at(-2).audio===false&&__fx.constraints.at(-1).video===false&&__fx.constraints.at(-1).audio.deviceId.exact==="fixture-mic"'))
   page.locator('#cameraLabStop').click();check('operator can turn off all tracks',page.evaluate('RetroApp.status.mode==="demo"&&__fx.streams.at(-1).stream.getTracks().every(t=>t.readyState==="ended")'))
  elif args.group=='native-export':
   page.add_script_tag(content="const C=RetroCore;function toast(x){window.__nativeToast=x;}\n"+(R/'src/native-export.js').read_text())

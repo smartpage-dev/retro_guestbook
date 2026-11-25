@@ -1,8 +1,8 @@
-**v0.9.2: Camera issue?** Admin > 02 / Device Check > Test camera only > Test microphone only > Apply camera + microphone > Export full diagnostic JSON. See [ANDROID_DIAGNOSTICS.md](ANDROID_DIAGNOSTICS.md).
+**v0.9.3: Independent media input fix.** Admin > 02 / Device Check > 1 / APPLY CAMERA - LIVE preview. The preview needs no microphone. Then use 2 / APPLY MICROPHONE; until both are ready, guest Start is disabled. See [ANDROID_MEDIA_V093.md](ANDROID_MEDIA_V093.md).
 
 # 03 / Android APK
 
-Same application ID, versionCode 9
+Same application ID, versionCode 12
 
 1. Download and extract the Android-APK artifact after a successful Android job. Use the TEST.apk, not the unsigned APK or AAB.
 2. Before updating an existing installation, export important recordings and retain the same signing identity. Do not uninstall or clear data to get around an update error.

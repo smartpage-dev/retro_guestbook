@@ -1,4 +1,12 @@
-## 0.9.2-alpha.1 — Android diagnostic export
+## v0.9.3-alpha.1 - 25 Nov 2026 - Android camera-only live preview + separate microphone
+
+- Camera-only live CRT preview (video:true,audio:false) operates when mic initialization fails; microphone separately requested (video:false,audio:true) and can later be attached or released without losing camera.
+- Combined Apply now executes two independent acquisition steps; Android mic failure is reported and logged separately, leaving camera live and guest Start locked.
+- Native Android install-time MODIFY_AUDIO_SETTINGS permission added; transient runtime permission-dialog pause no longer suspends WebView, with background onStop safety and deferred grant until resume.
+- Full diagnostics now include separate cameraReady / microphoneReady / partialPreview fields and precise camera/mic failure stages. Camera Lab labels and 390px mobile controls improved.
+- Same app ID and storage; Android versionCode12, Windows cloud backend unchanged. Native Android compile/hardware camera and mic acceptance still pending.
+
+## 0.9.3-alpha.1 — Android diagnostic export
 
 - Bounded in-memory app event log, camera/mic stage timings and sanitized failures.
 - Android native permission and lifecycle event snapshot, Android/WebView version, explicit export in Admin.

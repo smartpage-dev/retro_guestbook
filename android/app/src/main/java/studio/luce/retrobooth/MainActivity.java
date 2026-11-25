@@ -51,6 +51,9 @@ public final class MainActivity extends Activity {
     private boolean cloudApprovalPending=false;
     private FrameLayout root;
     private PermissionRequest pendingPermission;
+    private PermissionRequest deferredPermission;
+    private boolean activityResumed=false;
+    private boolean runtimeMediaPrompt=false;
     private ValueCallback<Uri[]> fileCallback;
     private View videoView;
     private WebChromeClient.CustomViewCallback videoCallback;
@@ -124,7 +127,11 @@ public final class MainActivity extends Activity {
         });
         web.setWebChromeClient(new WebChromeClient(){
             @Override public void onPermissionRequest(PermissionRequest request){runOnUiThread(()->askMediaPermission(request));}
-            @Override public void onPermissionRequestCanceled(PermissionRequest request){nativeDiag("webview_permission_cancelled","request_cancelled");if(pendingPermission==request)pendingPermission=null;}
+            @Override public void onPermissionRequestCanceled(PermissionRequest request){
+                nativeDiag("webview_permission_cancelled","request_cancelled");
+                if(pendingPermission==request){pendingPermission=null;runtimeMediaPrompt=false;}
+                if(deferredPermission==request)deferredPermission=null;
+            }
             @Override public boolean onShowFileChooser(WebView view,ValueCallback<Uri[]> callback,FileChooserParams params){
                 if(fileCallback!=null)fileCallback.onReceiveValue(null);fileCallback=callback;
                 Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/*");
@@ -197,7 +204,13 @@ public final class MainActivity extends Activity {
         pendingPermission=request;
         List<String> missing=new ArrayList<>();for(String permission:required)if(checkSelfPermission(permission)!=PackageManager.PERMISSION_GRANTED)missing.add(permission);
         if(missing.isEmpty()){pendingPermission=null;nativeDiag("media_permission_granted","already_granted");request.grant(request.getResources());}
-        else requestPermissions(missing.toArray(new String[0]),CAMERA_REQUEST);
+        else {
+            // Android may pause the Activity to display its permission dialog.
+            // Keep WebView media alive for this transient system prompt; onStop
+            // still suspends it if the Activity actually leaves the foreground.
+            runtimeMediaPrompt=true;
+            requestPermissions(missing.toArray(new String[0]),CAMERA_REQUEST);
+        }
     }
     @Override public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grants){
         super.onRequestPermissionsResult(requestCode,permissions,grants);
@@ -208,8 +221,13 @@ public final class MainActivity extends Activity {
             String permission=PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)?Manifest.permission.CAMERA:Manifest.permission.RECORD_AUDIO;
             ok &= checkSelfPermission(permission)==PackageManager.PERMISSION_GRANTED;
         }
+        runtimeMediaPrompt=false;
         nativeDiag(ok?"media_permission_granted":"media_permission_denied",ok?"runtime_granted":"runtime_denied");
-        if(ok)request.grant(request.getResources());else request.deny();
+        if(!ok){request.deny();return;}
+        if(!activityResumed){
+            // Do not resume Chromium capture before its host Activity has resumed.
+            deferredPermission=request;nativeDiag("media_permission_deferred","awaiting_activity_resume");
+        }else request.grant(request.getResources());
     }
     private void handleExport(JSONObject m,JavaScriptReplyProxy reply) throws Exception {
         String id=m.getString("id"),type=m.getString("type");
@@ -271,8 +289,42 @@ public final class MainActivity extends Activity {
     private void immersive(){getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);}
     private void toast(String text){runOnUiThread(()->Toast.makeText(this,text,Toast.LENGTH_LONG).show());}
     @Override public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);if(focus)immersive();}
-    @Override protected void onPause(){nativeDiag("app_lifecycle","paused");if(printer!=null)printer.pause();if(web!=null){web.evaluateJavascript("window.dispatchEvent(new Event('retro-native-pause'))",null);web.onPause();}super.onPause();}
-    @Override protected void onResume(){super.onResume();nativeDiag("app_lifecycle","resumed");if(printer!=null)printer.resume();if(web!=null)web.onResume();immersive();}
+    @Override protected void onPause(){
+        activityResumed=false;nativeDiag("app_lifecycle","paused");if(printer!=null)printer.pause();
+        if(web!=null){
+            if(runtimeMediaPrompt&&pendingPermission!=null){
+                nativeDiag("webview_media_pause_suppressed","android_runtime_permission_dialog");
+            }else{
+                web.evaluateJavascript("window.dispatchEvent(new Event('retro-native-pause'))",null);
+                web.onPause();
+            }
+        }
+        super.onPause();
+    }
+    @Override protected void onStop(){
+        // A system permission overlay normally produces only onPause. If the
+        // Activity is genuinely stopped, never keep its mic/camera running.
+        if(web!=null){web.evaluateJavascript("window.dispatchEvent(new Event('retro-native-pause'))",null);web.onPause();}
+        if(pendingPermission!=null){pendingPermission.deny();pendingPermission=null;}
+        if(deferredPermission!=null){deferredPermission.deny();deferredPermission=null;}
+        runtimeMediaPrompt=false;
+        nativeDiag("app_lifecycle","stopped");super.onStop();
+    }
+    @Override protected void onResume(){
+        super.onResume();activityResumed=true;nativeDiag("app_lifecycle","resumed");
+        if(printer!=null)printer.resume();if(web!=null)web.onResume();
+        if(deferredPermission!=null){
+            PermissionRequest request=deferredPermission;deferredPermission=null;
+            boolean valid=true;
+            for(String resource:request.getResources()){
+                String permission=PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)?Manifest.permission.CAMERA:Manifest.permission.RECORD_AUDIO;
+                valid &= checkSelfPermission(permission)==PackageManager.PERMISSION_GRANTED;
+            }
+            nativeDiag(valid?"media_permission_resume_granted":"media_permission_resume_denied","after_activity_resume");
+            if(valid)request.grant(request.getResources());else request.deny();
+        }
+        immersive();
+    }
     @Override public void onBackPressed(){if(videoView!=null){hideVideo();return;}new AlertDialog.Builder(this).setTitle("Exit RetroBooth TEST?").setMessage("Export recordings before clearing data or uninstalling. This is not an event-ready recorder.").setNegativeButton("Stay",null).setPositiveButton("Exit",(d,w)->finish()).show();}
-    @Override protected void onDestroy(){if(printer!=null)printer.destroy();if(pendingPermission!=null)pendingPermission.deny();if(fileCallback!=null)fileCallback.onReceiveValue(null);synchronized(exportLock){cancelExport();}writer.shutdownNow();if(web!=null){web.stopLoading();web.destroy();}super.onDestroy();}
+    @Override protected void onDestroy(){if(printer!=null)printer.destroy();if(pendingPermission!=null)pendingPermission.deny();if(deferredPermission!=null)deferredPermission.deny();if(fileCallback!=null)fileCallback.onReceiveValue(null);synchronized(exportLock){cancelExport();}writer.shutdownNow();if(web!=null){web.stopLoading();web.destroy();}super.onDestroy();}
 }
