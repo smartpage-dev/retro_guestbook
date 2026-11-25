@@ -1,4 +1,4 @@
-"""Check RetroBooth v0.9.4 repository shape and three independent workflows.
+"""Check RetroBooth v0.9.5 repository shape and three independent workflows.
 This is a source-contract check, not proof of native compilation.
 """
 from pathlib import Path
@@ -9,6 +9,10 @@ required = [
     '.github/workflows/build-windows.yml',
     '.github/workflows/verify-all.yml',
     'cloud/retrobooth_private/app/StoredZip.php',
+    'cloud/retrobooth_private/app/Drive.php',
+    'cloud/retrobooth_private/app/DriveWorker.php',
+    'cloud/retrobooth_private/tools/sync_drive.php',
+    'tests/drive_pilot.php',
     'cloud/retrobooth_private/tools/build_archives.php',
     'cloud/public_html/client/index.html',
     'cloud/public_html/assets/client.js',

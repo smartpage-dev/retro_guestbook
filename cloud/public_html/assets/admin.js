@@ -13,9 +13,41 @@
   $('archiveCopy').disabled=!$('archiveUrl').value;
   $('archivePrepare').disabled=false; // Explicit new Prepare can recover an abandoned 'building' state after the old worker is stopped.
  }
+ let driveInfo=null;
+ async function refreshDrive(){
+  const d=await api('drive/status');driveInfo=d;
+  const account=d.connected?(d.account?.email||d.account?.name||'Connected'):'Not connected';
+  const parent=d.parent?.name||'No base folder selected';
+  $('driveStatus').textContent=(d.configured?'OAuth configured':'OAuth client not configured in private config.php')+' · '+account+' · '+parent+' · Google drive.file permission / Hostinger QR unchanged';
+  $('driveAuto').checked=!!d.autoForNewEvents;
+  $('driveConnect').disabled=!d.configured;
+  $('drivePick').disabled=!d.connected;
+  $('driveCreateFolder').disabled=!d.connected;
+  $('driveAuto').disabled=!d.connected||!d.parent;
+  $('driveSaveOptions').disabled=!d.connected||!d.parent;
+  const e=(d.events||[]).find(x=>x.id===active);
+  $('driveEventToggle').disabled=!d.connected||!d.parent||!e;
+  if(!e){$('driveEventStatus').textContent='Create or select an Event.';return;}
+  $('driveEventToggle').textContent=e.enabled?'Stop NEW Drive uploads for this Event':'Enable Drive copy for this Event';
+  $('driveEventStatus').textContent='Event: '+e.name+' · '+(e.enabled?'DRIVE SYNC ON':'DRIVE SYNC OFF')+
+    ' · '+e.ready+'/'+e.total+' copied · '+e.failed+' errors · '+e.deleting+' remote deletes pending'+
+    (e.folder?' · folder: '+e.folder.name+' ('+e.folder.id+')':' · folder pending (cron)');
+ }
+ function openGoogle(mode){
+  const popup=window.open('about:blank','_blank');
+  action(async()=>{
+   try{const result=await api('drive/start',{mode});
+    $('driveOauthUrl').value=result.url;$('driveOpenOauth').disabled=false;
+    if(popup&&!popup.closed){popup.location.href=result.url;
+       $('message').textContent='Google authorization opened in another tab. Return here afterwards and Refresh Drive status.';}
+    else $('message').textContent='Popup blocked: use Open Google authorization below (system browser).';
+   }catch(e){if(popup&&!popup.closed)popup.close();throw e;}
+  });
+ }
  async function load(){
   const answer=await api('events');events=answer.events;const select=$('event');select.replaceChildren();for(const e of events)select.append(new Option(e.title,e.id));if(events.some(e=>e.id===active))select.value=active;else active=select.value;
   $('dashboard').hidden=false;$('login').hidden=true;
+  await refreshDrive();
   if(!active){$('clips').textContent='Create your first event.';$('archiveStatus').textContent='Create your first event.';return;}
   const event=events.find(e=>e.id===active);$('renameEvent').value=event.title;$('issueToggle').textContent=event.issueOpen?'Close NEW QR reservations':'Open NEW QR reservations';$('uploadToggle').textContent=event.uploadOpen?'Pause upload drain':'Resume upload drain';
   const clips=(await api('clips',{eventId:active})).clips;$('clips').replaceChildren();
@@ -39,6 +71,25 @@
  $('copyBundle').onclick=()=>action(()=>navigator.clipboard.writeText($('bundle').value));$('refresh').onclick=()=>action(load);
  for(const [id,field] of [['issueToggle','issueOpen'],['uploadToggle','uploadOpen']])$(id).onclick=()=>action(async()=>{const e=events.find(e=>e.id===active);if(!e)return;await api('event/'+active,{[field]:!e[field]});await load();});
  $('saveEventName').onclick=()=>action(async()=>{if(!active)return;await api('event/'+active,{title:$('renameEvent').value.trim()});await load();});
+ $('driveConnect').onclick=()=>openGoogle('connect');
+ $('drivePick').onclick=()=>openGoogle('pick');
+ $('driveOpenOauth').onclick=()=>{const url=$('driveOauthUrl').value;if(!url.startsWith('https://accounts.google.com/'))return;window.open(url,'_blank','noopener,noreferrer');};
+ $('driveRefresh').onclick=()=>action(refreshDrive);
+ $('driveSaveOptions').onclick=()=>action(async()=>{await api('drive/options',{autoForNewEvents:$('driveAuto').checked});await refreshDrive();});
+ $('driveCreateFolder').onclick=()=>action(async()=>{
+   if(!confirm('Create a NEW base folder in your Google Drive? Existing Event folders will NOT move.'))return;
+   await api('drive/folder',{name:$('driveNewFolder').value.trim()});await refreshDrive();
+ });
+ $('driveEventToggle').onclick=()=>action(async()=>{
+   const e=(driveInfo?.events||[]).find(x=>x.id===active);if(!e)return;
+   const enable=!e.enabled;
+   if(enable&&!confirm('Copy ALL verified videos in this Event to the selected Drive folder (including videos hidden from slideshow)? Check parent folder permissions.'))return;
+   await api('drive/event',{eventId:active,enabled:enable});await refreshDrive();
+ });
+ $('driveDisconnect').onclick=()=>action(async()=>{
+   if(prompt('Disconnect Google account? Existing Drive files remain. Remote Delete jobs will stop until you reconnect the SAME account. Type DISCONNECT.')!=='DISCONNECT')return;
+   await api('drive/disconnect',{confirm:'DISCONNECT'});$('driveOauthUrl').value='';$('driveOpenOauth').disabled=true;await refreshDrive();
+ });
  $('archiveRefresh').onclick=()=>action(refreshArchive);
  $('archivePrepare').onclick=()=>action(async()=>{
   if(!active)throw new Error('Select an event first.');

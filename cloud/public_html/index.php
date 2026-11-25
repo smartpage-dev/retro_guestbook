@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__).'/retrobooth_private/app/Cloud.php';
+require dirname(__DIR__).'/retrobooth_private/app/Drive.php';
 ini_set('display_errors','0');
 header('X-Content-Type-Options: nosniff');header('Referrer-Policy: no-referrer');header('X-Frame-Options: DENY');header('Cache-Control: no-store');
 function rb_json(array $data,int $status=200): never {http_response_code($status);header('Content-Type: application/json; charset=utf-8');echo json_encode($data,JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR);exit;}
@@ -33,6 +34,16 @@ try {
         header('Content-Type: text/html; charset=utf-8');readfile($file);exit;
     }
     $api=new CloudApi($cfg);
+    // OAuth callback is the ONLY Drive endpoint callable without the Admin Bearer
+    // token: its state is single-use, random, short-lived and created by Admin.
+    if ($route==='/api/drive/oauth/callback' && $method==='GET') {
+        header('Content-Type: text/html; charset=utf-8');
+        try { (new DriveBridge($cfg,$api->repo))->callback($_GET);
+            echo '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="referrer" content="no-referrer"><title>RetroBooth Google Drive</title></head><body><h2>Google Drive connected / folder selected</h2><p>Return to the RetroBooth Cloud Admin tab and press Refresh Drive status. You can close this tab.</p></body></html>';
+        } catch(CloudError $e) {http_response_code($e->status);
+            echo '<!doctype html><html><head><meta charset="utf-8"><meta name="referrer" content="no-referrer"></head><body><h2>Google Drive setup was not completed</h2><p>'.htmlspecialchars($e->reason,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8').'</p><p>Return to Cloud Admin to retry.</p></body></html>';
+        }exit;
+    }
     $auth=$_SERVER['HTTP_AUTHORIZATION']??$_SERVER['REDIRECT_HTTP_AUTHORIZATION']??'';
     $token=preg_match('/^Bearer ([A-Za-z0-9_.-]{32,180})$/D',$auth,$m)?$m[1]:'';
     if (preg_match('#^/api/media/([a-f0-9]{32})$#D',$route,$m) && in_array($method,['GET','HEAD'],true)) {
@@ -78,6 +89,49 @@ try {
             try {$body=json_decode($raw,true,32,JSON_THROW_ON_ERROR);}catch(Throwable $e){rb_fail(400,'invalid_json');}
             if (!is_array($body)||array_is_list($body)&&$body!==[]) rb_fail(400,'json_object_required');
         }
+    }
+    if (str_starts_with($route,'/api/admin/drive/')) {
+        if(!hash_equals($cfg['adminKey'],$token))rb_fail(401,'unauthorized');
+        $drive=new DriveBridge($cfg,$api->repo);
+        $op=substr($route,strlen('/api/admin/drive/'));
+        if ($op==='status' && $method==='GET') {
+            $status=$drive->publicStatus();
+            $status['events']=$api->repo->transaction(function(array &$s){$rows=[];
+                foreach($s['events'] as $e){$total=0;$done=0;$failed=0;$deleting=0;
+                    foreach($s['clips'] as $c){if($c['eventId']!==$e['id'])continue;
+                        if($c['status']==='deleted'){if(($c['driveSync']['status']??'')==='delete_pending')$deleting++;continue;}
+                        if($c['status']!=='ready')continue;$total++;
+                        if(($c['driveSync']['status']??'')==='ready')$done++;
+                        if(($c['driveSync']['status']??'')==='error')$failed++;
+                    }
+                    $rows[]=['id'=>$e['id'],'name'=>$e['title'],'enabled'=>($e['driveEnabled']??false)===true,
+                        'folder'=>$e['driveFolder']??null,'ready'=>$done,'total'=>$total,'failed'=>$failed,'deleting'=>$deleting];}
+                return $rows;});
+            rb_json($status);
+        }
+        if($op==='start' && $method==='POST')rb_json($drive->begin((string)($body['mode']??'')));
+        if($op==='options' && $method==='POST')rb_json($drive->updateOptions($body));
+        if($op==='folder' && $method==='POST')rb_json(['folder'=>$drive->createBaseFolder((string)($body['name']??''))]);
+        if($op==='disconnect' && $method==='POST'){
+            if(($body['confirm']??'')!=='DISCONNECT')rb_fail(400,'confirmation_required');rb_json($drive->disconnect());
+        }
+        if($op==='event' && $method==='POST') {
+            if(!is_bool($body['enabled']??null))rb_fail(400,'invalid_event_drive_option');
+            $id=(string)($body['eventId']??'');
+            if($body['enabled']===true&&empty($drive->settings()['parent']['id']))rb_fail(409,'select_google_drive_parent_first');
+            rb_json($api->repo->transaction(function(array &$s)use($id,$body){
+                if(!isset($s['events'][$id]))rb_fail(404,'event_not_found');
+                $s['events'][$id]['driveEnabled']=$body['enabled'];return ['eventId'=>$id,'enabled'=>$body['enabled']];}));
+        }
+        if($op==='retry' && $method==='POST') {
+            $id=(string)($body['clipId']??'');
+            rb_json($api->repo->transaction(function(array &$s)use($id){
+                if(!isset($s['clips'][$id]))rb_fail(404,'clip_not_found');
+                $c=&$s['clips'][$id];if($c['status']!=='ready'||!empty($c['driveSync']['fileId']))rb_fail(409,'drive_retry_not_allowed');
+                $c['driveSync']['retryAt']=0;$c['driveSync']['retries']=0;$c['driveSync']['status']='pending';$c['driveSync']['error']='';
+                return ['queued'=>true];}));
+        }
+        rb_fail(404,'drive_admin_route_not_found');
     }
     $result=$api->handle($method,$route,$token,$body,$binary,$_SERVER['HTTP_X_CHUNK_SHA256']??'');
     if (isset($result['archiveGrant'])) {

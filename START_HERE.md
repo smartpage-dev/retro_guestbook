@@ -1,3 +1,9 @@
+# RetroBooth v0.9.5 — Google Drive Event Mirror (OPTIONAL)
+
+Hostinger stays the **Guest QR and Event/private ZIP authority**; optional Google Drive copies VERIFIED Event videos into a chosen existing or newly created folder, with per-event subfolders. Configure Google account and folder inside Hostinger **Cloud Admin** (Android Admin opens it in the system browser). Set private Google OAuth Web Application credentials + Cron. **Read `docs/V095_GOOGLE_DRIVE_SETUP_ZH.md` and `docs/V095_TEST_REPORT.md` first.** Same Android app ID, versionCode **14**, three independent GitHub Actions workflows. No compiled APK/EXE bundled.
+
+---
+
 # RetroBooth v0.9.4 — Real Guest QR + Private Events + Client ZIP Share
 
 This update fixes misleading QR behavior when Cloud is not connected. To produce a genuinely scannable guest video link, deploy/connect the Hostinger Cloud event BEFORE recording. Android video capture remains local-first. After the event, Cloud Admin can prepare all verified clips into private per-event ZIP bundles using the PHP Cron worker, then issue a revocable, expiring link for client downloads. Read **docs/V094_EVENT_CLOUD_SHARE_SETUP_ZH.md** and **docs/V094_CHANGELOG.md**.

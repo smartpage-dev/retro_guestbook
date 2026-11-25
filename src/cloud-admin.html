@@ -3,6 +3,7 @@
  <p><strong>Important:</strong> Without a verified Hostinger event connection, recordings are LOCAL-ONLY and the guest will not receive a usable QR. Connect Cloud BEFORE the first guest. Connect a device bundle from Cloud Admin. Real recordings use pre-reserved guest links; uploads run while idle. Demo recordings remain local.</p>
  <label for="cloudBundle">Device setup bundle (secret; do not publish)</label><textarea id="cloudBundle" rows="4" autocomplete="off" spellcheck="false" placeholder='Paste the JSON from Cloud Admin here'></textarea>
  <div class="button-row"><button id="cloudConnect" class="btn primary" type="button">Verify + connect cloud</button><button id="cloudRefill" class="btn secondary" type="button">Refill QR reserve</button><button id="cloudRetry" class="btn secondary" type="button">Retry / sync now</button><button id="cloudDisable" class="btn secondary" type="button">Local-only for new recordings</button></div>
+ <div class="button-row"><button id="openCloudAdmin" class="btn secondary" type="button">Manage Events + Google Drive in Cloud Admin ↗</button></div>
  <p class="small muted">Create/manage events and prepare passwordless expiring client ZIP shares at your Hostinger <strong>/admin/</strong> page. Never paste the Cloud Admin master key into this kiosk. Local-only captures cannot be retroactively assigned a guest QR.</p>
  <p id="cloudStatus" class="small mono" role="status">Cloud is off. Existing recordings are not automatically uploaded.</p>
  <div id="cloudQueue" class="cloud-queue"></div>

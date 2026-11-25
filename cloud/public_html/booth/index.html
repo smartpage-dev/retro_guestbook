@@ -241,6 +241,9 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 @media(max-width:760px){.delivery-settings-grid{grid-template-columns:1fr;gap:0}}
 @media(orientation:portrait){.delivery-overlay{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);text-align:left;padding:4%;gap:3%;align-content:center}.delivery-kicker{font-size:7px;letter-spacing:.6px;margin-bottom:5px}.delivery-copy h2{font-size:16px;letter-spacing:0;margin-bottom:6px}.delivery-copy>p{display:none}.delivery-ref{font-size:9px;padding:3px 5px}.delivery-clock{justify-content:flex-start;margin:8px 0;gap:6px}.delivery-clock strong{font-size:28px}.delivery-clock span{font-size:7px;letter-spacing:0}.delivery-reason{display:none}.delivery-qr-box{height:min(42vw,150px)}.delivery-test-label{margin-top:5px;font-size:7px;letter-spacing:0;line-height:1.4}.delivery-code>p{display:none}}
 
+/* A local-only recording must never display a scannable placeholder QR. */
+.delivery-qr-box[hidden]{display:none!important}
+
 .cloud-card{margin-top:26px}.cloud-card>p{max-width:850px;margin:12px 0 18px}.cloud-card textarea{display:block;width:100%;border:1px solid #c8ccb9;border-radius:5px;background:#f8f7f0;padding:12px;font:12px/1.5 var(--mono);resize:vertical;margin:8px 0 18px}.cloud-queue{margin:18px 0;max-height:280px;overflow:auto}.cloud-job{padding:12px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.cloud-job button{min-height:40px;padding:8px 12px}.cloud-job span{font-size:12px;overflow-wrap:anywhere}.cloud-card label{display:block;font-size:12px}
 
 .printer-card{margin-top:24px}.printer-card p{margin:12px 0}.printer-card h3{margin:16px 0 12px;font:600 18px var(--sans)}.printer-status{padding:14px 16px;background:#edf0e5;border-radius:5px;font:12px/1.8 var(--mono);overflow-wrap:anywhere}.printer-card .button-row{margin:14px 0}.printer-card .button-row .btn{flex:1 1 150px}.printer-card .form-row{margin:18px 0;align-items:end}.printer-card select,.printer-card input{width:100%;min-width:0}.printer-divider{border-top:1px solid var(--line);margin-top:24px}.printer-card details{margin:20px 0;padding:18px;background:#f0ede3;border:1px solid var(--line);border-radius:5px}.printer-card summary{cursor:pointer;font-weight:600;font-size:13px;line-height:1.6}.printer-journal{max-height:300px;overflow:auto}.printer-job{padding:12px 8px;border-bottom:1px solid var(--line);font:11px/1.8 var(--mono);overflow-wrap:anywhere}.printer-job code{display:block;user-select:all}.printer-card [aria-disabled=true]{opacity:.6}@media(max-width:600px){.printer-card .button-row{flex-direction:column}.printer-card .button-row .btn{flex:auto;min-height:44px}.printer-card details{padding:14px 12px}.printer-card .form-row{grid-template-columns:1fr}}
@@ -350,9 +353,11 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 
 <section class="admin-card wide cloud-card" id="cloudCard">
  <div class="card-number">07 / PRIVATE CLOUD DELIVERY - ALPHA</div><h2>A real link. A private moment.</h2>
- <p>Connect a device bundle from Cloud Admin. Real recordings use pre-reserved guest links; uploads run while idle. Demo recordings remain local.</p>
+ <p><strong>Important:</strong> Without a verified Hostinger event connection, recordings are LOCAL-ONLY and the guest will not receive a usable QR. Connect Cloud BEFORE the first guest. Connect a device bundle from Cloud Admin. Real recordings use pre-reserved guest links; uploads run while idle. Demo recordings remain local.</p>
  <label for="cloudBundle">Device setup bundle (secret; do not publish)</label><textarea id="cloudBundle" rows="4" autocomplete="off" spellcheck="false" placeholder='Paste the JSON from Cloud Admin here'></textarea>
  <div class="button-row"><button id="cloudConnect" class="btn primary" type="button">Verify + connect cloud</button><button id="cloudRefill" class="btn secondary" type="button">Refill QR reserve</button><button id="cloudRetry" class="btn secondary" type="button">Retry / sync now</button><button id="cloudDisable" class="btn secondary" type="button">Local-only for new recordings</button></div>
+ <div class="button-row"><button id="openCloudAdmin" class="btn secondary" type="button">Manage Events + Google Drive in Cloud Admin ↗</button></div>
+ <p class="small muted">Create/manage events and prepare passwordless expiring client ZIP shares at your Hostinger <strong>/admin/</strong> page. Never paste the Cloud Admin master key into this kiosk. Local-only captures cannot be retroactively assigned a guest QR.</p>
  <p id="cloudStatus" class="small mono" role="status">Cloud is off. Existing recordings are not automatically uploaded.</p>
  <div id="cloudQueue" class="cloud-queue"></div>
  <p class="small muted">Your receipt link can manage and delete that recording. Keep it private. Hide keeps the private video; Delete revokes cloud access and waits for the booth to reconnect before confirming local cleanup. Projector broadcasting and physical printing are not connected.</p>
@@ -422,7 +427,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 </section>
 
 </main>
-<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.3-alpha.1 · 24 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
+<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.4-alpha.1 · 25 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="aboutDialog"><button class="dialog-close" data-close="aboutDialog" aria-label="Close">×</button><div class="eyebrow">PROTOTYPE BOUNDARY</div><h2>Real interactions.<br>Honest boundaries.</h2><p><b>Working:</b> demo flow, optional camera and microphone, retro canvas recording, browser-local saved clips, playback/export, pixel receipt composition, settings and failure scenarios.</p><p><b>Not connected:</b> Physical printer, physical handset, native crash-recoverable storage and remote projector. Local Control room is not authenticated; the separate Cloud Admin requires its secret key.</p><p>Demo sessions contain no guest video. Real recordings stay local unless Cloud Delivery is explicitly connected. Existing recordings are not silently enrolled. No analytics or external fonts are used.</p><p>For Android screen testing, serve the static package over HTTPS. Opening an HTML attachment inside a chat or Files preview may not execute the app.</p><button class="btn primary" data-close="aboutDialog">Explore the prototype</button></dialog>
@@ -1785,7 +1790,7 @@ module.exports = QRCode;
   const u=new URL(raw.serverOrigin),loop=['127.0.0.1','localhost'].includes(u.hostname);
   if((u.protocol!=='https:'&&!(loop&&u.protocol==='http:'))||u.pathname!=='/'||u.search||u.hash||u.username||u.password)throw new Error('Use a root HTTPS server origin, not a path.');
   if(!/^[a-f0-9]{32}$/.test(raw.eventId||'')||!/^[a-f0-9]{32}$/.test(raw.deviceId||'')||!new RegExp('^'+raw.deviceId+'\\.[A-Za-z0-9_-]{32}$').test(raw.deviceToken||''))throw new Error('Invalid device setup bundle.');
-  return {enabled:true,serverOrigin:u.origin,eventId:raw.eventId,deviceId:raw.deviceId,deviceToken:raw.deviceToken,expiresAt:Number(raw.expiresAt)||0};
+  return {enabled:true,serverOrigin:u.origin,eventId:raw.eventId,deviceId:raw.deviceId,deviceToken:raw.deviceToken,expiresAt:Number(raw.expiresAt)||0,eventTitle:String(raw.eventTitle||'').slice(0,80)};
  }
  const binding=c=>c?c.serverOrigin+'|'+c.eventId+'|'+c.deviceId:'';
  const tokenOK=s=>/^[a-f0-9]{32}\.[A-Za-z0-9_-]{32}$/.test(s||'');
@@ -1815,7 +1820,7 @@ module.exports = QRCode;
    const c=config(raw);if(!c)throw new Error('Paste a valid setup bundle.');
    const proof=await this.call(c,'/api/device/verify');
    if(proof.deviceId!==c.deviceId||proof.event.id!==c.eventId||proof.publicOrigin!==c.serverOrigin)throw new Error('Server identity does not match this setup bundle.');
-   c.expiresAt=proof.event.expiresAt;
+   c.expiresAt=proof.event.expiresAt;c.eventTitle=String(proof.event.title||'').slice(0,80);
    const old=this.connection;await this.store.setAux('cloud-connection',c);this.connection=c;
    if(binding(old)!==binding(c))await this.store.setAux('cloud-pool',{binding:binding(c),slots:[]});
    this.error='';await this.refill();return proof;
@@ -1940,7 +1945,7 @@ module.exports = QRCode;
  }
  root.RetroPrinter={PROFILE,guestTicket,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
 })(typeof window==='undefined'?globalThis:window);
-</script><script>/* RetroBooth v0.9.3-alpha.1. Pure, independently testable domain helpers. */
+</script><script>/* RetroBooth v0.9.5-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -2285,9 +2290,10 @@ module.exports = QRCode;
     if(logoCache.size>8)logoCache.delete(logoCache.keys().next().value);
   }
   function renderReceipt(canvas,clip,source,settings){
-    const payload=RetroCore.qrPayload(clip.id,clip.cloud),qr=new RetroQR(0,0);qr.addData(payload);qr.make();
-    const module=5,quiet=4,qrSize=(qr.getModuleCount()+quiet*2)*module;
-    const photo=settings.receipt!=='qr',showQR=settings.receipt!=='photo',style=settings.receiptStyle||'classic';
+    const payload=(clip.kind==='real'&&clip.cloud)||clip.kind==='demo'?RetroCore.qrPayload(clip.id,clip.cloud):null;
+    const qr=payload?new RetroQR(0,0):null;if(qr){qr.addData(payload);qr.make();}
+    const module=5,quiet=4,qrSize=qr?(qr.getModuleCount()+quiet*2)*module:0;
+    const photo=settings.receipt!=='qr',showQR=settings.receipt!=='photo'&&!!payload,style=settings.receiptStyle||'classic';
     const paper=document.createElement('canvas');paper.width=384;paper.height=2400;
     const c=paper.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,384,2400);c.fillStyle='#000';c.textAlign='center';
     let y=24;
@@ -2303,7 +2309,7 @@ module.exports = QRCode;
     if(style==='ticket'){c.fillRect(14,y,356,35);c.fillStyle='#fff';c.font='bold 18px monospace';c.fillText('ADMIT ONE LITTLE MEMORY',192,y+24);c.fillStyle='#000';y+=51;}
     text(settings.title,style==='minimal'?28:25,true,3);text(settings.date,16,false,1);
     if(style!=='minimal')text('LOVE, ON TAPE.',14,false,1);
-    divider();text(clip.cloud?'PRIVATE VIDEO / KEEP THIS TICKET':'PROTOTYPE / NOT A LIVE TICKET',16,true,1);y+=10;
+    divider();text(clip.kind==='demo'?'DEMO QR / NOT A DOWNLOAD':payload?'PRIVATE VIDEO / KEEP THIS TICKET':'LOCAL-ONLY / NO PHONE QR',16,true,1);y+=10;
     if(photo){c.drawImage(pixelPhoto(source),0,y);y+=350;}
     text(settings.receiptCaption||'A LITTLE LOVE, TO KEEP.',18,true,3);divider();
     text('MESSAGE No. '+String(clip.seq).padStart(3,'0'),25,true,1);
@@ -2311,8 +2317,9 @@ module.exports = QRCode;
     if(showQR){
       const left=Math.floor((384-qrSize)/2);
       for(let r=0;r<qr.getModuleCount();r++)for(let col=0;col<qr.getModuleCount();col++)if(qr.isDark(r,col))c.fillRect(left+(col+quiet)*module,y+(r+quiet)*module,module,module);
-      y+=qrSize+15;text(clip.cloud?'SCAN TO VIEW / MAY BE UPLOADING':'DEMO QR / NO ONLINE VIDEO',16,true,1);text('Review and manage later',15,false,1);
+      y+=qrSize+15;text(clip.kind==='demo'?'TEST MARKER / NOT A LINK':'SCAN TO VIEW / MAY BE UPLOADING',16,true,1);text(clip.kind==='demo'?'No real video to download':'Review and manage later',15,false,1);
     }
+    if(!payload){text('Saved only on this device. Cloud not connected.',14,false,3);}
     divider();text(settings.receiptFooter||'THANK YOU FOR BEING HERE',17,false,5);
     text('RETROBOOTH BY @LUCE.STUDIOHK',14,false,1);text('LOCAL REF '+clip.id.slice(0,12).toUpperCase(),13,false,1);y+=20;
     if(y>2400)throw new Error('Receipt exceeded safe canvas height.');
@@ -3201,7 +3208,7 @@ function renderDeliveryVisibility(){
   $('deliveryOverlay').hidden=state!=='qr'||currentView!=='booth'||document.hidden||!deliveryContext;
 }
 function drawDeliveryQr(){
-  if(state!=='qr'||!deliveryContext)return;
+  if(state!=='qr'||!deliveryContext||(!deliveryContext.ticket.online&&!deliveryContext.demo))return;
   const c=$('deliveryQrCanvas'),box=$('deliveryQrBox').getBoundingClientRect();
   const q=new RetroQR(0,0);q.addData(deliveryContext.ticket.payload);q.make();
   const quiet=4,n=q.getModuleCount(),modules=n+quiet*2;
@@ -3229,12 +3236,14 @@ function showTimedQr(context){
   setState('qr');
   $('deliveryMessage').textContent=context.demo?'\u793a\u7bc4\u7559\u8a00\uff0c\u6c92\u6709\u9304\u4f4e\u5f71\u7247\u3002':'\u5f71\u7247\u5df2\u4fdd\u5b58\u65bc\u6b64\u700f\u89bd\u5668\u3002';
   $('deliveryRef').textContent=context.ticket.label;
-  $('deliveryQrLabel').textContent=context.ticket.online?'PRIVATE VIDEO / KEEP THIS LINK':'TEST QR / NO ONLINE VIDEO';
-  $('deliveryQrHelp').textContent=context.ticket.online?'Scan to view later. Upload may still be pending. This private link can hide or delete the recording.':'Local test only. No online video for this recording.';
-  $('deliveryQrCanvas').setAttribute('aria-label',context.ticket.online?'Private video QR link':'Local test QR, not an online video link');
+  $('deliveryQrBox').hidden=!context.ticket.online&&!context.demo;
+  $('deliveryQrLabel').textContent=context.ticket.online?'PRIVATE VIDEO / KEEP THIS LINK':context.demo?'TEST QR / NO ONLINE VIDEO':'LOCAL-ONLY / QR UNAVAILABLE';
+  $('deliveryQrHelp').textContent=context.ticket.online?'Scan to view later. Upload may still be pending. This private link can hide or delete the recording.':context.demo?'SIMULATION ONLY. This test pattern does not open a real video. Never share as a guest download link.':'Recording is saved on this device only. Connect an active Hostinger event in Admin before the NEXT recording to provide a guest phone QR.';
+  $('deliveryQrCanvas').setAttribute('aria-label',context.ticket.online?'Private video QR link':context.demo?'Simulation test pattern, not a real URL':'No guest URL is available');
+  if(!context.ticket.online&&!context.demo)log('delivery_no_cloud_qr',{reason:'cloud_not_connected_for_capture',clipId:context.ticket.clipId});
   if(context.ticket.online)$('deliveryMessage').textContent='Saved locally. Your private page is reserved; upload continues after returning to Start.';
   const reasons={screen_only:'Screen QR only.',print_disabled:'No printer route enabled.',receipt_has_no_qr:'Photo-only receipt: keep the screen QR.',receipt_artwork_failed:'Receipt preview unavailable; the saved recording is retained.',not_connected:'Printer not connected.',connected_only:'Connection alone does not confirm this ticket.',sent_unconfirmed:'Sent in simulation; paper not confirmed. No automatic reprint.',failed_before_send:'Print failed in simulation. The QR remains available.',outcome_unknown:'Simulated uncertain result. Check paper before any reprint.',timeout:'Print-result wait expired. No automatic resend.',always_screen:'Always show QR, including after simulated printing.'};
-  $('deliveryReason').textContent=context.nativeAttempted?'QR ticket '+context.reason+'. Paper not electronically confirmed; scan this QR as backup.':reasons[context.reason]||'Screen QR fallback. No confirmed QR ticket.';
+  $('deliveryReason').textContent=!context.ticket.online&&!context.demo?'No online guest page exists. Export recordings from Admin or connect Cloud for new messages.':context.nativeAttempted?'QR ticket '+context.reason+'. Paper not electronically confirmed; scan this QR as backup.':reasons[context.reason]||'Screen QR fallback. No confirmed QR ticket.';
   deliveryTick();drawDeliveryQr();requestAnimationFrame(drawDeliveryQr);
   clearInterval(deliveryTimer);deliveryTimer=setInterval(deliveryTick,100);
 }
@@ -3314,7 +3323,7 @@ async function authorizeNativeCloud(origin){
 function renderCloud(){
  if(!cloudClient||!$('cloudStatus'))return;
  const c=cloudClient.connection,rows=clips.filter(x=>x.cloud);
- $('cloudStatus').textContent=(c?'CONNECTED / '+c.serverOrigin+' / '+cloudClient.poolCount+' reserved QR links':'LOCAL-ONLY for new recordings')+' / '+rows.filter(x=>x.cloud.status==='ready').length+' cloud verified / '+rows.filter(x=>x.cloud.status!=='ready').length+' waiting'+(cloudClient.error?' / '+cloudClient.error:'');
+ $('cloudStatus').textContent=(c?'CONNECTED / Event: '+(c.eventTitle||c.eventId.slice(0,8))+' / '+c.serverOrigin+' / '+cloudClient.poolCount+' reserved QR links':'LOCAL-ONLY / No working phone QR until Hostinger event connected')+' / '+rows.filter(x=>x.cloud.status==='ready').length+' cloud verified / '+rows.filter(x=>x.cloud.status!=='ready').length+' waiting'+(cloudClient.error?' / '+cloudClient.error:'');
  $('cloudQueue').replaceChildren();
  for(const clip of rows.slice(-30).reverse()){
   const line=document.createElement('div');line.className='cloud-job';const text=document.createElement('span');text.textContent='Message '+clip.seq+' / '+clip.cloud.status+(clip.cloud.lastError?' / '+clip.cloud.lastError:'');line.append(text);
@@ -3337,6 +3346,12 @@ async function setupCloud(){
  cloudClient=new RetroCloud.Client({store,list:()=>store.list(),change:changeClip,purge:purgeCloudClip,canRun:()=>ready&&tabAllowed&&surfaceRole==='booth'&&state==='idle'&&!settingsSaving&&!cloudClaimBusy&&!document.hidden,onStatus:renderCloud});
  try{await cloudClient.init();}catch(e){cloudClient.error=e.message;renderCloud();}
  async function action(fn){if(state!=='idle'||settingsSaving||cloudClaimBusy){toast('Finish the current session first.');return;}const buttons=$('cloudCard').querySelectorAll('button');buttons.forEach(b=>b.disabled=true);settingsSaving=true;renderState();try{await fn();}catch(e){cloudClient.error=e.message;toast(e.message);}finally{settingsSaving=false;buttons.forEach(b=>b.disabled=false);renderState();renderCloud();}}
+ $('openCloudAdmin').onclick=()=>{
+   const origin=cloudClient?.connection?.serverOrigin;
+   if(!origin||!/^https:\/\/[^/]+$/.test(origin)){toast('Connect to an approved Hostinger Event first.');return;}
+   if(window.RetroExternal?.postMessage){window.RetroExternal.postMessage(JSON.stringify({action:'open-cloud-admin',origin}));return;}
+   window.open(origin+'/admin/','_blank','noopener,noreferrer');
+ };
  $('cloudConnect').onclick=()=>action(async()=>{const raw=JSON.parse($('cloudBundle').value);const cfg=RetroCloud.config(raw);await authorizeNativeCloud(cfg.serverOrigin);await cloudClient.connect(cfg);$('cloudBundle').value='';toast('Cloud verified. Reserved links are saved locally.');});
  $('cloudRefill').onclick=()=>action(()=>cloudClient.refill());
  $('cloudDisable').onclick=()=>action(()=>cloudClient.disable());
@@ -3429,9 +3444,9 @@ function setupPrinter(){
       const native=await nativeDiagnostics();
       let permissions={};
       if(navigator.permissions?.query){for(const name of ['camera','microphone']){try{permissions[name]=(await navigator.permissions.query({name})).state;}catch{permissions[name]='unavailable';}}}
-      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.3-alpha.1',generatedAt:new Date().toISOString(),
+      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.5-alpha.1',generatedAt:new Date().toISOString(),
         notice:'App-scoped diagnostic data, not Android system logcat. Up to 250 sanitized events survive app restarts where browser storage permits. No videos, snapshots, private QR URLs, credentials or device identifiers are intentionally included. Review before sharing.',
-        runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
+        runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,cloudReservedCount:cloudClient?.poolCount||0,cloudUploadsVerified:clips.filter(c=>c.cloud?.status==='ready').length,cloudUploadsWaiting:clips.filter(c=>c.cloud&&c.cloud.status!=='ready').length,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
         media:{permissions,cameraReady:cameraReady(),microphoneReady:microphoneReady(),partialPreview:mediaPartiallyReady(),cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
         native,events:diagnosticRing.snapshot()};
       textDownload(RetroDiagnostics.safe(report),'RetroBooth_Android_Diagnostics_'+new Date().toISOString().replace(/[:.]/g,'-')+'.json');
@@ -3453,7 +3468,7 @@ function setupPrinter(){
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.9.3-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.5-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
@@ -3513,7 +3528,7 @@ function setupPrinter(){
       }).catch(()=>{log('tab_lock_unavailable');resolve();});
     });
   }
-  ready=true;log('app_ready',{version:'0.9.3-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
+  ready=true;log('app_ready',{version:'0.9.5-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
   if(surfaceRole==='guest'){openGuest(location.hash.slice(7));}else if(surfaceRole==='show'){go('show');}else{go(new URLSearchParams(location.search).has('setup')?'admin':'booth');}
   if(document.documentElement.dataset.serviceWorker==='true' && location.protocol!=='file:' && 'serviceWorker'in navigator){
     navigator.serviceWorker.register('./sw.js').catch(e=>log('offline_shell_unavailable',{error:e.message}));

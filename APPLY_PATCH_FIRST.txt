@@ -1,0 +1,19 @@
+RetroBooth v0.9.5-alpha.1 — GOOGLE DRIVE EVENT MIRROR PATCH
+
+Apply only to a COMPLETE v0.9.4 RetroBooth repository. Extract and merge the
+CONTENTS of this ZIP into the repository ROOT next to package.json, including
+any dotfiles/workflows. Do not upload the ZIP itself to GitHub.
+
+- This patch does NOT include private config.php, live cloud data or OAuth tokens.
+- Cloud PHP must be deployed separately; keep old adminKey, signingKey, state.json.
+- Connect Google Account / choose existing or create new folder in Hostinger
+  Cloud Admin, then configure PRIVATE Google Drive PHP CLI cron worker.
+- Android Admin button opens Hostinger Cloud Admin using the SYSTEM BROWSER.
+- Hostinger stays the Guest QR / private Client ZIP authority. Google is an
+  OPTIONAL mirror of Event videos, not a Drive-only QR service.
+- Android versionCode 14; keep same signing keystore to upgrade safely.
+- For a repository with missing source files use the COMPLETE GitHub-ready ZIP.
+- Delete legacy .github/workflows/build-all.yml if it still exists.
+
+Read docs/V095_GOOGLE_DRIVE_SETUP_ZH.md before setup or event testing.
+Source only: no compiled APK/EXE, no live Google account acceptance.

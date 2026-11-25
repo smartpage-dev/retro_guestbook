@@ -1,3 +1,7 @@
+# RetroBooth v0.9.5 — Google Drive Event Mirror (Alpha)
+
+**NEW:** Cloud Admin Google Account OAuth / One Pick existing Drive folder / create My Drive folder / default new Event sync / per-Event enable/disable / private Cron mirroring. Hostinger QR and client ZIP remain unchanged; **Drive-only Guest QR is NOT implemented**. See `docs/V095_GOOGLE_DRIVE_SETUP_ZH.md` and `docs/V095_TEST_REPORT.md`. Android versionCode 14, same app ID, APK and EXE workflows independent. Google API real-account validation still required.
+
 # RetroBooth v0.9.4 — Guest QR + Events + Client ZIP (Alpha)
 
 The Android camera/microphone v0.9.3 fix is preserved. A valid guest video QR requires an active Hostinger event connection; local-only recordings never display a scannable fake QR. New cloud events store media under private Event ID folders and Cloud Admin can prepare a private ZIP snapshot plus a revocable client share link. Server-side ZIP construction uses the private PHP Cron worker. **Read [Event + QR + ZIP Setup (Cantonese)](docs/V094_EVENT_CLOUD_SHARE_SETUP_ZH.md) and [v0.9.4 Test Report](docs/V094_TEST_REPORT.md) before deployment or event use.**

@@ -156,6 +156,21 @@ public final class MainActivity extends Activity {
                     if(!isMainFrame||!trusted(sourceOrigin))return;
                     try{approveCloud(new JSONObject(message.getData()),reply);}catch(Exception e){toast("Cloud approval rejected.");}
                 });
+            WebViewCompat.addWebMessageListener(web,"RetroExternal",Collections.singleton(ORIGIN),
+                (view,message,sourceOrigin,isMainFrame,reply)->{
+                    if(!isMainFrame||!trusted(sourceOrigin)||view.getUrl()==null||!"/assets/www/index.html".equals(Uri.parse(view.getUrl()).getPath()))return;
+                    try{
+                        String payload=message.getData();if(payload==null||payload.length()>512)return;
+                        JSONObject m=new JSONObject(payload);
+                        if(!"open-cloud-admin".equals(m.optString("action"))||cloudOrigin.isEmpty()||!cloudOrigin.equals(m.optString("origin")))return;
+                        Uri url=Uri.parse(cloudOrigin+"/admin/");
+                        if(!"https".equals(url.getScheme())||url.getHost()==null)return;
+                        runOnUiThread(()->{
+                            try{startActivity(new Intent(Intent.ACTION_VIEW,url));nativeDiag("cloud_admin_external_browser","launched");}
+                            catch(Exception e){toast("No browser found. Open Hostinger /admin/ manually.");}
+                        });
+                    }catch(Exception e){nativeDiag("cloud_admin_external_browser","rejected");}
+                });
             WebViewCompat.addWebMessageListener(web,"RetroDiagnosticsNative",Collections.singleton(ORIGIN),
                 (view,message,sourceOrigin,isMainFrame,reply)->{
                     if(!isMainFrame||!trusted(sourceOrigin)||view.getUrl()==null||!"/assets/www/index.html".equals(Uri.parse(view.getUrl()).getPath()))return;

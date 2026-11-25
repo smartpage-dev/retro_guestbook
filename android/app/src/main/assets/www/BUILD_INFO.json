@@ -1,10 +1,10 @@
 {
-  "version": "0.9.4-alpha.1",
+  "version": "0.9.5-alpha.1",
   "stage": "prototype - not event ready",
   "commit": "local-uncommitted",
   "run": "local",
-  "standaloneSHA256": "2af850ac8800c282b5c158e3d7f01ee16d7392562c847854779a28242011fd77",
-  "cloud": "opt-in private events and client archive ZIP alpha",
+  "standaloneSHA256": "05ed489558ebae53f50ffb0488aaf2f22985f66f202b10d7075a8f3fb1043ee2",
+  "cloud": "opt-in private events, client ZIP and optional Google Drive mirror alpha",
   "printer": "independent Android secure-SPP QR-only alpha; physical validation pending",
   "android": "WebView secure-SPP pilot; native recording not implemented",
   "windows": "Electron desktop build candidate; no Windows printer adapter"

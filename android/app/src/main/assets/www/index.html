@@ -356,6 +356,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
  <p><strong>Important:</strong> Without a verified Hostinger event connection, recordings are LOCAL-ONLY and the guest will not receive a usable QR. Connect Cloud BEFORE the first guest. Connect a device bundle from Cloud Admin. Real recordings use pre-reserved guest links; uploads run while idle. Demo recordings remain local.</p>
  <label for="cloudBundle">Device setup bundle (secret; do not publish)</label><textarea id="cloudBundle" rows="4" autocomplete="off" spellcheck="false" placeholder='Paste the JSON from Cloud Admin here'></textarea>
  <div class="button-row"><button id="cloudConnect" class="btn primary" type="button">Verify + connect cloud</button><button id="cloudRefill" class="btn secondary" type="button">Refill QR reserve</button><button id="cloudRetry" class="btn secondary" type="button">Retry / sync now</button><button id="cloudDisable" class="btn secondary" type="button">Local-only for new recordings</button></div>
+ <div class="button-row"><button id="openCloudAdmin" class="btn secondary" type="button">Manage Events + Google Drive in Cloud Admin ↗</button></div>
  <p class="small muted">Create/manage events and prepare passwordless expiring client ZIP shares at your Hostinger <strong>/admin/</strong> page. Never paste the Cloud Admin master key into this kiosk. Local-only captures cannot be retroactively assigned a guest QR.</p>
  <p id="cloudStatus" class="small mono" role="status">Cloud is off. Existing recordings are not automatically uploaded.</p>
  <div id="cloudQueue" class="cloud-queue"></div>
@@ -1944,7 +1945,7 @@ module.exports = QRCode;
  }
  root.RetroPrinter={PROFILE,guestTicket,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
 })(typeof window==='undefined'?globalThis:window);
-</script><script>/* RetroBooth v0.9.4-alpha.1. Pure, independently testable domain helpers. */
+</script><script>/* RetroBooth v0.9.5-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -3345,6 +3346,12 @@ async function setupCloud(){
  cloudClient=new RetroCloud.Client({store,list:()=>store.list(),change:changeClip,purge:purgeCloudClip,canRun:()=>ready&&tabAllowed&&surfaceRole==='booth'&&state==='idle'&&!settingsSaving&&!cloudClaimBusy&&!document.hidden,onStatus:renderCloud});
  try{await cloudClient.init();}catch(e){cloudClient.error=e.message;renderCloud();}
  async function action(fn){if(state!=='idle'||settingsSaving||cloudClaimBusy){toast('Finish the current session first.');return;}const buttons=$('cloudCard').querySelectorAll('button');buttons.forEach(b=>b.disabled=true);settingsSaving=true;renderState();try{await fn();}catch(e){cloudClient.error=e.message;toast(e.message);}finally{settingsSaving=false;buttons.forEach(b=>b.disabled=false);renderState();renderCloud();}}
+ $('openCloudAdmin').onclick=()=>{
+   const origin=cloudClient?.connection?.serverOrigin;
+   if(!origin||!/^https:\/\/[^/]+$/.test(origin)){toast('Connect to an approved Hostinger Event first.');return;}
+   if(window.RetroExternal?.postMessage){window.RetroExternal.postMessage(JSON.stringify({action:'open-cloud-admin',origin}));return;}
+   window.open(origin+'/admin/','_blank','noopener,noreferrer');
+ };
  $('cloudConnect').onclick=()=>action(async()=>{const raw=JSON.parse($('cloudBundle').value);const cfg=RetroCloud.config(raw);await authorizeNativeCloud(cfg.serverOrigin);await cloudClient.connect(cfg);$('cloudBundle').value='';toast('Cloud verified. Reserved links are saved locally.');});
  $('cloudRefill').onclick=()=>action(()=>cloudClient.refill());
  $('cloudDisable').onclick=()=>action(()=>cloudClient.disable());
@@ -3437,7 +3444,7 @@ function setupPrinter(){
       const native=await nativeDiagnostics();
       let permissions={};
       if(navigator.permissions?.query){for(const name of ['camera','microphone']){try{permissions[name]=(await navigator.permissions.query({name})).state;}catch{permissions[name]='unavailable';}}}
-      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.4-alpha.1',generatedAt:new Date().toISOString(),
+      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.5-alpha.1',generatedAt:new Date().toISOString(),
         notice:'App-scoped diagnostic data, not Android system logcat. Up to 250 sanitized events survive app restarts where browser storage permits. No videos, snapshots, private QR URLs, credentials or device identifiers are intentionally included. Review before sharing.',
         runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,cloudReservedCount:cloudClient?.poolCount||0,cloudUploadsVerified:clips.filter(c=>c.cloud?.status==='ready').length,cloudUploadsWaiting:clips.filter(c=>c.cloud&&c.cloud.status!=='ready').length,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
         media:{permissions,cameraReady:cameraReady(),microphoneReady:microphoneReady(),partialPreview:mediaPartiallyReady(),cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
@@ -3461,7 +3468,7 @@ function setupPrinter(){
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.9.4-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.5-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
@@ -3521,7 +3528,7 @@ function setupPrinter(){
       }).catch(()=>{log('tab_lock_unavailable');resolve();});
     });
   }
-  ready=true;log('app_ready',{version:'0.9.4-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
+  ready=true;log('app_ready',{version:'0.9.5-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
   if(surfaceRole==='guest'){openGuest(location.hash.slice(7));}else if(surfaceRole==='show'){go('show');}else{go(new URLSearchParams(location.search).has('setup')?'admin':'booth');}
   if(document.documentElement.dataset.serviceWorker==='true' && location.protocol!=='file:' && 'serviceWorker'in navigator){
     navigator.serviceWorker.register('./sw.js').catch(e=>log('offline_shell_unavailable',{error:e.message}));

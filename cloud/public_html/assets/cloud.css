@@ -2,3 +2,6 @@
 
 /* v0.9.4 private client download page; external stylesheet for strict CSP. */
 .download-list{display:grid;gap:12px;margin:24px 0}.download-entry{display:flex;gap:14px;align-items:center;justify-content:space-between;border:1px solid #cbbd9b;border-radius:8px;padding:16px}.mono{font-family:monospace}.hint{font-size:13px;color:#605f5b}.state{font-weight:700}
+
+/* v0.9.5 Drive destination settings. Keep checkbox readable on 320px screens. */
+#driveCard .check{margin:18px 0}#driveCard .check small{display:block;margin-top:4px}#driveOauthUrl{font-size:12px;overflow-wrap:anywhere}#driveEventStatus{background:#f3eedf}

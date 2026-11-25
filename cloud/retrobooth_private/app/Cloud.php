@@ -82,6 +82,12 @@ final class CloudRepo {
             $c['permission']='hidden';$c['moderation']='pending';$c['revision']++;
             $c['purge']='pending';$c['devicePurgeAck']=false;
             $c['chunks']=[]; unset($c['sourceId'],$c['seq']);
+            // Drive is an OPTIONAL mirror. Queue remote deletion durably; the private
+            // Drive CLI worker performs it. Until then an external Drive copy may remain.
+            if((!empty($c['driveSync']['fileId'])||!empty($c['driveSync']['session']))&&!($c['driveSync']['deleted']??false)) {
+                $c['driveSync']['status']='delete_pending';
+                $c['driveSync']['updatedAt']=time();
+            }
             $e=&$s['events'][$c['eventId']];
             if (isset($e['archive']) && in_array($c['id'],$e['archive']['clipIds']??[],true)) {
                 $archiveId=$e['archive']['id'];
@@ -201,7 +207,7 @@ final class CloudApi {
         if ($s['clips'][$id]['status']==='deleted') rb_fail(410,'clip_deleted');
     }
     public function handle(string $method,string $route,string $token,array $body=[],string $binary='',string $chunkHash=''): array {
-        if ($route==='/api/health' && $method==='GET') return ['service'=>'RetroBooth','api'=>1,'build'=>'0.9.4-alpha.1','printer'=>'not_connected'];
+        if ($route==='/api/health' && $method==='GET') return ['service'=>'RetroBooth','api'=>1,'build'=>'0.9.5-alpha.1','printer'=>'not_connected'];
         return $this->repo->transaction(function(array &$s) use($method,$route,$token,$body,$binary,$chunkHash) {
             if (str_starts_with($route,'/api/admin/')) {
                 $this->auth($s,$token,'admin');
@@ -212,7 +218,8 @@ final class CloudApi {
                     if (count($s['events'])>=100) rb_fail(409,'event_limit');
                     $id=rb_id();$dir=$this->repo->eventDir($id).'/clips';
                     if (!is_dir($dir)&&!mkdir($dir,0700,true)) rb_fail(503,'event_storage_unwritable');
-                    $s['events'][$id]=['id'=>$id,'title'=>$title,'expiresAt'=>time()+$days*86400,'issueOpen'=>true,'uploadOpen'=>true,'createdAt'=>time()];
+                    $defaultDriveSync=class_exists('DriveBridge')?(new DriveBridge($this->cfg,$this->repo))->autoForNewEvents():false;
+                    $s['events'][$id]=['id'=>$id,'title'=>$title,'expiresAt'=>time()+$days*86400,'issueOpen'=>true,'uploadOpen'=>true,'createdAt'=>time(),'driveEnabled'=>$defaultDriveSync];
                     return $s['events'][$id];
                 }
                 if (preg_match('#^/api/admin/event/([a-f0-9]{32})/archive$#D',$route,$m)) {

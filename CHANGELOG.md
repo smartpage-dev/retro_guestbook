@@ -1,3 +1,10 @@
+## 0.9.5-alpha.1 — November 25, 2026
+
+- Optional Google Drive mirror of verified Hostinger Event videos; authenticated Cloud Admin Google OAuth (system browser, limited drive.file scope), existing folder via One Pick, new My Drive folder, Event child folders and per-event enablement/default.
+- Encrypted server-side refresh token, account identity lock, short-lived single-use callback state, resumable checksum-verified upload, idempotency checks and queued remote delete. No Google credentials in kiosk app.
+- Private PHP CLI Drive worker and Cloud Admin link within Android Admin. Same Hostinger Guest QR/Client ZIP paths; no Drive-only QR.
+- Android versionCode 14; separate APK/EXE workflows preserved; real Google OAuth/Hostinger/Android acceptance still pending.
+
 ## 0.9.4-alpha.1 — November 25, 2026
 
 - Android/Windows local-only captures display no misleading scannable QR; Cloud required before next recording for a usable link.
