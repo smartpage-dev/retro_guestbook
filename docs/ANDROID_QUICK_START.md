@@ -1,4 +1,4 @@
-**v0.9.4: Independent media input fix.** Admin > 02 / Device Check > 1 / APPLY CAMERA - LIVE preview. The preview needs no microphone. Then use 2 / APPLY MICROPHONE; until both are ready, guest Start is disabled. See [ANDROID_MEDIA_V093.md](ANDROID_MEDIA_V093.md).
+**v0.9.3: Independent media input fix.** Admin > 02 / Device Check > 1 / APPLY CAMERA - LIVE preview. The preview needs no microphone. Then use 2 / APPLY MICROPHONE; until both are ready, guest Start is disabled. See [ANDROID_MEDIA_V093.md](ANDROID_MEDIA_V093.md).
 
 # 03 / Android APK
 

@@ -1,18 +1,3 @@
-## 0.9.5-alpha.1 — November 25, 2026
-
-- Optional Google Drive mirror of verified Hostinger Event videos; authenticated Cloud Admin Google OAuth (system browser, limited drive.file scope), existing folder via One Pick, new My Drive folder, Event child folders and per-event enablement/default.
-- Encrypted server-side refresh token, account identity lock, short-lived single-use callback state, resumable checksum-verified upload, idempotency checks and queued remote delete. No Google credentials in kiosk app.
-- Private PHP CLI Drive worker and Cloud Admin link within Android Admin. Same Hostinger Guest QR/Client ZIP paths; no Drive-only QR.
-- Android versionCode 14; separate APK/EXE workflows preserved; real Google OAuth/Hostinger/Android acceptance still pending.
-
-## 0.9.4-alpha.1 — November 25, 2026
-
-- Android/Windows local-only captures display no misleading scannable QR; Cloud required before next recording for a usable link.
-- Hostinger Cloud Admin event management enhanced, all-verified-video ZIP snapshots and expiring/revocable private client sharing added.
-- New private per-event physical media folders; older flat folders stay readable.
-- Independent ZIP builder runs from private PHP Cron, splits large downloads; deletion or late uploading invalidates ZIP.
-- Same Android App ID and separated Camera/Mic initialization; versionCode 13. Full Hostinger and native device acceptance still needed.
-
 ## v0.9.3-alpha.1 - 25 Nov 2026 - Android camera-only live preview + separate microphone
 
 - Camera-only live CRT preview (video:true,audio:false) operates when mic initialization fails; microphone separately requested (video:false,audio:true) and can later be attached or released without losing camera.
