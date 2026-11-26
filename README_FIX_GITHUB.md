@@ -1,18 +1,27 @@
-# RetroBooth v0.9 — GitHub dotfile repair (Run 45316384369)
+# RetroBooth v0.9.6 GitHub root package.json fix
 
-## Diagnosis from actual GitHub Actions log
+## What the November 26 Android build log proves
 
-`npm run desktop:prepare` now finds `tools/prepare-desktop.mjs` and `src/desktop-admin.html`, but fails at `tools/build.mjs:18` because **`src/.htaccess` is absent** from GitHub checkout. The run checked out commit `6e1481c0a19fe2538954c7390c2c186a61bb7c5e` on `main`. This is not an Android or Electron compiler failure; those jobs did not start.
+The runner checked out `main` commit `5c652337414d3cd82bdfa0e24301e82ae9cbd25d` and confirmed the four source files were Git-tracked, but stopped at:
 
-## Apply without losing local changes
+`npm error Missing script: "desktop:prepare"`
 
-1. Back up your working GitHub repository first. Extract this ZIP outside the repository.
-2. Copy `src/.htaccess` into your repository's `src/` directory. Also check/restore `cloud/public_html/.htaccess`, `cloud/retrobooth_private/.htaccess` and `.gitattributes`. Do **not** blindly overwrite a customized `.gitignore`; compare it first.
-3. Copy `check-github-source.py` and `source-required-sha256.json` to the repository root. The manifest lists all 109+ build/test source paths in the supplied v0.9 baseline; the checker verifies presence and Git tracking, not byte-identical source content.
-4. In repository root run `python check-github-source.py` (or `py -3 check-github-source.py` on Windows). Repair every `MISSING` and `NOT COMMITTED` item. If the checker lists other source files, restore them from `RetroBooth_v0.9_COMPLETE_REPO_ROOT.zip`, not from unknown downloads.
-5. `git add -f src/.htaccess cloud/public_html/.htaccess cloud/retrobooth_private/.htaccess` only if necessary; normally plain `git add` is enough. `git add .gitattributes check-github-source.py source-required-sha256.json`, then commit and push to `main`.
-6. On GitHub **Code → main → src**, confirm `.htaccess` exists. Check the new commit hash differs from `6e1481c0a19f`. Start a **new** Actions run on `main` (do not rerun an old commit).
+This is a **repository root package.json** problem, not a QR printing or native Android compile error. The expected v0.9.6 root package.json has the missing script.
 
-GitHub's web upload and some file managers may hide dot-prefixed files. The original v0.9 complete root ZIP **does contain** `src/.htaccess`, so this repair does not alter application behavior. The cloud `.htaccess` files protect server paths: do not remove them as a workaround.
+## Exact install
 
-The log ends before APK/EXE build. Passing this preflight does not certify native builds, real camera or physical QR printing.
+1. In GitHub Desktop, open the cloned `smartpage-dev/retro_guestbook` repository on branch `main`.
+2. Back up the existing ROOT `package.json` for comparison.
+3. Extract this ZIP into the repository root so it replaces only the ROOT `package.json` and adds `tools/check-root-package.py`.
+4. DO NOT overwrite `desktop/package.json` with this root file. They are intentionally different.
+5. In the repository root run: `python tools/check-root-package.py` (on some Windows installations use `py -3 tools/check-root-package.py`).
+6. Optional full preflight: `npm run desktop:prepare` and `npm test`.
+7. Review GitHub Desktop changes; commit and push the two files to **main**.
+8. Inspect GitHub Code > package.json (NOT desktop/package.json); check that `scripts.desktop:prepare` is present.
+9. Actions > **RetroBooth - Build Android APK** > **Run workflow** as a **new run**. Do not re-run a prior commit.
+
+If other missing-file errors remain, restore the complete v0.9.6 repository root archive instead of patching files one by one.
+
+## Scope / verification
+
+This patch changes build metadata and a local checker only: no UI, camera, CRT, ticket, cloud, or printing logic. A freshly extracted v0.9.6 repository passed `npm run desktop:prepare`, `npm test` (46 desktop assertions plus other tests), `npm run test:native-core` (85 JVM assertions) and `python tools/verify-repository.py`. The exact GitHub repository's current package.json was NOT available in the uploaded log, so this fix remains to be verified by a new GitHub run. No native APK was compiled here.
