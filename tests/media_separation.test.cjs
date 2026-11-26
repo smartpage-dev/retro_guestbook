@@ -12,6 +12,7 @@ assert(app.includes("mode=video?(audio?'real':'preview'):'demo'"),'partial previ
 assert(app.includes('mediaPartiallyReady()'),'guest recording must reject partial media');
 assert(app.includes('microphone_apply_failure'),'specific mic error must be logged');
 assert(manifest.includes('android.permission.MODIFY_AUDIO_SETTINGS'),'audio routing permission needed');
+assert(native.includes('data.length()>30000')&&native.includes('data.length()>4096'),'bounded photo message must be allowed only on print/test');
 assert(native.includes('webview_media_pause_suppressed'),'runtime permission prompt must not pause media');
 assert(native.includes('if(!activityResumed)'),'grant must defer until native resume');
 assert(native.includes('protected void onStop()')&&native.includes('web.onPause();'),'full native stop must suspend WebView media');

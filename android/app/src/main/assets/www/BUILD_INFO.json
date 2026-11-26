@@ -1,11 +1,11 @@
 {
-  "version": "0.9.4-alpha.1",
+  "version": "0.9.5-alpha.1",
   "stage": "prototype - not event ready",
   "commit": "local-uncommitted",
   "run": "local",
-  "standaloneSHA256": "b188d024f2219569c94917c96a28c7a1d9607e06d7b0edf8dacbd3b7a6e81853",
+  "standaloneSHA256": "07b2366b96f7104e1e8dbaf98df5e44b466b766bb58e6b54123174d7be51d548",
   "cloud": "opt-in PHP private-delivery alpha",
-  "printer": "independent Android secure-SPP QR-only alpha; physical validation pending",
+  "printer": "Android secure-SPP 384-dot photo + QR test pilot; physical print validation pending",
   "android": "WebView secure-SPP pilot; native recording not implemented",
   "windows": "Electron desktop build candidate; no Windows printer adapter"
 }

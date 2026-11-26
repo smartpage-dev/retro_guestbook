@@ -1,23 +1,10 @@
-# RetroBooth v0.9.5 — Google Drive Event Mirror / Test Report
+# RetroBooth v0.9.5 test scope
 
-## Test scope
-- Actual PHP Hostinger private-cloud API over local HTTP (104 existing regression checks).
-- Drive bridge with in-process synthetic Google HTTP transport (16 scenario checks).
-- Real Cloud Admin auth/failsafe with live local PHP HTTP (7 checks) and offline headless Chromium UI rendering at 390, 800, 1440 pixels (3 viewports); Chrome network to localhost is restricted in this environment, so UI Google API behavior is mocked. Actual admin.js client is executed.
-- Existing Node/desktop unit suite, JVM print-core regression, PHP syntax, repository preflight and built web assets.
-- ZIP integrity / patch-content consistency.
+- `npm run desktop:prepare && npm test`: source contracts, standalone HTML, native transport client mock, all 46 desktop tests.
+- `npm run test:native-core`: real local Java 17 JVM, fake SPP transport, on-disk ticket journal, verify QR+384x336 raster ESC/POS bytes, duplicate safety. Does NOT validate actual printer.
+- `tests/browser_v095_ticket_photo.py`: Chromium synthetic camera/mic, simulated native response; validates photo+QR test request, 1-bit image size/black pixels, default T-2 countdown image persisted in a 10s real MediaRecorder run, settings T-1/T-3 and no unexpected JS errors.
+- Android native APK not compiled in authoring environment; GitHub Actions must build and test.
+- Real 32-inch Android kiosk, printer Bluetooth SPP, paper image/QR scan, firmware, printer heat and auto-cutter are not verified by these synthetic tests.
+- Printer result sent_unconfirmed is not paperConfirmed. Never auto-retry unknown results.
 
-## Expected results
-- `npm run desktop:prepare`, `npm test`, `npm run test:native-core`, `python tools/verify-repository.py`
-- `python tests/cloud_api.py` — 104 legacy Cloud HTTP tests.
-- `php tests/drive_pilot.php` — 16 checks, fake Google API calls only.
-- `python tests/browser_v095_drive.py` — real PHP auth failsafe + offline Chromium UI assertions.
-- `find cloud -name '*.php' -print0 | xargs -0 -n 1 php -l`.
-
-## Not yet tested
-- Authentic Google Account OAuth / One Pick, real Google Drive upload responses or their rate limits.
-- Hostinger actual PHP CLI Cron, shared-hosting quota / outbound TLS / sustained video load.
-- GitHub Android native compilation and 32-inch kiosk hardware acceptance.
-- Native Windows EXE runtime / code signing / Google authorization on a live event.
-
-**Assessment:** Pilot source ready for staging deployment and independent GitHub builds, NOT certified as a fully working commercial Drive integration.
+- v0.9.4 full multi-viewport style regression was attempted but did not finish under the authoring session timeout. Existing CRT shell styling code was not changed in this release; no claim of a full rerun.

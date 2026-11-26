@@ -1,8 +1,10 @@
+**Latest v0.9.5 Android versionCode 14.** The printer pilot adds 384-dot QR + live/countdown still raster for compatible classic Bluetooth SPP ESC/POS ticket printers. See [QR_PHOTO_TICKET_V095_ZH.md](QR_PHOTO_TICKET_V095_ZH.md). This is not BLE/USB, paper-status or cutter support. Android APK compilation and real paper testing are required.
+
 **v0.9.3: Independent media input fix.** Admin > 02 / Device Check > 1 / APPLY CAMERA - LIVE preview. The preview needs no microphone. Then use 2 / APPLY MICROPHONE; until both are ready, guest Start is disabled. See [ANDROID_MEDIA_V093.md](ANDROID_MEDIA_V093.md).
 
 # 03 / Android APK
 
-Same application ID, versionCode 12
+Same application ID, versionCode 14
 
 1. Download and extract the Android-APK artifact after a successful Android job. Use the TEST.apk, not the unsigned APK or AAB.
 2. Before updating an existing installation, export important recordings and retain the same signing identity. Do not uninstall or clear data to get around an update error.
@@ -15,7 +17,7 @@ Source minimum is Android 8/API 26; the intended screen is Android 12, still req
 
 ## Bluetooth QR pilot remains Android-only
 
-Pair the printer in Android settings, then pin its exact address in Admin section 08. Use secure Classic SPP and a compatible native ESC/POS QR profile. Test a diagnostic ticket, then a real selected private QR. There is no BLE/USB/raster snapshot support in this paper path.
+Pair the printer in Android settings, then pin its exact address in Admin section 08. Use secure Classic SPP and a compatible native ESC/POS QR profile. Test a diagnostic ticket, then a real selected private QR. No BLE/USB support; the 384-dot GS v 0 photo extension is a hardware-unverified test path.
 
 Default send result is sent_unconfirmed, not paper-confirmed; keep timed screen QR enabled initially. Unknown jobs never auto-replay. The detailed connection, reprint and fast-return checklist is preserved in history/v0.8/SETUP_AND_RUNNING_GUIDE.md, sections 12-16.
 

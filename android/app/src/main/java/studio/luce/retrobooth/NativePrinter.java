@@ -55,7 +55,7 @@ public final class NativePrinter {
         try{JSONObject o=new JSONObject();o.put("id",id);o.put("version",1);if(error!=null)o.put("error",error);else o.put("data",data==null?new JSONObject():data);String text=o.toString();activity.runOnUiThread(()->{try{if(!dead)r.postMessage(text);}catch(Exception ignored){}});}catch(Exception ignored){}
     }
     private JSONObject status() throws Exception {
-        JSONObject o=new JSONObject();o.put("available",true);o.put("profile",QrTicket.PROFILE);o.put("permission",permission());o.put("supported",adapter()!=null);o.put("pinned",pinned);o.put("connected",connected());o.put("connectionEpoch",epoch);o.put("busy",busy.get());o.put("automaticEnabled",autoEnabled);o.put("fastReturnArmed",fast.active(pinned,epoch,System.nanoTime()));o.put("paperStatus","unavailable");o.put("qrOnly",true);o.put("error",ledgerError.isEmpty()?problem:ledgerError);
+        JSONObject o=new JSONObject();o.put("available",true);o.put("profile",QrTicket.PROFILE);o.put("permission",permission());o.put("supported",adapter()!=null);o.put("pinned",pinned);o.put("connected",connected());o.put("connectionEpoch",epoch);o.put("busy",busy.get());o.put("automaticEnabled",autoEnabled);o.put("fastReturnArmed",fast.active(pinned,epoch,System.nanoTime()));o.put("paperStatus","unavailable");o.put("qrOnly",false);o.put("photoRasterTestSupported",true);o.put("photoProfile",QrTicket.PHOTO_ENCODING);o.put("error",ledgerError.isEmpty()?problem:ledgerError);
         return o;
     }
     public void handle(JSONObject m,JavaScriptReplyProxy r){
@@ -99,7 +99,7 @@ public final class NativePrinter {
             if(op.equals("automatic")){
                 if(!m.optBoolean("enabled")){autoEnabled=false;fast.clear();reply(r,id,status(),null);return;}
                 if(!connected()||busy.get()||dialogOpen||!ledgerError.isEmpty()){reply(r,id,null,"Connect and check the dedicated printer first.");return;}
-                confirm("Allow automatic QR tickets?","This app may send one QR-only ticket after each saved cloud recording. No snapshot, cutter or paper sensor. Keep screen QR enabled until tested. Permission resets when disconnected or the app pauses.",()->{try{autoEnabled=connected()&&active;reply(r,id,status(),null);}catch(Exception e){reply(r,id,null,"Could not enable automatic tickets.");}},()->reply(r,id,null,"Automatic tickets remain off."));return;
+                confirm("Allow automatic QR tickets?","This app may send one QR ticket with a locally saved still after each cloud recording. Photo output depends on ESC/POS GS v 0 support. No cutter or paper sensor. Keep screen QR enabled until tested. Permission resets when disconnected or the app pauses.",()->{try{autoEnabled=connected()&&active;reply(r,id,status(),null);}catch(Exception e){reply(r,id,null,"Could not enable automatic tickets.");}},()->reply(r,id,null,"Automatic tickets remain off."));return;
             }
             if(op.equals("ledger")){
                 worker.execute(()->{try{needReady();List<Properties> jobs=ledger.all();jobs.sort((x,y)->Long.compare(Long.parseLong(y.getProperty("created")),Long.parseLong(x.getProperty("created"))));JSONArray a=new JSONArray();for(Properties p:jobs.subList(0,Math.min(30,jobs.size()))){JSONObject j=new JSONObject();for(String key:Arrays.asList("id","clip","state","label","kind","created","parent"))j.put(key,p.getProperty(key));a.put(j);}JSONObject o=status();o.put("jobs",a);reply(r,id,o,null);}catch(Exception e){reply(r,id,null,"Ticket journal unavailable; no jobs were sent.");}});return;
@@ -141,15 +141,24 @@ public final class NativePrinter {
             String origin=activity.getPreferences(Activity.MODE_PRIVATE).getString("cloudOrigin","");
             String job=m.optString("jobId"),clip=m.optString("clipId");
             if(test){job=UUID.randomUUID().toString().replace("-","");clip=job;}
-            ticket=new QrTicket(job,clip,test?"https://example.invalid/retrobooth-printer-test/"+clip:m.optString("payload"),test?"0":m.optString("label"),test?"":m.optString("parent"),test?"test":"guest",origin);
+            byte[] photo=null;String moment="";
+            if(m.has("photoBase64")||m.has("photoEncoding")||m.has("photoMoment")){
+                if(!QrTicket.PHOTO_ENCODING.equals(m.optString("photoEncoding"))||m.optInt("photoWidth")!=QrTicket.PHOTO_WIDTH||m.optInt("photoHeight")!=QrTicket.PHOTO_HEIGHT)
+                    throw new IllegalArgumentException("Unknown raster image profile");
+                String encoded=m.optString("photoBase64");
+                if(encoded.length()<100||encoded.length()>23000||!encoded.matches("[A-Za-z0-9+/]+={0,2}"))throw new IllegalArgumentException("Invalid bounded raster");
+                photo=Base64.getDecoder().decode(encoded);
+                moment=m.optString("photoMoment");
+            }
+            ticket=new QrTicket(job,clip,test?"https://example.invalid/retrobooth-printer-test/"+clip:m.optString("payload"),test?"0":m.optString("label"),test?"":m.optString("parent"),test?"test":"guest",origin,photo,moment);
             if(automatic&&(!ticket.id.equals(ticket.clipId)||!ticket.parent.isEmpty()))throw new IllegalArgumentException();
-        }catch(Exception e){reply(r,requestId,null,"QR ticket rejected. Use a saved, non-deleted cloud clip on the approved HTTPS origin; maximum 256 ASCII bytes.");return;}
+        }catch(Exception e){reply(r,requestId,null,"Ticket rejected before sending: verify saved cloud QR and bounded photo image profile. No bytes sent.");return;}
         int waitMs=Math.max(1000,Math.min(15000,m.optInt("waitMs",4000)));
         long deadlineEpoch=automatic?m.optLong("deadlineEpochMs",0):0;
         if(automatic&&(deadlineEpoch<=System.currentTimeMillis()||deadlineEpoch>System.currentTimeMillis()+16000)){reply(r,requestId,null,"Expired or invalid automatic print deadline.");return;}
         Runnable send=()->{pendingPrintRequest="";pendingClip="";int left=automatic?(int)Math.min(waitMs,deadlineEpoch-System.currentTimeMillis()):waitMs;if(left<=0){reply(r,requestId,null,"Print deadline expired; no ticket sent.");return;}send(ticket,automatic,left,r,requestId);};
         if(!automatic){pendingPrintRequest=requestId;pendingClip=ticket.clipId;}
-        if(automatic)send.run();else confirm(ticket.parent.isEmpty()?"Send QR ticket?":"Reprint the SAME private link?",test?"This sends a diagnostic QR. It is NOT a video link. No photo or cutter command is sent.":"Message "+ticket.label+" to pinned printer "+pinned+".\nThis is a PRIVATE owner QR with delete access.\n"+(ticket.parent.isEmpty()?"An existing ticket ID is never automatically sent again.":"The original may already have printed. This intentionally creates another copy of the SAME link."),send,()->{pendingPrintRequest="";pendingClip="";reply(r,requestId,null,"Print cancelled. Nothing queued.");});
+        if(automatic)send.run();else confirm(ticket.parent.isEmpty()?"Send QR ticket?":"Reprint the SAME private link?",test?"DIAGNOSTIC ONLY: this sends a non-working QR"+(ticket.hasPhoto?" plus a LIVE camera photo":"")+". No cutter command. Check real paper after the test.":"Message "+ticket.label+" to pinned printer "+pinned+".\nThis is a PRIVATE owner QR with delete access.\n"+(ticket.parent.isEmpty()?"An existing ticket ID is never automatically sent again.":"The original may already have printed. This intentionally creates another copy of the SAME link."),send,()->{pendingPrintRequest="";pendingClip="";reply(r,requestId,null,"Print cancelled. Nothing queued.");});
     }
     private void send(QrTicket ticket,boolean automatic,int waitMs,JavaScriptReplyProxy r,String requestId){
         if(!active||!connected()||(automatic&&!autoEnabled)||!busy.compareAndSet(false,true)){reply(r,requestId,null,"Printer no longer ready. No ticket queued.");return;}
@@ -161,9 +170,9 @@ public final class NativePrinter {
                 needReady();if(cancel.get()||!permission()||!connection.equals(epoch)||socket!=target||!active)throw new IOException();
                 OutputStream out=target.getOutputStream();
                 TicketEngine.Result result=engine.send(ticket,device,connection,new TicketEngine.Link(){public void write(byte[] b,int start,int n)throws IOException{out.write(b,start,n);}public void flush()throws IOException{out.flush();}},cancel,deadline);
-                boolean eligible=!cancel.get()&&System.nanoTime()<deadline&&active&&connected()&&connection.equals(epoch)&&fast.permits(ticket,device,connection,System.nanoTime(),result);
+                boolean eligible=!ticket.hasPhoto&&!cancel.get()&&System.nanoTime()<deadline&&active&&connected()&&connection.equals(epoch)&&fast.permits(ticket,device,connection,System.nanoTime(),result);
                 if(!result.state.equals("sent_unconfirmed")){fast.clear();autoEnabled=false;closeSocket();}
-                JSONObject o=new JSONObject();o.put("jobId",ticket.id);o.put("clipId",ticket.clipId);o.put("urlHash",QrTicket.sha(ticket.payload.getBytes(java.nio.charset.StandardCharsets.US_ASCII)));o.put("state",result.state);o.put("duplicate",result.duplicate);o.put("bytes",result.bytes);o.put("connectionEpoch",connection);o.put("transport","android_secure_spp");o.put("simulated",false);o.put("paperConfirmed",false);o.put("fastReturnEligible",eligible);o.put("status",status());reply(r,requestId,o,null);
+                JSONObject o=new JSONObject();o.put("jobId",ticket.id);o.put("clipId",ticket.clipId);o.put("urlHash",QrTicket.sha(ticket.payload.getBytes(java.nio.charset.StandardCharsets.US_ASCII)));o.put("state",result.state);o.put("duplicate",result.duplicate);o.put("bytes",result.bytes);o.put("connectionEpoch",connection);o.put("transport","android_secure_spp");o.put("photoIncluded",ticket.hasPhoto);o.put("simulated",false);o.put("paperConfirmed",false);o.put("fastReturnEligible",eligible);o.put("status",status());reply(r,requestId,o,null);
             }catch(Exception e){fast.clear();autoEnabled=false;closeSocket();reply(r,requestId,null,"Print not completed. Outcome may be unknown; inspect the ticket journal and paper. Never automatically retry.");}
             finally{timeout.cancel(false);if(activeCancel==cancel)activeCancel=null;activePrintRequest="";activeClip="";busy.set(false);}
         });

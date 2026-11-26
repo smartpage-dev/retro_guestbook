@@ -1,9 +1,9 @@
 /* Only bundled Android can connect SPP. The cloud server never talks to nearby Bluetooth. */
 let printerClient=null,printerActionBusy=false;
-function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9 TEST APK for this pilot.';
+function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. Photo + QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9.5 TEST APK for this pilot.';
  return (s.connected?'CONNECTED (transport only)':'DISCONNECTED')+' / '+(s.pinned||'no pinned device')+' / automatic '+(s.automaticEnabled?'ON':'OFF')+' / fast return '+(s.fastReturnArmed?'OPERATOR RISK ACCEPTED':'OFF; screen QR retained')+' / no electronic paper confirmation'+(s.error?' / '+s.error:'');}
 function renderPrinter(){if(!$('printerStatus'))return;$('printerStatus').textContent=printerText();const available=!!printerClient?.available;
- for(const id of ['printerPermission','printerSettings','printerList','printerPin','printerConnect','printerTest','printerEnableAuto','printerDisableAuto','printerManual','printerReprint','printerObserve','printerFastOff','printerRefresh'])$(id).disabled=!available||printerActionBusy;
+ for(const id of ['printerPermission','printerSettings','printerList','printerPin','printerConnect','printerTest','printerTestPhoto','printerEnableAuto','printerDisableAuto','printerManual','printerReprint','printerObserve','printerFastOff','printerRefresh'])$(id).disabled=!available||printerActionBusy;
  $('printerDisconnect').disabled=!available;
 }
 function refreshPrinterClips(){
@@ -53,7 +53,8 @@ function setupPrinter(){
  $('printerDisconnect').onclick=async()=>{try{await printerClient.call('disconnect');}catch(e){toast(e.message);}await refreshPrinter();};
  act('printerEnableAuto',async()=>{await printerClient.call('automatic',{enabled:true},60000);});
  act('printerDisableAuto',async()=>{await printerClient.call('automatic',{enabled:false});});
- act('printerTest',async()=>{const r=await printerClient.call('test',{waitMs:15000},90000);$('printerNotice').textContent='Diagnostic ticket '+r.jobId+' / '+r.state+'. Test QR is NOT a video link and does not unlock fast return.';});
+ act('printerTest',async()=>{const r=await printerClient.call('test',{waitMs:15000},90000);$('printerNotice').textContent='QR-only diagnostic ticket '+r.jobId+' / '+r.state+'. TEST QR is NOT a video link and does not unlock fast return.';});
+ act('printerTestPhoto',async()=>{if(!cameraReady())throw new Error('Apply Camera first in 02 / DEVICE CHECK before printing a LIVE photo.');const photo=RetroTicketPhoto.raster(renderer.snapshot());const r=await printerClient.call('test',{...photo,photoMoment:'TEST LIVE',waitMs:15000},90000);if(r?.photoIncluded!==true)throw new Error('Printer did not acknowledge the image layout. Inspect paper; do not automatically repeat.');$('printerNotice').textContent='LIVE photo + diagnostic QR test '+r.jobId+' / '+r.state+'. Inspect paper and scan the TEST QR; no real video link.';log('ticket_photo_test_sent',{state:r.state,bytes:r.bytes||0});});
  $('printerClipRefresh').onclick=()=>refreshPrinterClips();
  act('printerManual',async()=>{await printSavedGuest($('printerClip').value);});
  act('printerReprint',async()=>{await printSavedGuest($('printerClip').value,true);});

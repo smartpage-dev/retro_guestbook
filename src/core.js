@@ -1,4 +1,4 @@
-/* RetroBooth v0.9.4-alpha.1. Pure, independently testable domain helpers. */
+/* RetroBooth v0.9.5-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -36,6 +36,7 @@
       countdown: [0,3].includes(Number(raw.countdown)) ? Number(raw.countdown) : 3,
       returnSeconds: [0,1,2,3,5].includes(Number(raw.returnSeconds)) ? Number(raw.returnSeconds) : 2,
       receiptStyle: ['classic','ticket','minimal'].includes(raw.receiptStyle) ? raw.receiptStyle : 'classic',
+      ticketCaptureSecond: [1,2,3].includes(Number(raw.ticketCaptureSecond)) ? Number(raw.ticketCaptureSecond) : 2,
       receiptCaption: String(raw.receiptCaption || 'A LITTLE LOVE, TO KEEP.').slice(0,80),
       receiptFooter: String(raw.receiptFooter || 'THANK YOU FOR BEING HERE').slice(0,100),
       logoData: /^data:image\/(png|jpeg);base64,/.test(raw.logoData||'') && raw.logoData.length<300000 ? raw.logoData : '',

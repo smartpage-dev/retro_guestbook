@@ -9,7 +9,7 @@
   function safe(raw={}){return {
     postRecordMode:MODES.includes(raw.postRecordMode)?raw.postRecordMode:'smart',
     qrDisplaySeconds:seconds(raw.qrDisplaySeconds,10,5,60),
-    printWaitSeconds:seconds(raw.printWaitSeconds,4,1,15),
+    printWaitSeconds:seconds(raw.printWaitSeconds,12,1,15),
     receiptPrintEnabled:raw.receiptPrintEnabled===true
   };}
   function snapshot(clip,payload){

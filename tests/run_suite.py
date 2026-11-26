@@ -6,13 +6,13 @@ groups=[('browser_v04.py',x) for x in ['layout','appearance','storage-contract',
 groups += [('browser_v06.py',x) for x in ['settings','branches','timers','layout','webcam-guard']]
 groups += [('browser_v07.py',x) for x in ['booth-cloud','guest','admin']]
 groups += [('browser_v08.py',x) for x in ['printer-ui','native-flow','deadline-manual']]
-groups += [('browser_v091_camera.py','probes'),('browser_v092_diagnostics.py','export'),('browser_v093_separated.py','independent-inputs'),('browser_v094_style_fit.py','modern-crt-layout')]
+groups += [('browser_v091_camera.py','probes'),('browser_v092_diagnostics.py','export'),('browser_v093_separated.py','independent-inputs'),('browser_v094_style_fit.py','modern-crt-layout'),('browser_v095_ticket_photo.py','countdown-photo-ticket')]
 results=[]
 for script,group in groups:
  name=script.replace('.py','')+'-'+group;start=time.monotonic();log=Q/('final-'+name+'.log')
  print('RUN',name,flush=True)
  with log.open('w') as handle:
-  try:cp=subprocess.run([sys.executable,str(R/'tests'/script)]+([] if script in ('browser_v091_camera.py','browser_v092_diagnostics.py','browser_v093_separated.py','browser_v094_style_fit.py') else ['--group',group]),cwd=R,stdout=handle,stderr=subprocess.STDOUT,timeout=240);code=cp.returncode
+  try:cp=subprocess.run([sys.executable,str(R/'tests'/script)]+([] if script in ('browser_v091_camera.py','browser_v092_diagnostics.py','browser_v093_separated.py','browser_v094_style_fit.py','browser_v095_ticket_photo.py') else ['--group',group]),cwd=R,stdout=handle,stderr=subprocess.STDOUT,timeout=240);code=cp.returncode
   except subprocess.TimeoutExpired:code=124;handle.write('\nTIMEOUT: not a pass.\n')
  text=log.read_text();import re
  matches=re.findall(r'TOTAL (\d+) PASSED',text);count=int(matches[-1]) if code==0 and matches else 0

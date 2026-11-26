@@ -2,6 +2,9 @@
 const assert=require('node:assert/strict');
 const C=require('../src/core.js');let count=0;
 function test(name,fn){fn();console.log('PASS '+name);count++;}
+test('ticket photo defaults to countdown T-2',()=>assert.equal(C.safeSettings().ticketCaptureSecond,2));
+test('ticket photo countdown supports T-1, T-2, T-3',()=>[1,2,3].forEach(n=>assert.equal(C.safeSettings({ticketCaptureSecond:n}).ticketCaptureSecond,n)));
+test('ticket photo rejects out of range config',()=>assert.equal(C.safeSettings({ticketCaptureSecond:123}).ticketCaptureSecond,2));
 test('fixed duration defaults to ten',()=>assert.equal(C.safeSettings().duration,10));
 test('single touch start is default',()=>assert.equal(C.safeSettings().trigger,'touch'));
 test('show is off by default',()=>assert.equal(C.safeSettings().showEnabled,false));

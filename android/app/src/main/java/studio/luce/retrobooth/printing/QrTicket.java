@@ -10,10 +10,18 @@ import java.util.Locale;
 public final class QrTicket {
     public static final String PROFILE="native-qr-model2-m-size4-v1";
     public static final int MAX_URL_BYTES=256;
+    public static final int PHOTO_WIDTH=384, PHOTO_HEIGHT=336, PHOTO_BYTES=PHOTO_WIDTH*PHOTO_HEIGHT/8;
+    public static final String PHOTO_ENCODING="escpos-gsv0-384x336-1bpp-v1";
     public final String id, clipId, payload, origin, label, parent, kind;
     public final byte[] bytes;
+    public final boolean hasPhoto;
+    public final String photoMoment;
     public final String fingerprint;
     public QrTicket(String id,String clipId,String payload,String label,String parent,String kind,String approvedOrigin) {
+        this(id,clipId,payload,label,parent,kind,approvedOrigin,null,"");
+    }
+    /** Raster is 1bpp black=1, MSB first; never stored in ticket ledger or logs. */
+    public QrTicket(String id,String clipId,String payload,String label,String parent,String kind,String approvedOrigin,byte[] photo,String moment) {
         if(!hex(id,32)||!hex(clipId,32))throw new IllegalArgumentException("Invalid ticket identity");
         if(!parent.isEmpty()&&!hex(parent,32))throw new IllegalArgumentException("Invalid parent identity");
         if(!kind.equals("guest")&&!kind.equals("test"))throw new IllegalArgumentException("Invalid ticket kind");
@@ -31,16 +39,31 @@ public final class QrTicket {
             if(!this.origin.equals(approvedOrigin)||!"/guest/".equals(u.getRawPath())||u.getRawFragment()==null||!u.getRawFragment().matches("[a-f0-9]{32}\\.[A-Za-z0-9_-]{32}"))
                 throw new IllegalArgumentException("QR is not an exact guest capability on the approved cloud origin");
         }
+        if(photo!=null&&photo.length!=PHOTO_BYTES)throw new IllegalArgumentException("Ticket raster must be exactly 384x336 1bpp");
+        if(photo!=null&&!String.valueOf(moment).matches("T-[123]|REC START|LEGACY|TEST LIVE"))throw new IllegalArgumentException("Invalid capture moment");
+        if(photo==null&&moment!=null&&!moment.isEmpty())throw new IllegalArgumentException("Moment without photo");
         this.id=id;this.clipId=clipId;this.payload=payload;this.label=label;this.parent=parent;this.kind=kind;
-        this.bytes=encode(payload,label,kind.equals("test"));
-        this.fingerprint=sha((PROFILE+"\n"+clipId+"\n"+payload+"\n"+label+"\n"+kind).getBytes(StandardCharsets.UTF_8));
+        this.hasPhoto=photo!=null;this.photoMoment=photo==null?"":moment;
+        this.bytes=encode(payload,label,kind.equals("test"),photo,photoMoment);
+        String identity=PROFILE+"\n"+clipId+"\n"+payload+"\n"+label+"\n"+kind;
+        // Keep QR-only fingerprints identical to the v0.9.4 journal; preserve old tickets.
+        if(photo!=null)identity+="\nphoto:"+PHOTO_ENCODING+":"+sha(photo)+":"+photoMoment;
+        this.fingerprint=sha(identity.getBytes(StandardCharsets.UTF_8));
     }
     public static boolean hex(String x,int n){return x!=null&&x.length()==n&&x.matches("[a-f0-9]+");}
     public static String sha(byte[] b){try{byte[] d=MessageDigest.getInstance("SHA-256").digest(b);StringBuilder s=new StringBuilder();for(byte x:d)s.append(String.format(Locale.ROOT,"%02x",x&255));return s.toString();}catch(Exception e){throw new IllegalStateException(e);}}
-    private static byte[] encode(String value,String label,boolean test){
+    private static byte[] encode(String value,String label,boolean test,byte[] photo,String moment){
         ByteArrayOutputStream b=new ByteArrayOutputStream();
         emit(b,0x1b,0x40,0x1b,0x61,1); // initialize; centered ASCII only
         text(b,"RETROBOOTH\n"+(test?"PRINTER TEST - NOT A VIDEO":"PRIVATE VIDEO TICKET")+"\nMESSAGE "+label+"\n\n");
+        if(photo!=null){
+            text(b,"SNAPSHOT "+moment+"\n");
+            // ESC/POS GS v 0: 48 bytes/row x 336 rows. m=0 (no scaling).
+            // A compatibility test profile only: printers lacking GS v 0 won't print the photo.
+            emit(b,0x1d,0x76,0x30,0,PHOTO_WIDTH/8,0,PHOTO_HEIGHT&255,PHOTO_HEIGHT>>8);
+            b.write(photo,0,photo.length);
+            text(b,"\n");
+        }
         emit(b,0x1d,0x28,0x6b,4,0,49,65,50,0); // Model 2
         emit(b,0x1d,0x28,0x6b,3,0,49,67,4); // 4 dots/module
         emit(b,0x1d,0x28,0x6b,3,0,49,69,49); // error correction M

@@ -74,6 +74,6 @@ test('native printers are not masqueraded as available on Windows',()=>{
 });
 test('version, Android identity, installer and portability configuration align',()=>{
  const pkg=require('../package.json'),desktop=require('../desktop/package.json'),builder=require('../desktop/electron-builder.cjs'),gradle=fs.readFileSync(path.join(root,'android/app/build.gradle'),'utf8');
- assert.equal(pkg.version,desktop.version);assert(gradle.includes("versionName '"+pkg.version+"'"));assert(gradle.includes('versionCode 13'));assert(gradle.includes("applicationId 'studio.luce.retrobooth.preview'"));
+ assert.equal(pkg.version,desktop.version);assert(gradle.includes("versionName '"+pkg.version+"'"));assert(gradle.includes('versionCode 14'));assert(gradle.includes("applicationId 'studio.luce.retrobooth.preview'"));
  assert.equal(builder.asar,true);assert.equal(builder.nsis.deleteAppDataOnUninstall,false);assert.notEqual(builder.nsis.artifactName,builder.portable.artifactName);assert.equal(builder.win.requestedExecutionLevel,'asInvoker');
 });

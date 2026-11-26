@@ -34,7 +34,27 @@ public class TicketCoreTest {
   rejects("reject oversize QR",()->new QrTicket(id(1),id(1),longHost+"/guest/#"+id(91)+"."+"A".repeat(32),"47","","guest",longHost));
   QrTicket diagnostic=new QrTicket(id(50),id(50),"https://example.invalid/retrobooth-printer-test/"+id(50),"0","","test","");
   check("diagnostic explicitly NOT a video",new String(diagnostic.bytes,StandardCharsets.ISO_8859_1).contains("NOT A VIDEO"));
+  byte[] pixels=new byte[QrTicket.PHOTO_BYTES];for(int i=0;i<pixels.length;i++)pixels[i]=(byte)(i%5==0?0x81:0x24);
+  QrTicket photo=new QrTicket(id(60),id(60),url,"47","","guest",origin,pixels,"T-2");
+  check("photo ticket declares raster profile",photo.hasPhoto&&QrTicket.PHOTO_ENCODING.equals("escpos-gsv0-384x336-1bpp-v1"));
+  byte[] header=new byte[]{29,118,48,0,48,0,80,1};int imageAt=-1;
+  for(int j=0;j<=photo.bytes.length-header.length;j++){boolean same=true;for(int k=0;k<header.length;k++)if(photo.bytes[j+k]!=header[k]){same=false;break;}if(same){imageAt=j;break;}}
+  check("ESC/POS GS v 0 raster header exact 384x336",imageAt>0);
+  check("raster payload exact bit order and length",Arrays.equals(Arrays.copyOfRange(photo.bytes,imageAt+header.length,imageAt+header.length+pixels.length),pixels));
+  check("native model-2 QR remains scannable after raster",Arrays.equals(qrBytes(photo.bytes),url.getBytes(StandardCharsets.US_ASCII)));
+  check("photo and QR-only fingerprints cannot collide",!photo.fingerprint.equals(new QrTicket(id(60),id(60),url,"47","","guest",origin).fingerprint));
+  check("same photo layout intentional reprint preserves fingerprint",new QrTicket(id(61),id(60),url,"47",id(60),"guest",origin,pixels,"T-2").fingerprint.equals(photo.fingerprint));
+  byte[] modified=Arrays.copyOf(pixels,pixels.length);modified[0]^=1;
+  check("changed snapshot changes print identity",!new QrTicket(id(62),id(60),url,"47",id(60),"guest",origin,modified,"T-2").fingerprint.equals(photo.fingerprint));
+  rejects("reject too-short raster",()->new QrTicket(id(63),id(63),url,"47","","guest",origin,new byte[10],"T-2"));
+  rejects("reject invalid moment",()->new QrTicket(id(64),id(64),url,"47","","guest",origin,pixels,"\u001b@"));
+  rejects("reject moment without raster",()->new QrTicket(id(65),id(65),url,"47","","guest",origin,null,"T-2"));
+  check("photo data does not embed cut command",!new String(photo.bytes,StandardCharsets.ISO_8859_1).contains("\u001dV"));
   try(TicketLedger ledger=new TicketLedger(root)){
+   TicketEngine.Result photoResult=new TicketEngine(ledger).send(photo,"D","E",sink(new ByteArrayOutputStream()),new AtomicBoolean(),System.nanoTime()+TimeUnit.SECONDS.toNanos(12));
+   check("photo bytes sent on fake physical transport (unconfirmed)",photoResult.state.equals("sent_unconfirmed")&&photoResult.bytes==photo.bytes.length);
+   String ledgerFile=Files.readString(root.resolve(photo.id+".job"));
+   check("photo is NOT persisted to private journal",!ledgerFile.contains(java.util.Base64.getEncoder().encodeToString(pixels)));
    rejects("same-process second ledger lock rejected",()->{try(TicketLedger ignored=new TicketLedger(root)) {}});
    TicketEngine engine=new TicketEngine(ledger);ByteArrayOutputStream bytes=new ByteArrayOutputStream();AtomicInteger writes=new AtomicInteger();
    TicketEngine.Link checking=new TicketEngine.Link(){public void write(byte[] b,int s,int n)throws IOException{check("sending journal precedes chunk "+writes.incrementAndGet(),"sending".equals(ledger.get(a.id).getProperty("state")));bytes.write(b,s,n);}public void flush(){}};

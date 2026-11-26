@@ -20,11 +20,14 @@
   }
   pause(){for(const p of this.pending.values()){clearTimeout(p.timer);p.reject(new Error('Native app paused; print outcome may be unknown.'));}this.pending.clear();this.status.connected=false;this.status.automaticEnabled=false;this.status.fastReturnArmed=false;}
   async refresh(){if(!this.available)return this.status;this.status=await this.call('status');return this.status;}
-  async send(clip,{automatic=false,reprint=false,waitMs=4000,deadlineEpochMs=0,isCurrent=()=>true}={}){
+  async send(clip,{automatic=false,reprint=false,waitMs=12000,deadlineEpochMs=0,isCurrent=()=>true}={}){
    const t=guestTicket(clip,reprint?clip.id:'');const expected=await hash(t.payload);
    const end=automatic?(deadlineEpochMs||Date.now()+waitMs):0;
    if(!isCurrent()||(automatic&&Date.now()>=end))throw new Error('Print hand-off expired before submission.');
-   const r=await this.call('print',{...t,automatic,deadlineEpochMs:end,waitMs:Math.max(1000,Math.min(15000,waitMs))},automatic?Math.max(1,end-Date.now()):90000);
+   const photo=await root.RetroTicketPhoto.fromClip(clip);
+   if(!isCurrent()||(automatic&&Date.now()>=end))throw new Error('Photo preparation took too long; no ticket sent.');
+   const r=await this.call('print',{...t,...photo,automatic,deadlineEpochMs:end,waitMs:Math.max(1000,Math.min(15000,waitMs))},automatic?Math.max(1,end-Date.now()):90000);
+   if((r?.photoIncluded===true)!==Boolean(photo.photoBase64))throw new Error('Native printer photo acknowledgement mismatch. Inspect paper; do NOT automatically retry.');
    if(r?.jobId!==t.jobId||r.clipId!==t.clipId||r.urlHash!==expected||r.transport!=='android_secure_spp'||r.simulated!==false||r.paperConfirmed!==false||!['sent_unconfirmed','failed_before_send','outcome_unknown'].includes(r.state))throw new Error('Mismatched native result. Keep the screen QR; inspect paper and journal before reprinting.');
    if(r.status)this.status=r.status;
    return {...clip.deliverySnapshot,...r,payload:t.payload,nativeValidated:true,fastReturnEligible:r.fastReturnEligible===true&&!r.duplicate};

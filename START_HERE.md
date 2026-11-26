@@ -1,7 +1,7 @@
-# RetroBooth v0.9.4 — 32-inch Android CRT frame update
+# RetroBooth v0.9.5 — 32-inch Android CRT frame update
 
 - **01 Modern CRT** now has a proper graphite/silver 1990s television housing. The video screen, bezel, right control-panel width, outer padding and landscape responsive rules exactly follow the proven **02 Heritage TV** layout.
-- Bottom-right **v0.9.4 / PREVIEW** now stays within the small landscape safe area. Tap **five times** to open Admin. As an alternative, hold **CH 03** at top-left for five seconds.
+- Bottom-right **v0.9.5 / PREVIEW** now stays within the small landscape safe area. Tap **five times** to open Admin. As an alternative, hold **CH 03** at top-left for five seconds.
 - **02 Heritage TV** unchanged in design. Recording, Camera-only/Mic-only controls, QR, and cloud are preserved from v0.9.3.
 - Build a new Android TEST APK: **Actions > RetroBooth - Build Android APK > Run workflow**. Android versionCode **13**, same package ID and signing-key requirements.
 - For style test: Admin > `01 / DISPLAY STYLES` > `01 / Modern CRT television` > Apply. Select 02 to return to original.
@@ -15,7 +15,7 @@
 
 New Android native changes: `MODIFY_AUDIO_SETTINGS` install-time permission and protected permission-dialog WebView lifecycle. An actual Android test APK must be built, installed and checked; neither cause is certified fixed on target hardware.
 
-**Build:** upload repo ROOT contents including hidden `.github`, commit, push `main`, run **RetroBooth - Build Android APK**. The Android artifact is expected to contain `RetroBooth-v0.9.4-Android-TEST.apk` IF GitHub's native build succeeds. Keep same signing key and export existing videos before updating. Windows EXE workflow remains separate.
+**Build:** upload repo ROOT contents including hidden `.github`, commit, push `main`, run **RetroBooth - Build Android APK**. The Android artifact is expected to contain `RetroBooth-v0.9.5-Android-TEST.apk` IF GitHub's native build succeeds. Keep same signing key and export existing videos before updating. Windows EXE workflow remains separate.
 
 Read `docs/ANDROID_MEDIA_V093.md` for full instructions. Existing cloud and QR print workflows are unchanged.
 
@@ -38,9 +38,9 @@ One GitHub repository; **three independent manual Actions workflows**. No platfo
 
 ## Expected installable output names
 
-- Android: `RetroBooth-v0.9.4-Android-TEST.apk` (requires Android job success).
-- Windows x64 installer: `RetroBooth-0.9.4-alpha.1-Windows-x64-Setup.exe`.
-- Windows x64 portable: `RetroBooth-0.9.4-alpha.1-Windows-x64-Portable.exe`.
+- Android: `RetroBooth-v0.9.5-Android-TEST.apk` (requires Android job success).
+- Windows x64 installer: `RetroBooth-0.9.5-alpha.1-Windows-x64-Setup.exe`.
+- Windows x64 portable: `RetroBooth-0.9.5-alpha.1-Windows-x64-Portable.exe`.
 
 No compiled APK/EXE is included in this source ZIP. Android keeps the existing secure-SPP QR-only pilot, not paper-validated. Windows native printing is not implemented. Keep stable `RETRO_TEST_*` signing secrets for upgrades, export important clips before uninstalling, and never upload private cloud keys or recordings to GitHub.
 

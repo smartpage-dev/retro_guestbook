@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "Admin ticket photo moment has T-2 default",
+    "Android photo + QR test command available",
+    "Test sends EXACT 384x336 1bpp raster",
+    "Test still is current LIVE camera frame, not all blank",
+    "Test ticket distinguishes live probe snapshot",
+    "real clip stores the unique T-2 photo",
+    "saved clip includes independent recording still",
+    "QA getter does not expose private photo as data URL",
+    "Admin T-1 selection persists to settings",
+    "Admin T-3 selection persists to settings",
+    "App has zero browser JS errors"
+  ],
+  "count": 11,
+  "errors": [],
+  "scope": "Chromium with synthetic camera/mic + simulated native printer reply; real Android/physical paper not tested"
+}

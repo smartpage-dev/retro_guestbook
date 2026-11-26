@@ -1,4 +1,16 @@
-# RetroBooth v0.9.4-alpha.1 — Modern CRT fit + TV cabinet
+# RetroBooth v0.9.5 — Android 58mm Photo + QR Ticket Pilot
+
+The latest incremental change adds a REAL printer write path for a **384-dot monochrome guest still + ESC/POS model-2 QR** through the existing Android secure Classic-Bluetooth SPP adapter. It also saves a separate countdown snapshot at **T-2 seconds by default** (Admin > Receipt Design: T-1/T-2/T-3). An immediate **LIVE Photo + QR TEST** in Admin uses the camera and a clearly non-working diagnostic URL. Manual printing of a saved cloud clip prints its frozen countdown still and exact private QR. QR-only receipts remain supported.
+
+**Hardware caveat:** source code and simulated transport are testable here; there is NO evidence yet that your specific 58mm ticket printer accepts ESC/POS `GS v 0` graphics or prints the QR correctly. No BLE, Android USB, Windows printer driver, logo, CJK text, or auto cutter has been added. Paper is *never electronically confirmed*. The screen QR is retained for photo tickets even when bytes are written. The native journal still blocks duplicate automatic sends and does not contain guest URLs or photo bytes.
+
+**Build:** copy this archive's files into the GitHub repository root; retain `.github` and existing private/runtime configuration OUTSIDE the repository. Run **RetroBooth - Build Android APK**; download `RetroBooth-v0.9.5-Android-TEST.apk` from a SUCCESSFUL job (not Evidence/unsigned). Android versionCode 14, same app ID. Use the same signing key for upgrades. The Windows EXE workflow is independent and unchanged in hardware capabilities.
+
+**User instructions:** [docs/QR_PHOTO_TICKET_V095_ZH.md](docs/QR_PHOTO_TICKET_V095_ZH.md). Real-phone, actual paper, printed QR scan, recording/audio, and 32-inch Android screen acceptance remain necessary before an event.
+
+---
+
+# RetroBooth v0.9.5-alpha.1 — Modern CRT fit + TV cabinet
 
 **New:** 01 Modern CRT now uses the exact same viewport/cabinet/panel geometry, inset and responsive size rules as 02 Heritage television. Modern graphite casing with silver bevel and colour-film CRT treatment. Right-side five-tap Admin/version control remains inside the picture-safe area. 02 Heritage TV styling is intentionally unchanged.
 

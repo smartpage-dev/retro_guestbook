@@ -6,7 +6,7 @@
   try{if(window.BroadcastChannel)channel=new BroadcastChannel('luce-retrobooth-v05-updates');}catch{}
   function designForm(){return {
     countdown:Number($('countdownSetting').value),returnSeconds:Number($('returnSeconds').value),
-    receiptStyle:$('receiptStyle').value,receiptCaption:$('receiptCaption').value,receiptFooter:$('receiptFooter').value,
+    receiptStyle:$('receiptStyle').value,ticketCaptureSecond:Number($('ticketCaptureSecond').value),receiptCaption:$('receiptCaption').value,receiptFooter:$('receiptFooter').value,
     logoData:draftLogo,showEnabled:$('showEnabled').checked,showDelay:Number($('showDelay').value)
   };}
   async function previewDesign(){

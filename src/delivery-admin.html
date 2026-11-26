@@ -4,10 +4,10 @@
  <div class="delivery-settings-grid">
   <label>After recording<select id="postRecordMode"><option value="smart">Smart: skip only after accepted native send / confirmed DEMO</option><option value="screen">Screen QR only / no print attempt</option><option value="both">Print + always show screen QR</option></select></label>
   <label>QR display time (5-60 seconds)<input type="number" min="5" max="60" step="1" id="qrDisplaySeconds" value="10" required></label>
-  <label>Maximum print-result wait (1-15 seconds)<input type="number" min="1" max="15" step="1" id="printWaitSeconds" value="4" required></label>
+  <label>Maximum print-result wait (1-15 seconds; 12s suggested for photo)<input type="number" min="1" max="15" step="1" id="printWaitSeconds" value="12" required></label>
  </div>
- <label class="check"><input type="checkbox" id="receiptPrintEnabled"> Enable receipt-print route (Android QR pilot or explicit DEMO simulation)</label>
- <p class="delivery-safe-note">Connected is not printed. Default: keep screen QR after a send. Only explicit connection-bound operator risk acceptance can bypass after native transmission. Timeout, unknown result, unqualified links and photo-only receipts keep the QR.</p>
+ <label class="check"><input type="checkbox" id="receiptPrintEnabled"> Enable receipt-print route (Android photo + QR test pilot or DEMO simulation)</label>
+ <p class="delivery-safe-note">Connected is not printed. Default: keep screen QR after a send. Photo tickets always keep the screen QR. QR-only tickets need explicit connection-bound operator risk acceptance before skip after a native send. Timeout, unknown result, unqualified links and photo-only receipts keep the QR.</p>
  <div class="button-row"><button type="submit" class="btn primary">Save QR &amp; return settings</button><button type="button" id="deliveryReturn" class="btn secondary">Return without saving</button></div><p id="deliverySaveStatus" class="small muted" role="status"></p>
  <div class="delivery-lab"><strong>Flow simulation / DEMO recordings only</strong>
  <label>Next demo recordings use<select id="deliveryScenario"><option value="not_connected">No printer (default)</option><option value="connected_only">Connected only / no job completion</option><option value="printed_confirmed">Confirmed QR print (SIMULATED, no paper)</option><option value="sent_unconfirmed">Sent, paper not confirmed</option><option value="failed_before_send">Failed before sending / offline</option><option value="outcome_unknown">Interrupted / outcome unknown</option><option value="timeout">No result / wait timeout</option></select></label>

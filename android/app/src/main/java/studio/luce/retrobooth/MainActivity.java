@@ -149,7 +149,14 @@ public final class MainActivity extends Activity {
             WebViewCompat.addWebMessageListener(web,"RetroPrinterNative",Collections.singleton(ORIGIN),
                 (view,message,sourceOrigin,isMainFrame,reply)->{
                     if(!isMainFrame||!trusted(sourceOrigin)||view.getUrl()==null||!"/assets/www/index.html".equals(Uri.parse(view.getUrl()).getPath()))return;
-                    try{String data=message.getData();if(data==null||data.length()>4096)return;printer.handle(new JSONObject(data),reply);}catch(Exception e){toast("Printer request rejected.");}
+                    try{
+                        String data=message.getData();if(data==null||data.length()>30000)return;
+                        JSONObject command=new JSONObject(data);
+                        // QR-only control commands remain 4 KiB. Only the two print operations
+                        // may carry an explicitly bounded 384x336 1bpp raster (~22 KiB base64).
+                        if(data.length()>4096&&!("print".equals(command.optString("op"))||"test".equals(command.optString("op"))))return;
+                        printer.handle(command,reply);
+                    }catch(Exception e){toast("Printer request rejected.");}
                 });
             WebViewCompat.addWebMessageListener(web,"RetroCloudNative",Collections.singleton(ORIGIN),
                 (view,message,sourceOrigin,isMainFrame,reply)->{

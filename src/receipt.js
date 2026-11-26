@@ -1,4 +1,4 @@
-/* Receipt composition only. No BLE writes or OS print calls are made. */
+/* Screen receipt compositor; native physical ticket uses a separate QR command + the same pixelPhoto dither. */
 (function () {
   'use strict';
   function pixelPhoto(source) {
@@ -29,10 +29,9 @@
     if(logoCache.size>8)logoCache.delete(logoCache.keys().next().value);
   }
   function renderReceipt(canvas,clip,source,settings){
-    const payload=(clip.kind==='real'&&clip.cloud)||clip.kind==='demo'?RetroCore.qrPayload(clip.id,clip.cloud):null;
-    const qr=payload?new RetroQR(0,0):null;if(qr){qr.addData(payload);qr.make();}
-    const module=5,quiet=4,qrSize=qr?(qr.getModuleCount()+quiet*2)*module:0;
-    const photo=settings.receipt!=='qr',showQR=settings.receipt!=='photo'&&!!payload,style=settings.receiptStyle||'classic';
+    const payload=RetroCore.qrPayload(clip.id,clip.cloud),qr=new RetroQR(0,0);qr.addData(payload);qr.make();
+    const module=5,quiet=4,qrSize=(qr.getModuleCount()+quiet*2)*module;
+    const photo=settings.receipt!=='qr',showQR=settings.receipt!=='photo',style=settings.receiptStyle||'classic';
     const paper=document.createElement('canvas');paper.width=384;paper.height=2400;
     const c=paper.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,384,2400);c.fillStyle='#000';c.textAlign='center';
     let y=24;
@@ -48,7 +47,7 @@
     if(style==='ticket'){c.fillRect(14,y,356,35);c.fillStyle='#fff';c.font='bold 18px monospace';c.fillText('ADMIT ONE LITTLE MEMORY',192,y+24);c.fillStyle='#000';y+=51;}
     text(settings.title,style==='minimal'?28:25,true,3);text(settings.date,16,false,1);
     if(style!=='minimal')text('LOVE, ON TAPE.',14,false,1);
-    divider();text(clip.kind==='demo'?'DEMO QR / NOT A DOWNLOAD':payload?'PRIVATE VIDEO / KEEP THIS TICKET':'LOCAL-ONLY / NO PHONE QR',16,true,1);y+=10;
+    divider();text(clip.cloud?'PRIVATE VIDEO / KEEP THIS TICKET':'PROTOTYPE / NOT A LIVE TICKET',16,true,1);y+=10;
     if(photo){c.drawImage(pixelPhoto(source),0,y);y+=350;}
     text(settings.receiptCaption||'A LITTLE LOVE, TO KEEP.',18,true,3);divider();
     text('MESSAGE No. '+String(clip.seq).padStart(3,'0'),25,true,1);
@@ -56,9 +55,8 @@
     if(showQR){
       const left=Math.floor((384-qrSize)/2);
       for(let r=0;r<qr.getModuleCount();r++)for(let col=0;col<qr.getModuleCount();col++)if(qr.isDark(r,col))c.fillRect(left+(col+quiet)*module,y+(r+quiet)*module,module,module);
-      y+=qrSize+15;text(clip.kind==='demo'?'TEST MARKER / NOT A LINK':'SCAN TO VIEW / MAY BE UPLOADING',16,true,1);text(clip.kind==='demo'?'No real video to download':'Review and manage later',15,false,1);
+      y+=qrSize+15;text(clip.cloud?'SCAN TO VIEW / MAY BE UPLOADING':'DEMO QR / NO ONLINE VIDEO',16,true,1);text('Review and manage later',15,false,1);
     }
-    if(!payload){text('Saved only on this device. Cloud not connected.',14,false,3);}
     divider();text(settings.receiptFooter||'THANK YOU FOR BEING HERE',17,false,5);
     text('RETROBOOTH BY @LUCE.STUDIOHK',14,false,1);text('LOCAL REF '+clip.id.slice(0,12).toUpperCase(),13,false,1);y+=20;
     if(y>2400)throw new Error('Receipt exceeded safe canvas height.');

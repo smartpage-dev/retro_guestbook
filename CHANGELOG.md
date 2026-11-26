@@ -1,4 +1,14 @@
-## v0.9.4-alpha.1 — Modern CRT framing and kiosk-safe UI (25 Nov 2026)
+## v0.9.5-alpha.1 — QR ticket bitmap and configurable countdown capture (26 Nov 2026)
+
+- Android secure-SPP test ticket now supports a 384x336 dithered monochrome LIVE still + native model-2 QR (GS v 0 bitmap format); QR-only diagnostic retained. No cutter/status sensor.
+- Admin Photo + QR test uses current applied camera and a non-working `example.invalid` test QR; manual saved cloud tickets use **frozen** per-clip image and existing capability URL.
+- Guest ticket still captured at countdown T-2 by default (configurable T-1/T-2/T-3) independently of recording best-shot; if countdown disabled, fallback REC START. Settings and still saved locally with the clip.
+- WebView print channel increased only for photo print/test operations to 30KiB max; other commands remain at 4KiB. Native raster validated before journal reservation.
+- Print IDs remain idempotent: photo hash/moment are journaled only as fingerprint; old QR-only journal data remains readable. No automatic retry after an unknown outcome.
+- 12s recommended default Bluetooth ticket deadline for new installations; existing saved value is preserved. Photo receipts cannot fast-return; on-screen QR remains fallback.
+- Physical printer and Android native compilation unverified in authoring environment; mock JVM/browser tests are not paper acceptance.
+
+## v0.9.5-alpha.1 — Modern CRT framing and kiosk-safe UI (25 Nov 2026)
 - Both screen styles now share the *same physical cabinet layout* and responsive breakpoints, derived from the working Heritage TV design.
 - Replaced the exposed edge-to-edge style 01 with graphite/brushed metal 1990s CRT housing and modern side panel; retains the existing Colour Film effect on recorded frames.
 - Raised 01 bottom-right five-tap Version/Admin affordance into a touch-safe bordered area; short-landscape CSS viewport reductions.

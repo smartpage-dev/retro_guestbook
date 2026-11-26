@@ -24,7 +24,7 @@
   }
   let state='idle', mode='demo', offHook=false, session=0, stream=null, cameraInput=null, microphoneInput=null, recorder=null, recordStream=null;
   let audioContext=null, analyser=null, audioNode=null, elapsed=0, started=0, interval=null;
-  let pending=null, recordParts=[], stopPromise=null, sessionSettings=null, sessionId='', snapshots=[], snapIndex=0;
+  let pending=null, recordParts=[], stopPromise=null, sessionSettings=null, sessionId='', snapshots=[], snapIndex=0, ticketSnapshot=null, ticketPhotoMoment='';
   let selectedClip=null, lastReceipt=null, playbackURL=null, currentView='booth', wakeLock=null, cameraBusy=false;
   let settingsSaving=false;
   let thankTime=0, stopInFlight=false, tabAllowed=true, ready=false;
@@ -312,19 +312,24 @@
       if(currentView!=='booth'||state!=='idle'||document.hidden)return;
     }
     session++;const run=session;sessionSettings=C.safeSettings(settings);sessionDeliveryScenario=$('deliveryScenario').value;
-    pending=null;selectedClip=null;elapsed=0;snapshots=[];snapIndex=0;stopInFlight=false;
+    pending=null;selectedClip=null;elapsed=0;snapshots=[];snapIndex=0;ticketSnapshot=null;ticketPhotoMoment='';stopInFlight=false;
     go('booth');setState('greeting');await ensureAudio();await wake();
     // Only a cue and text greeting in this version; custom voice greetings are not implemented.
     await wait(100);if(run!==session||state!=='greeting')return;
     setState('countdown');
-    for(let i=sessionSettings.countdown;i>=1;i--){$('stateTitle').textContent=String(i);await wait(1000);if(run!==session||state!=='countdown')return;}
+    for(let i=sessionSettings.countdown;i>=1;i--){$('stateTitle').textContent=String(i);if(i===sessionSettings.ticketCaptureSecond)captureTicketStill('T-'+i);await wait(1000);if(run!==session||state!=='countdown')return;}
     tone();await wait(320);if(run!==session||state!=='countdown')return;
     try{
-      if(mode==='real')beginRecorder();
+      if(mode==='real'){if(!ticketSnapshot)captureTicketStill('REC START');beginRecorder();}
       started=performance.now();setState('recording');renderer.recording=true;
       $('audioWarning').textContent=mode==='demo'?zh.demo:zh.actual;
       recordTick();interval=setInterval(recordTick,70);
     }catch(e){cleanupRecorder();showError('Recording could not start: '+e.message);}
+  }
+  function captureTicketStill(moment){
+    if(ticketSnapshot||!cameraReady()||mode!=='real')return;
+    try{ticketSnapshot=RetroTicketPhoto.capture(renderer.snapshot());ticketPhotoMoment=moment;log('ticket_photo_captured',{moment,format:'jpeg',width:512,height:448});}
+    catch(e){log('ticket_photo_capture_failure',{reason:String(e?.name||'Error')});}
   }
   function beginRecorder(){
     const canvasStream=$('cameraCanvas').captureStream(30);
@@ -385,7 +390,7 @@
       pending={id:sessionId,seq,createdAt:new Date().toISOString(),kind:blob?'real':'demo',durationMs:Math.round(elapsed),
         cloud:blob?sessionCloud:null,mime:blob?.type||null,sizeBytes:blob?.size||0,blob,sha256,validation,interrupted,interruptionReason:reason,
         title:sessionSettings.title,eventDate:sessionSettings.date,settings:C.safeSettings(sessionSettings),captureLook:RetroEffects.resolve(sessionSettings),effectEngine:'shared-grade-v1',thumbnail:renderer.thumbnail(),
-        rawSnapshot:best.toDataURL('image/jpeg',.85),uploadState:'not_configured',printState:'not_connected',
+        rawSnapshot:best.toDataURL('image/jpeg',.85),ticketSnapshot,ticketPhotoMoment,uploadState:'not_configured',printState:'not_connected',
         lifecycle:'active',guestPermission:'private',moderation:'pending',showAfter:Date.now()+sessionSettings.showDelay*1000,privacyRevision:0,
         simulation:{upload:simulations.offline?'simulated_pending':'simulated_ready',print:simulations.failPrint?'simulated_pending':'simulated_complete'}};
       pending.deliverySnapshot=RetroDelivery.snapshot(pending,C.qrPayload(pending.id,pending.cloud));
@@ -431,7 +436,7 @@
   }
   async function displayReceipt(clip){
     await Receipt.prepare(clip.settings);
-    const image=new Image();image.src=clip.rawSnapshot;await Promise.race([image.decode(),wait(5000).then(()=>{throw new Error('Receipt image decode timed out.');})]);
+    const image=new Image();image.src=clip.ticketSnapshot||clip.rawSnapshot;await Promise.race([image.decode(),wait(5000).then(()=>{throw new Error('Receipt image decode timed out.');})]);
     const c=document.createElement('canvas');c.width=image.width;c.height=image.height;c.getContext('2d').drawImage(image,0,0);
     lastReceipt={clip,source:c,settings:clip.settings};$('receiptDownload').disabled=false;Receipt.render($('receiptCanvas'),clip,c,clip.settings);
     $('receiptStatus').textContent='Message #'+String(clip.seq).padStart(3,'0')+' / preview only';
@@ -451,7 +456,7 @@
     syncAppearanceForm();syncEffects();
     $('eventTitle').value=settings.title;$('eventDate').value=settings.date;$('duration').value=settings.duration;$('preset').value=settings.preset;
     $('grain').value=Math.round(settings.grain*100);$('grainValue').textContent=Math.round(settings.grain*100)+'%';
-    $('countdownSetting').value=settings.countdown;$('returnSeconds').value=settings.returnSeconds;
+    $('countdownSetting').value=settings.countdown;$('returnSeconds').value=settings.returnSeconds;$('ticketCaptureSecond').value=settings.ticketCaptureSecond;
     $('receiptStyle').value=settings.receiptStyle;$('receiptCaption').value=settings.receiptCaption;$('receiptFooter').value=settings.receiptFooter;draftLogo=settings.logoData;
     $('showEnabled').checked=settings.showEnabled;$('showDelay').value=settings.showDelay;
     $('mirror').checked=settings.mirror;$('osd').checked=settings.osd;$('trigger').value=settings.trigger;$('receiptMode').value=settings.receipt;
@@ -522,7 +527,7 @@
       const native=await nativeDiagnostics();
       let permissions={};
       if(navigator.permissions?.query){for(const name of ['camera','microphone']){try{permissions[name]=(await navigator.permissions.query({name})).state;}catch{permissions[name]='unavailable';}}}
-      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.4-alpha.1',generatedAt:new Date().toISOString(),
+      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.5-alpha.1',generatedAt:new Date().toISOString(),
         notice:'App-scoped diagnostic data, not Android system logcat. Up to 250 sanitized events survive app restarts where browser storage permits. No videos, snapshots, private QR URLs, credentials or device identifiers are intentionally included. Review before sharing.',
         runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
         media:{permissions,cameraReady:cameraReady(),microphoneReady:microphoneReady(),partialPreview:mediaPartiallyReady(),cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
@@ -546,7 +551,7 @@
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.9.4-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.5-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,ticketSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
@@ -606,14 +611,14 @@
       }).catch(()=>{log('tab_lock_unavailable');resolve();});
     });
   }
-  ready=true;log('app_ready',{version:'0.9.4-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
+  ready=true;log('app_ready',{version:'0.9.5-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
   if(surfaceRole==='guest'){openGuest(location.hash.slice(7));}else if(surfaceRole==='show'){go('show');}else{go(new URLSearchParams(location.search).has('setup')?'admin':'booth');}
   if(document.documentElement.dataset.serviceWorker==='true' && location.protocol!=='file:' && 'serviceWorker'in navigator){
     navigator.serviceWorker.register('./sw.js').catch(e=>log('offline_shell_unavailable',{error:e.message}));
   }
   window.RetroApp={
     get status(){return {state,mode,offHook,ready,tabAllowed,clipCount:clips.length,pending:!!pending,view:currentView,renderer:renderer.mode,settings:C.safeSettings(settings),activeLook:RetroEffects.resolve(settings),renderFps:renderer.fps,storageAvailable:store.available,delivery:deliveryStatus()};},
-    get clips(){return clips.map(({blob,rawSnapshot,thumbnail,cloud,deliverySnapshot,...rest})=>({...rest,cloudState:cloud?.status||'off',deliverySnapshot:deliverySnapshot?.online?{online:true,clipId:rest.id}:deliverySnapshot}));},
+    get clips(){return clips.map(({blob,rawSnapshot,ticketSnapshot,thumbnail,cloud,deliverySnapshot,...rest})=>({...rest,cloudState:cloud?.status||'off',deliverySnapshot:deliverySnapshot?.online?{online:true,clipId:rest.id}:deliverySnapshot}));},
     // Operational handlers exposed to aid repeatable QA; no privileged credentials exist in this build.
     hook,start,stop:stopRecording,go,exportDiagnostics,openGuest,applyScreenStyle,enableCamera,disableCamera,saveEffects,saveDeliverySettings,
     get showId(){return showClipId;},get guestId(){return guestId;}
