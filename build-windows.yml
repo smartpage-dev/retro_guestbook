@@ -36,6 +36,7 @@ jobs:
       - name: Repository preflight and fast source checks
         run: |
           git ls-files --error-unmatch src/.htaccess src/desktop-admin.html tools/prepare-desktop.mjs tools/verify-repository.py
+          python tools/check_release_versions.py
           npm run desktop:prepare
           npm test
           python tools/verify-repository.py

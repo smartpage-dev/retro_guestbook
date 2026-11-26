@@ -41,6 +41,7 @@ jobs:
           java-version: '17'
       - name: Prepare assets and run unit contracts
         run: |
+          python tools/check_release_versions.py
           npm run desktop:prepare
           npm test
           npm run test:native-core
