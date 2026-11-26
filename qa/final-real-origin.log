@@ -1,4 +1,0 @@
-unavailable Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:46265/?setup=1
-Call log:
-  - navigating to "http://127.0.0.1:46265/?setup=1", waiting until "load"
-

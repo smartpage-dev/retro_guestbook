@@ -1,7 +1,0 @@
-PASS native bridge begins chunks then finishes
-PASS native chunks are sequenced
-PASS native exported byte count matches
-PASS native completion is reported after finish ack
-PASS native cancellation rejects instead of false success
-PASS no JavaScript runtime errors
-TOTAL 6 PASSED

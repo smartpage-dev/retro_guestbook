@@ -30,6 +30,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Canonical source release integrity (all files and Git tracking)
+        run: |
+          node tools/check-release-integrity.mjs --require-git
       - name: Repository preflight and fast source checks
         run: |
           git ls-files --error-unmatch src/.htaccess src/desktop-admin.html tools/prepare-desktop.mjs tools/verify-repository.py

@@ -60,6 +60,7 @@ with sync_playwright() as p:
     page.wait_for_function('RetroApp.status.mode==="real"')
     check('mic can be attached later',page.evaluate('RetroApp.status.mode==="real"'))
     check('adding microphone does not reopen video',page.evaluate('(n)=>__fx.constraints.filter(c=>c.video!==false).length===n',before))
+    page.wait_for_function('document.querySelector("#micMeter").value>0',timeout=4000)
     check('mic meter has a synthetic source',page.locator('#micMeter').evaluate('node=>node.value>0'))
     page.locator('#releaseMicOnly').click()
     page.wait_for_function('RetroApp.status.mode==="preview"')

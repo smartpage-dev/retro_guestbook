@@ -1,6 +1,6 @@
 # RetroBooth v0.9
 
-Android APK + Windows EXE | GitHub build & device guide
+Android APK + Windows EXE | Independent GitHub builds & device guide
 
 Luce Studio / 0.9.0-alpha.1 / 23 November 2026
 
@@ -19,22 +19,24 @@ Extract RetroBooth_v0.9_Android_Windows_GitHub_Ready.zip. Copy the CONTENTS of i
 
 ## Build source is not a certified event release
 
-The delivered ZIP contains source and automated build gates, not precompiled APK/EXE files. The native toolchains were unavailable in the authoring environment; the first GitHub run must prove compilation and runtime checks. Physical cameras, printers and event endurance require acceptance on each device.
+The delivered ZIP contains source and separate build/verification workflows, not precompiled APK/EXE files. The native toolchains were unavailable in the authoring environment; the first GitHub run must prove compilation and runtime checks. Physical cameras, printers and event endurance require acceptance on each device.
 
 # 01 / Put the project on GitHub
 
-One private repository; no hosting keys in source
+One private repository; three independent manual workflows; no hosting keys in source
 
 1. Extract the ZIP locally. Inside RetroBooth, confirm package.json, src, android, desktop, cloud and the hidden .github folder exist.
 2. In GitHub Desktop create a PRIVATE repository, or select a clearly isolated branch of an existing RetroBooth repository. Copy the project contents into that repository folder.
-3. Check that .github/workflows/build-all.yml is directly below the repository root. Do not upload only the ZIP or put the source under another nested RetroBooth folder.
+3. Check that .github/workflows/build-android.yml, build-windows.yml and verify-all.yml are directly below the repository root. Do not upload only the ZIP or put the source under another nested RetroBooth folder.
 4. Review changes. Never commit guest recordings, cloud config.php, runtime data, device bundles, passwords, keystores or certificates. Commit the source and push.
-5. Ensure the workflow exists on the default branch. Open Actions, choose RetroBooth - Build APK and Windows EXE, then Run workflow.
-6. Leave Build Android and Build Windows enabled. Leave optional Windows ARM64 off unless you need that architecture. Start the run.
+5. Ensure the workflow exists on the default branch. Open Actions, choose RetroBooth - Build Android APK or RetroBooth - Build Windows EXE, then Run workflow. Run RetroBooth - Full Verification separately before event use.
+6. Choose the desired platform workflow independently. Windows ARM64 is optional and off by default. Start the run.
 
 ```text
 repository-root/
-  .github/workflows/build-all.yml
+  .github/workflows/build-android.yml
+  .github/workflows/build-windows.yml
+  .github/workflows/verify-all.yml
   package.json
   src/
   android/
@@ -53,7 +55,7 @@ Check the default branch, hidden .github folder, correct repository root and wri
 
 Programs, unsigned developer outputs and evidence are separate
 
-Open the workflow run summary. First inspect the Verify job, then the platform job you need. Do not treat a missing program or an evidence-only artifact as success.
+Open the workflow run summary. Inspect the chosen platform job; Full Verification runs separately and remains a required acceptance gate before live events. Do not treat a missing program or an evidence-only artifact as success.
 
 | Artifact name (RUN is the run number) | Use |
 | --- | --- |
@@ -221,3 +223,7 @@ npm --prefix desktop run package:win:x64
 ```
 
 See docs/TEST_REPORT.md for executed evidence and explicit non-results, docs/MIGRATION_AND_ROLLBACK.md for preservation rules, SOURCE_PROVENANCE.json for baseline hashes, and docs/PLATFORM_REFERENCES.md for official documentation. Native outputs are available only after their successful platform job.
+
+## Updated workflow instructions (24 Nov 2026)
+
+The workflows are now independent. For exact setup and removal of the old combined workflow, see `docs/SPLIT_WORKFLOWS_SETUP.md`. The historical Word guide may still describe the older combined workflow; use this Markdown guide for GitHub Actions steps.

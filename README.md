@@ -93,3 +93,5 @@ Detailed unchanged cloud and Android printer operation is preserved in `history/
 ## Android camera hotfix (v0.9.1)
 
 See `docs/ANDROID_CAMERA_TROUBLESHOOTING.md`. The Android build has versionCode 10; the same application ID is retained. Both platform workflows remain independent. No real Android camera has been validated by the synthetic tests.
+
+> **v0.9.6 GitHub source sync (26 Nov 2026):** When repairing an incomplete GitHub repository, use the one canonical FULL ROOT ZIP and `SYNC_TO_GITHUB.cmd`; never mix incremental patches. See `docs/ONE_TIME_GITHUB_SOURCE_SYNC_ZH.md`. Four independent GitHub workflows include an automatic fast source preflight on push.

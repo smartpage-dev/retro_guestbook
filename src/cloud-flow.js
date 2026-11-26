@@ -12,7 +12,7 @@ async function authorizeNativeCloud(origin){
 function renderCloud(){
  if(!cloudClient||!$('cloudStatus'))return;
  const c=cloudClient.connection,rows=clips.filter(x=>x.cloud);
- $('cloudStatus').textContent=(c?'CONNECTED / Event: '+(c.eventTitle||c.eventId.slice(0,8))+' / '+c.serverOrigin+' / '+cloudClient.poolCount+' reserved QR links':'LOCAL-ONLY / No working phone QR until Hostinger event connected')+' / '+rows.filter(x=>x.cloud.status==='ready').length+' cloud verified / '+rows.filter(x=>x.cloud.status!=='ready').length+' waiting'+(cloudClient.error?' / '+cloudClient.error:'');
+ $('cloudStatus').textContent=(c?'CONNECTED / '+c.serverOrigin+' / '+cloudClient.poolCount+' reserved QR links':'LOCAL-ONLY for new recordings')+' / '+rows.filter(x=>x.cloud.status==='ready').length+' cloud verified / '+rows.filter(x=>x.cloud.status!=='ready').length+' waiting'+(cloudClient.error?' / '+cloudClient.error:'');
  $('cloudQueue').replaceChildren();
  for(const clip of rows.slice(-30).reverse()){
   const line=document.createElement('div');line.className='cloud-job';const text=document.createElement('span');text.textContent='Message '+clip.seq+' / '+clip.cloud.status+(clip.cloud.lastError?' / '+clip.cloud.lastError:'');line.append(text);
@@ -35,12 +35,6 @@ async function setupCloud(){
  cloudClient=new RetroCloud.Client({store,list:()=>store.list(),change:changeClip,purge:purgeCloudClip,canRun:()=>ready&&tabAllowed&&surfaceRole==='booth'&&state==='idle'&&!settingsSaving&&!cloudClaimBusy&&!document.hidden,onStatus:renderCloud});
  try{await cloudClient.init();}catch(e){cloudClient.error=e.message;renderCloud();}
  async function action(fn){if(state!=='idle'||settingsSaving||cloudClaimBusy){toast('Finish the current session first.');return;}const buttons=$('cloudCard').querySelectorAll('button');buttons.forEach(b=>b.disabled=true);settingsSaving=true;renderState();try{await fn();}catch(e){cloudClient.error=e.message;toast(e.message);}finally{settingsSaving=false;buttons.forEach(b=>b.disabled=false);renderState();renderCloud();}}
- $('openCloudAdmin').onclick=()=>{
-   const origin=cloudClient?.connection?.serverOrigin;
-   if(!origin||!/^https:\/\/[^/]+$/.test(origin)){toast('Connect to an approved Hostinger Event first.');return;}
-   if(window.RetroExternal?.postMessage){window.RetroExternal.postMessage(JSON.stringify({action:'open-cloud-admin',origin}));return;}
-   window.open(origin+'/admin/','_blank','noopener,noreferrer');
- };
  $('cloudConnect').onclick=()=>action(async()=>{const raw=JSON.parse($('cloudBundle').value);const cfg=RetroCloud.config(raw);await authorizeNativeCloud(cfg.serverOrigin);await cloudClient.connect(cfg);$('cloudBundle').value='';toast('Cloud verified. Reserved links are saved locally.');});
  $('cloudRefill').onclick=()=>action(()=>cloudClient.refill());
  $('cloudDisable').onclick=()=>action(()=>cloudClient.disable());

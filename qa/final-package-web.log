@@ -1,5 +1,0 @@
-
-> luce-retrobooth@0.9.0-alpha.1 package:web
-> node tools/package.mjs
-
-Packaged web test distributions into artifacts/

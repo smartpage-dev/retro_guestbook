@@ -42,3 +42,7 @@ test('screen style whitelist',()=>assert.equal(C.safeSettings({screenStyle:'url(
 test('style and camera preset are independent',()=>assert.equal(C.safeSettings({screenStyle:'heritage',preset:'mono'}).preset,'mono'));
 test('style change preserves fixed duration',()=>assert.equal(C.safeSettings({...C.safeSettings({duration:60}),screenStyle:'edge'}).duration,60));
 console.log('TOTAL '+count+' PASSED');
+
+test('ticket 4:3 screenshot is default',()=>assert.equal(C.safeSettings().ticketPhotoAspect,'4:3'));
+test('ticket 16:9 screenshot accepted',()=>assert.equal(C.safeSettings({ticketPhotoAspect:'16:9'}).ticketPhotoAspect,'16:9'));
+test('ticket invalid screenshot ratio rejected',()=>assert.equal(C.safeSettings({ticketPhotoAspect:'3:2'}).ticketPhotoAspect,'4:3'));

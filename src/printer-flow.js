@@ -1,10 +1,11 @@
 /* Only bundled Android can connect SPP. The cloud server never talks to nearby Bluetooth. */
 let printerClient=null,printerActionBusy=false;
-function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. Photo + QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9.5 TEST APK for this pilot.';
+function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. Photo + QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9.6 TEST APK for this pilot.';
  return (s.connected?'CONNECTED (transport only)':'DISCONNECTED')+' / '+(s.pinned||'no pinned device')+' / automatic '+(s.automaticEnabled?'ON':'OFF')+' / fast return '+(s.fastReturnArmed?'OPERATOR RISK ACCEPTED':'OFF; screen QR retained')+' / no electronic paper confirmation'+(s.error?' / '+s.error:'');}
 function renderPrinter(){if(!$('printerStatus'))return;$('printerStatus').textContent=printerText();const available=!!printerClient?.available;
  for(const id of ['printerPermission','printerSettings','printerList','printerPin','printerConnect','printerTest','printerTestPhoto','printerEnableAuto','printerDisableAuto','printerManual','printerReprint','printerObserve','printerFastOff','printerRefresh'])$(id).disabled=!available||printerActionBusy;
  $('printerDisconnect').disabled=!available;
+ if($('receiptTestPrint')){const connected=available&&printerClient?.status?.connected===true;for(const id of ['receiptTestPrint','receiptTestQR'])$(id).disabled=!connected||printerActionBusy;}
 }
 function refreshPrinterClips(){
  const selected=$('printerClip').value;$('printerClip').replaceChildren(new Option('Choose a saved cloud recording',''));
@@ -54,7 +55,28 @@ function setupPrinter(){
  act('printerEnableAuto',async()=>{await printerClient.call('automatic',{enabled:true},60000);});
  act('printerDisableAuto',async()=>{await printerClient.call('automatic',{enabled:false});});
  act('printerTest',async()=>{const r=await printerClient.call('test',{waitMs:15000},90000);$('printerNotice').textContent='QR-only diagnostic ticket '+r.jobId+' / '+r.state+'. TEST QR is NOT a video link and does not unlock fast return.';});
- act('printerTestPhoto',async()=>{if(!cameraReady())throw new Error('Apply Camera first in 02 / DEVICE CHECK before printing a LIVE photo.');const photo=RetroTicketPhoto.raster(renderer.snapshot());const r=await printerClient.call('test',{...photo,photoMoment:'TEST LIVE',waitMs:15000},90000);if(r?.photoIncluded!==true)throw new Error('Printer did not acknowledge the image layout. Inspect paper; do not automatically repeat.');$('printerNotice').textContent='LIVE photo + diagnostic QR test '+r.jobId+' / '+r.state+'. Inspect paper and scan the TEST QR; no real video link.';log('ticket_photo_test_sent',{state:r.state,bytes:r.bytes||0});});
+ act('printerTestPhoto',async()=>{if(!cameraReady())throw new Error('Apply Camera first in 02 / DEVICE CHECK before printing a LIVE photo.');const photo=RetroTicketPhoto.raster(renderer.snapshot(),settings.ticketPhotoAspect);const r=await printerClient.call('test',{...photo,...RetroPrinter.ticketDesign(settings),photoMoment:'TEST LIVE',waitMs:15000},90000);if(r?.photoIncluded!==true)throw new Error('Printer did not acknowledge the image layout. Inspect paper; do not automatically repeat.');$('printerNotice').textContent='LIVE photo + diagnostic QR test '+r.jobId+' / '+r.state+'. Inspect paper and scan the TEST QR; no real video link.';log('ticket_photo_test_sent',{state:r.state,bytes:r.bytes||0});});
+ // Section 04 is a real native test, NOT an image download or fake print confirmation.
+ async function testFromReceipt(withPhoto){
+  await printerOperation(async()=>{
+   const notice=$('receiptTestNotice');notice.textContent='Preparing '+(withPhoto?'photo + QR':'QR-only')+' diagnostic ticket...';
+   try{
+    if(!printerClient?.available||!printerClient.status.connected)throw new Error('Connect a paired/pinned Bluetooth SPP printer in 08 first.');
+    const draft=C.safeSettings({...settings,...designForm(),title:$('eventTitle').value,date:$('eventDate').value,receipt:$('receiptMode').value});
+    const live=cameraReady();
+    const image=withPhoto&&draft.receipt!=='qr'?RetroTicketPhoto.raster(renderer.snapshot(),draft.ticketPhotoAspect):{};
+    // Even when the real event is configured photo-only, the diagnostic always has a non-working test QR.
+    const moment=image.photoBase64?(live?'TEST LIVE':'TEST SAMPLE'):undefined;
+    const result=await printerClient.call('test',{...image,...RetroPrinter.ticketDesign(draft),...(moment?{photoMoment:moment}:{}),waitMs:15000},90000);
+    if(result.state!=='sent_unconfirmed'||Boolean(result.photoIncluded)!==Boolean(image.photoBase64))throw new Error('Printer result requires manual paper inspection. Never automatically repeat an uncertain send.');
+    notice.textContent='Sent (paper unconfirmed): '+(image.photoBase64?(live?'LIVE ':'SAMPLE ')+draft.ticketPhotoAspect+' photo + ':'')+'TEST QR. Ticket '+result.jobId+'. Check image proportions and SCAN the printed QR. No video link.';
+    log('receipt_test_ticket_sent',{state:result.state,hasPhoto:!!image.photoBase64,aspect:draft.ticketPhotoAspect,live,bytes:result.bytes||0});
+   }catch(e){notice.textContent='TEST NOT CONFIRMED: '+e.message;throw e;}
+  });
+ }
+ $('receiptTestPrint').onclick=()=>testFromReceipt(true);
+ $('receiptTestQR').onclick=()=>testFromReceipt(false);
+ $('receiptPrinterSetup').onclick=()=>{const card=$('printerCard');if(card){card.scrollIntoView({behavior:'smooth',block:'start'});card.querySelector('summary')?.setAttribute('aria-expanded','true');}};
  $('printerClipRefresh').onclick=()=>refreshPrinterClips();
  act('printerManual',async()=>{await printSavedGuest($('printerClip').value);});
  act('printerReprint',async()=>{await printSavedGuest($('printerClip').value,true);});

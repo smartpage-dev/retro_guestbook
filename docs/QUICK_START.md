@@ -1,6 +1,6 @@
 # RetroBooth v0.9 - Web and cloud quick start
 
-This is the web/cloud distribution. It is NOT an APK or Windows EXE. Build those using the complete Android/Windows GitHub source package and `.github/workflows/build-all.yml`.
+This is the web/cloud distribution. It is NOT an APK or Windows EXE. Build those using the complete Android/Windows GitHub source package and `.github/workflows/build-android.yml` or `.github/workflows/build-windows.yml`.
 
 ## Local webcam package
 

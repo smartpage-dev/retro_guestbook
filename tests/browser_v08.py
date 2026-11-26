@@ -1,4 +1,4 @@
-"""v0.8 UI tests with explicit MOCK native bridge, mock cloud/IDB and synthetic A/V.
+"""Legacy v0.8 flows revalidated against the v0.9.6 PHOTO+QR native contract;
 This is not Android execution, Bluetooth transport or paper output validation.
 """
 from pathlib import Path
@@ -32,7 +32,7 @@ window.RetroPrinterNative={postMessage:async raw=>{const m=JSON.parse(raw);__np.
   if(!__np.connected||m.automatic&&!__np.automaticEnabled)error='Printer disconnected or automatic permission off.';
   else{const old=__np.jobs.find(j=>j.id===m.jobId);const dup=!!old||__np.duplicate;
    if(!old)__np.jobs.push({id:m.jobId,clip:m.clipId,state:__np.state,label:m.label,kind:'guest',created:Date.now(),parent:m.parent,payload:m.payload});
-   d={jobId:m.jobId,clipId:m.clipId,urlHash:__np.badHash?'bad':await RetroPrinter.hash(m.payload),state:__np.state,duplicate:dup,transport:'android_secure_spp',simulated:false,paperConfirmed:false,fastReturnEligible:__np.fast&&!dup,status:mockStatus()};
+   d={jobId:m.jobId,clipId:m.clipId,urlHash:__np.badHash?'bad':await RetroPrinter.hash(m.payload),state:__np.state,duplicate:dup,transport:'android_secure_spp',simulated:false,paperConfirmed:false,photoIncluded:!!m.photoBase64,fastReturnEligible:__np.fast&&!dup,status:mockStatus()};
   }
  }
  if(m.op==='print'&&__np.delay)await new Promise(r=>setTimeout(r,__np.delay));
@@ -54,7 +54,7 @@ with sync_playwright() as pw:
  if args.group=='printer-ui':
   check('browser truthfully reports native APK required','no native Bluetooth bridge' in p.locator('#printerStatus').inner_text())
   for id in ['printerConnect','printerManual','printerReprint','printerTest','printerObserve','printerPin']:check(id+' disabled without native',p.locator('#'+id).is_disabled())
-  check('QR-only limit visible','no snapshot' in p.locator('#printerCard').inner_text())
+  check('photo + QR pilot is described honestly','384-dot monochrome guest snapshot' in p.locator('#printerCard').inner_text() and 'No cutter' in p.locator('#printerCard').inner_text())
   check('paper status warning visible','paper sensor' in p.locator('#printerCard').inner_text())
   for w,h in [(1920,1080),(1440,1000),(800,720),(390,844),(320,720)]:
    p.set_viewport_size({'width':w,'height':h});p.locator('#printerCard').scroll_into_view_if_needed();p.wait_for_timeout(100)
@@ -77,7 +77,7 @@ with sync_playwright() as pw:
    check('automatic job ID equals local clip ID',p.evaluate('__np.calls.find(c=>c.op==="print").jobId===__fx.clips[0].id'))
    p.set_viewport_size({'width':1920,'height':1080});p.screenshot(path=str(Q/'v08-native-simulated-fallback.png'));leave(p)
    p.evaluate('__np.fast=true');capture(p);state(p,'idle')
-   check('accepted native send returns without QR',p.locator('#deliveryOverlay').is_hidden())
+   check('explicit fast return acceptance is transport success, never confirmed paper',p.evaluate('RetroApp.clips.at(-1).printTicket.paperConfirmed===false'))
    check('fast result never records printed-confirmed',p.evaluate('RetroApp.clips.at(-1).printState==="sent_unconfirmed"'))
    p.evaluate('RetroApp.go("admin");RetroApp.saveDeliverySettings({postRecordMode:"both"})');capture(p);state(p,'qr');check('always-screen overrides accepted native send',p.evaluate('RetroApp.status.delivery.reason==="always_screen"'));leave(p)
    p.evaluate('RetroApp.go("admin");RetroApp.saveDeliverySettings({postRecordMode:"smart"});__np.duplicate=true');capture(p);state(p,'qr');check('duplicate acknowledgement cannot hide QR',p.evaluate('RetroApp.status.delivery.route==="qr"'));leave(p)

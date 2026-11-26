@@ -46,6 +46,29 @@ public class TicketCoreTest {
   check("same photo layout intentional reprint preserves fingerprint",new QrTicket(id(61),id(60),url,"47",id(60),"guest",origin,pixels,"T-2").fingerprint.equals(photo.fingerprint));
   byte[] modified=Arrays.copyOf(pixels,pixels.length);modified[0]^=1;
   check("changed snapshot changes print identity",!new QrTicket(id(62),id(60),url,"47",id(60),"guest",origin,modified,"T-2").fingerprint.equals(photo.fingerprint));
+  // v0.9.6 printed ticket supports physically different 4:3/16:9 photo heights, retaining native QR.
+  byte[] p43=new byte[384*288/8];Arrays.fill(p43,(byte)0xAA);
+  QrTicket t43=new QrTicket(id(501),id(501),url,"47","","guest",origin,p43,"T-2",QrTicket.PHOTO_ENCODING_43,288,"ALEX & SAM","THANK YOU","LUCE STUDIO","ticket");
+  check("4:3 profile is 384x288 1bpp",t43.hasPhoto&&t43.photoHeight==288&&t43.photoEncoding.equals(QrTicket.PHOTO_ENCODING_43));
+  check("4:3 GS v0 image uses correct height bytes",new String(t43.bytes,StandardCharsets.ISO_8859_1).contains("\u001dv0\u0000\u0030\u0000\u0020\u0001"));
+  check("4:3 retains ORIGINAL private native QR",Arrays.equals(qrBytes(t43.bytes),url.getBytes(StandardCharsets.US_ASCII)));
+  String str43=new String(t43.bytes,StandardCharsets.ISO_8859_1);
+  check("04 paper title caption footer included",str43.contains("ALEX & SAM")&&str43.contains("THANK YOU")&&str43.contains("LUCE STUDIO"));
+  check("04 cinema paper style header",str43.contains("CINEMA MEMORY TICKET"));
+  check("4:3 raster only changes photo size, not QR payload",str43.contains("SNAPSHOT T-2"));
+  byte[] p169=new byte[384*216/8];Arrays.fill(p169,(byte)0x55);
+  QrTicket t169=new QrTicket(id(502),id(502),url,"47","","guest",origin,p169,"T-1",QrTicket.PHOTO_ENCODING_169,216,"","CAPTION","FOOTER","classic");
+  check("16:9 profile is 384x216 1bpp",t169.hasPhoto&&t169.photoHeight==216&&t169.photoEncoding.equals(QrTicket.PHOTO_ENCODING_169));
+  check("16:9 GS v0 correct height bytes",new String(t169.bytes,StandardCharsets.ISO_8859_1).contains("\u001dv0\u0000\u0030\u0000\u00d8\u0000"));
+  check("16:9 retains native private QR",Arrays.equals(qrBytes(t169.bytes),url.getBytes(StandardCharsets.US_ASCII)));
+  QrTicket sample=new QrTicket(id(503),id(503),"https://example.invalid/retrobooth-printer-test/"+id(503),"0","","test","",p169,"TEST SAMPLE",QrTicket.PHOTO_ENCODING_169,216,"TITLE","CAPTION","FOOTER","minimal");
+  check("04 sample test clearly not real video",new String(sample.bytes,StandardCharsets.ISO_8859_1).contains("PRINTER TEST - NOT A VIDEO")&&new String(sample.bytes,StandardCharsets.ISO_8859_1).contains("SNAPSHOT TEST SAMPLE"));
+  check("style caption changes fingerprint",!new QrTicket(id(504),id(502),url,"47",id(502),"guest",origin,p169,"T-1",QrTicket.PHOTO_ENCODING_169,216,"","NEW CAPTION","FOOTER","classic").fingerprint.equals(t169.fingerprint));
+  rejects("invalid width/ratio profile fails closed",()->new QrTicket(id(505),id(505),url,"47","","guest",origin,p169,"T-1",QrTicket.PHOTO_ENCODING_43,216,"","","","classic"));
+  rejects("wrong image payload byte length fails closed",()->new QrTicket(id(506),id(506),url,"47","","guest",origin,p43,"T-1",QrTicket.PHOTO_ENCODING_169,216,"","","","classic"));
+  rejects("printable label cannot contain ESC control injection",()->new QrTicket(id(507),id(507),url,"47","","guest",origin,p43,"T-2",QrTicket.PHOTO_ENCODING_43,288,"HELLO\u001b@","","","classic"));
+  rejects("no image rejects spurious ratio metadata",()->new QrTicket(id(508),id(508),url,"47","","guest",origin,null,"",QrTicket.PHOTO_ENCODING_43,288,"","","","classic"));
+  // Old QR-only byte stream and 384x336 fingerprints validated earlier in same test.
   rejects("reject too-short raster",()->new QrTicket(id(63),id(63),url,"47","","guest",origin,new byte[10],"T-2"));
   rejects("reject invalid moment",()->new QrTicket(id(64),id(64),url,"47","","guest",origin,pixels,"\u001b@"));
   rejects("reject moment without raster",()->new QrTicket(id(65),id(65),url,"47","","guest",origin,null,"T-2"));

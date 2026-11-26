@@ -1,4 +1,4 @@
-"""Check RetroBooth v0.9.1 repository shape and three independent workflows.
+"""Check RetroBooth v0.9.6 repository shape and three independent workflows.
 This is a source-contract check, not proof of native compilation.
 """
 from pathlib import Path
@@ -8,9 +8,13 @@ required = [
     '.github/workflows/build-android.yml',
     '.github/workflows/build-windows.yml',
     '.github/workflows/verify-all.yml',
+    '.github/workflows/source-preflight.yml',
+    'tools/check-release-integrity.mjs', 'tools/sync-release-to-repo.mjs',
+    'RELEASE_SOURCE_SHA256.json', 'SYNC_TO_GITHUB.cmd',
     'src/.htaccess', 'src/desktop-admin.html', 'src/diagnostics.js', 'tests/diagnostics.test.cjs',
     'tests/media_separation.test.cjs','tests/browser_v093_separated.py','docs/ANDROID_MEDIA_V093.md',
     'tests/browser_v094_style_fit.py','docs/MODERN_CRT_V094.md',
+    'tests/browser_v096_receipt_printer.py','docs/RECEIPT_PRINT_V096_ZH.md','src/ticket-photo.js',
     'tools/prepare-desktop.mjs',
     'desktop/main.cjs', 'desktop/package.json',
     'desktop/electron-builder.cjs', 'desktop/resources/icon.ico',
@@ -37,6 +41,10 @@ for label, text, tokens in [
         assert token in text, f'{label}: missing {token}'
     assert not re.search(r'continue-on-error:\s*true', text), f'{label}: test bypass forbidden'
     assert '    needs: verify' not in text, f'{label}: platform build should not depend on shared Verify'
+assert 'versionCode 15' in (R/'docs/ANDROID_QUICK_START.md').read_text(), 'Current Android quick start must say versionCode 15'
+assert 'push:' in (R/'.github/workflows/source-preflight.yml').read_text(), 'Fast source preflight must run on push.'
+for wf in ['build-android.yml', 'build-windows.yml', 'verify-all.yml', 'source-preflight.yml']:
+    assert 'check-release-integrity.mjs --require-git' in (R/'.github/workflows'/wf).read_text(), f'Integrity guard missing: {wf}'
 assert 'retrobooth://app' in (R/'cloud/retrobooth_private/config.example.php').read_text()
 assert not (R/'.github/workflows/build-all.yml').exists(), 'Remove legacy combined workflow to avoid duplicate/confusing builds.'
-print('Independent Android, Windows and Full Verify workflow contracts passed (not native compilation).')
+print('Independent Android, Windows, Full Verify, and automatic Fast Source Preflight contracts passed (not native compilation).')

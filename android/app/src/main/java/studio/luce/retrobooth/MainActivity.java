@@ -153,7 +153,7 @@ public final class MainActivity extends Activity {
                         String data=message.getData();if(data==null||data.length()>30000)return;
                         JSONObject command=new JSONObject(data);
                         // QR-only control commands remain 4 KiB. Only the two print operations
-                        // may carry an explicitly bounded 384x336 1bpp raster (~22 KiB base64).
+                        // may carry an explicitly bounded 384x216/288/336 1bpp raster (up to ~22 KiB base64).
                         if(data.length()>4096&&!("print".equals(command.optString("op"))||"test".equals(command.optString("op"))))return;
                         printer.handle(command,reply);
                     }catch(Exception e){toast("Printer request rejected.");}

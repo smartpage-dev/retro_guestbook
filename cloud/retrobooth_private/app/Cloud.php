@@ -27,26 +27,9 @@ final class CloudRepo {
         if (!$real || !$pub || $real===$pub || str_starts_with($real,$pub.'/')) rb_fail(503,'data_must_be_outside_public_root');
         if (is_link($this->root)) rb_fail(503,'symlink_data_root_not_supported');
     }
-    public function eventDir(string $eventId): string {
-        if (!preg_match('/^[a-f0-9]{32}$/D',$eventId)) rb_fail(400,'invalid_event_id');
-        return $this->root.'/events/'.$eventId;
-    }
-    public function path(string $id,?string $eventId=null): string {
+    public function path(string $id): string {
         if (!preg_match('/^[a-f0-9]{32}$/D',$id)) rb_fail(400,'invalid_clip_id');
-        // Read existing v0.7-v0.9.3 clips in their original flat storage location.
-        // All NEW uploads go to /events/<event-id>/clips/<clip-id>/.
-        $legacy=$this->root.'/clips/'.$id;
-        if (is_dir($legacy) || $eventId===null) return $legacy;
-        return $this->eventDir($eventId).'/clips/'.$id;
-    }
-    public function archiveDir(string $eventId): string {return $this->eventDir($eventId).'/archives';}
-    public function archivePath(string $eventId,string $archiveId,int $part): string {
-        if (!preg_match('/^[a-f0-9]{32}$/D',$archiveId)||$part<1||$part>100) rb_fail(400,'invalid_archive_part');
-        return $this->archiveDir($eventId).'/'.$archiveId.'-part-'.str_pad((string)$part,3,'0',STR_PAD_LEFT).'.zip';
-    }
-    public function clearArchiveFiles(string $eventId,string $archiveId): void {
-        if (!preg_match('/^[a-f0-9]{32}$/D',$archiveId)) return;
-        foreach (glob($this->archiveDir($eventId).'/'.$archiveId.'-part-*.zip')?:[] as $file) if (is_file($file)) @unlink($file);
+        return $this->root.'/clips/'.$id;
     }
     public function persist(array $s): void { rb_write($this->root.'/state.json',json_encode($s,JSON_THROW_ON_ERROR|JSON_UNESCAPED_SLASHES)); }
     public function transaction(callable $fn): mixed {
@@ -65,8 +48,8 @@ final class CloudRepo {
             return $value;
         } finally { flock($lock,LOCK_UN); fclose($lock); }
     }
-    public function removeMedia(string $id,?string $eventId=null): bool {
-        $dir=$this->path($id,$eventId); if (!is_dir($dir)) return true;
+    public function removeMedia(string $id): bool {
+        $dir=$this->path($id); if (!is_dir($dir)) return true;
         $ok=true;
         foreach (glob($dir.'/*')?:[] as $file) {
             if (is_dir($file)) { $ok=false; continue; }
@@ -82,21 +65,9 @@ final class CloudRepo {
             $c['permission']='hidden';$c['moderation']='pending';$c['revision']++;
             $c['purge']='pending';$c['devicePurgeAck']=false;
             $c['chunks']=[]; unset($c['sourceId'],$c['seq']);
-            // Drive is an OPTIONAL mirror. Queue remote deletion durably; the private
-            // Drive CLI worker performs it. Until then an external Drive copy may remain.
-            if((!empty($c['driveSync']['fileId'])||!empty($c['driveSync']['session']))&&!($c['driveSync']['deleted']??false)) {
-                $c['driveSync']['status']='delete_pending';
-                $c['driveSync']['updatedAt']=time();
-            }
-            $e=&$s['events'][$c['eventId']];
-            if (isset($e['archive']) && in_array($c['id'],$e['archive']['clipIds']??[],true)) {
-                $archiveId=$e['archive']['id'];
-                $e['archive']['status']='stale';$e['archive']['shareHash']='';$e['archive']['shareNonce']='';$e['archive']['error']='A recording was deleted. Rebuild the ZIP before sharing.';
-                $this->clearArchiveFiles($c['eventId'],$archiveId);
-            }
             $this->persist($s); // revoke access durably BEFORE unlinking any media.
         }
-        if ($this->removeMedia($id,$c['eventId'])) $c['purge']='complete';
+        if ($this->removeMedia($id)) $c['purge']='complete';
     }
     public function cleanup(): array {
         return $this->transaction(function(array &$s) {
@@ -105,7 +76,7 @@ final class CloudRepo {
                 $e=$s['events'][$c['eventId']];
                 if ($c['status']==='deleted' || $e['expiresAt']<=time()) { $this->tombstone($s,$id,$c['deleteReason']??'expired');$n++; }
                 elseif ($c['status']==='uploading' && ($c['updatedAt']??$c['createdAt'])<time()-86400) {
-                    $this->removeMedia($id,$c['eventId']);$c['chunks']=[];$c['updatedAt']=time();$stale++;
+                    $this->removeMedia($id);$c['chunks']=[];$c['updatedAt']=time();$stale++;
                 }
             } unset($c);
             foreach ($s['rate'] as $k=>$r) if ($r['at']<time()-600) unset($s['rate'][$k]);
@@ -143,53 +114,6 @@ final class CloudApi {
             if (count($s['rate'])>2048) {uasort($s['rate'],fn($a,$b)=>$a['at']<=>$b['at']);$s['rate']=array_slice($s['rate'],-1024,null,true);}
         });
     }
-    private function archiveStatus(array $event,bool $client=false): array {
-        $a=$event['archive']??null;
-        if(!$a)return ['status'=>'none','eventId'=>$event['id'],'eventTitle'=>$event['title'],'parts'=>[]];
-        $result=['status'=>$a['status'],'eventId'=>$event['id'],'eventTitle'=>$event['title'],
-            'count'=>$a['count']??0,'bytes'=>$a['bytes']??0,'parts'=>($a['status']==='ready'?$a['parts']:[]),
-            'createdAt'=>$a['createdAt']??null,'completedAt'=>$a['completedAt']??null,
-            'shareActive'=>($a['shareHash']??'')!==''&&($a['shareExpiresAt']??0)>time(),
-            'shareExpiresAt'=>$a['shareExpiresAt']??0];
-        if(!$client)$result['error']=$a['error']??'';
-        return $result;
-    }
-    private function clientAuth(array $s,string $token): array {
-        if (!preg_match('/^([a-f0-9]{32})\.([A-Za-z0-9_-]{32})$/D',$token,$m)) rb_fail(401,'invalid_client_link');
-        foreach($s['events'] as $e){$a=$e['archive']??null;
-            if (($a['id']??null)!==$m[1])continue;
-            if (($a['status']??'')!=='ready'||($a['shareHash']??'')===''||($a['shareExpiresAt']??0)<=time()||$e['expiresAt']<=time())rb_fail(410,'client_share_unavailable');
-            if(!hash_equals($a['shareHash'],rb_hash($m[2])))rb_fail(401,'invalid_client_link');
-            return [$e,$a];
-        }
-        rb_fail(401,'invalid_client_link');
-    }
-    private function archiveGrant(array $event,array $archive): array {
-        // A one-hour HttpOnly download grant lets clients fetch several independent ZIP
-        // parts without repeatedly opening their private invite. Revocation is checked
-        // on EVERY new download request, regardless of cookie expiry.
-        $expiry=min(time()+3600,$archive['shareExpiresAt'],$event['expiresAt']);
-        $value=$archive['id'].'.'.$expiry.'.'.$archive['shareNonce'];
-        return ['value'=>$value.'.'.hash_hmac('sha256',$value,$this->cfg['signingKey']),'expires'=>$expiry];
-    }
-    public function archiveDownload(string $archiveId,int $part,string $cookie): array {
-        return $this->repo->transaction(function(array &$s) use($archiveId,$part,$cookie) {
-            if (!preg_match('/^([a-f0-9]{32})\.([0-9]{10})\.([a-f0-9]{16})\.([a-f0-9]{64})$/D',$cookie,$m)
-                ||$m[1]!==$archiveId||(int)$m[2]<time())rb_fail(401,'archive_authorization_required');
-            $message=$m[1].'.'.$m[2].'.'.$m[3];
-            if(!hash_equals(hash_hmac('sha256',$message,$this->cfg['signingKey']),$m[4]))rb_fail(401,'archive_authorization_required');
-            foreach($s['events'] as $e){$a=$e['archive']??null;if(($a['id']??'')!==$archiveId)continue;
-                if(($a['status']??'')!=='ready'||$e['expiresAt']<=time()||($a['shareExpiresAt']??0)<time()
-                    ||!hash_equals((string)($a['shareNonce']??''),$m[3])||($a['shareHash']??'')==='')rb_fail(410,'client_share_unavailable');
-                if($part<1||$part>count($a['parts']??[]))rb_fail(404,'archive_part_not_found');
-                $meta=$a['parts'][$part-1];$path=$this->repo->archivePath($e['id'],$archiveId,$part);
-                if(!is_file($path)||is_link($path)||filesize($path)!==$meta['bytes'])rb_fail(503,'archive_file_missing');
-                $handle=fopen($path,'rb');if(!$handle)rb_fail(503,'archive_file_unavailable');
-                return ['handle'=>$handle,'size'=>$meta['bytes'],'name'=>'RetroBooth_Event_'.substr($e['id'],0,8).'_Part_'.$part.'.zip'];
-            }
-            rb_fail(404,'archive_not_found');
-        });
-    }
     private function clipStatus(array $c,array $e,string $role): array {
         $deleted=$c['status']==='deleted';
         return ['id'=>$c['id'],'status'=>$c['status'],'title'=>$deleted?'':$e['title'],
@@ -207,7 +131,7 @@ final class CloudApi {
         if ($s['clips'][$id]['status']==='deleted') rb_fail(410,'clip_deleted');
     }
     public function handle(string $method,string $route,string $token,array $body=[],string $binary='',string $chunkHash=''): array {
-        if ($route==='/api/health' && $method==='GET') return ['service'=>'RetroBooth','api'=>1,'build'=>'0.9.5-alpha.1','printer'=>'not_connected'];
+        if ($route==='/api/health' && $method==='GET') return ['service'=>'RetroBooth','api'=>1,'build'=>'0.7.0-alpha.1','printer'=>'not_connected'];
         return $this->repo->transaction(function(array &$s) use($method,$route,$token,$body,$binary,$chunkHash) {
             if (str_starts_with($route,'/api/admin/')) {
                 $this->auth($s,$token,'admin');
@@ -216,53 +140,8 @@ final class CloudApi {
                     $title=trim((string)($body['title']??''));$days=(int)($body['days']??30);
                     if ($title==='' || strlen($title)>240 || $days<1 || $days>365) rb_fail(400,'invalid_event');
                     if (count($s['events'])>=100) rb_fail(409,'event_limit');
-                    $id=rb_id();$dir=$this->repo->eventDir($id).'/clips';
-                    if (!is_dir($dir)&&!mkdir($dir,0700,true)) rb_fail(503,'event_storage_unwritable');
-                    $defaultDriveSync=class_exists('DriveBridge')?(new DriveBridge($this->cfg,$this->repo))->autoForNewEvents():false;
-                    $s['events'][$id]=['id'=>$id,'title'=>$title,'expiresAt'=>time()+$days*86400,'issueOpen'=>true,'uploadOpen'=>true,'createdAt'=>time(),'driveEnabled'=>$defaultDriveSync];
+                    $id=rb_id();$s['events'][$id]=['id'=>$id,'title'=>$title,'expiresAt'=>time()+$days*86400,'issueOpen'=>true,'uploadOpen'=>true,'createdAt'=>time()];
                     return $s['events'][$id];
-                }
-                if (preg_match('#^/api/admin/event/([a-f0-9]{32})/archive$#D',$route,$m)) {
-                    $id=$m[1];if (!isset($s['events'][$id])) rb_fail(404,'event_not_found');$e=&$s['events'][$id];
-                    if ($method==='GET') return $this->archiveStatus($e);
-                    if ($method!=='POST') rb_fail(405,'method_not_allowed');
-                    $action=$body['action']??'';
-                    if ($action==='prepare') {
-                        if (($body['confirm']??'')!=='SHARE_ALL_READY') rb_fail(400,'share_confirmation_required');
-                        if ($e['expiresAt']<=time()) rb_fail(410,'event_expired');
-                        if ($e['issueOpen']||$e['uploadOpen']) rb_fail(409,'close_event_reservations_and_upload_drain_first');
-                        $rows=[];$total=0;
-                        foreach($s['clips'] as $clip) {
-                            if ($clip['eventId']!==$id) continue;
-                            if ($clip['status']==='uploading') rb_fail(409,'uploads_not_complete');
-                            if ($clip['status']!=='ready') continue;
-                            $total+=(int)$clip['size'];
-                            if ($total>(int)($this->cfg['maxArchiveBytes']??2147483648)) rb_fail(413,'archive_too_large_use_offline_export');
-                            $rows[]=$clip['id'];
-                        }
-                        if (!count($rows)) rb_fail(409,'no_ready_recordings');
-                        if (count($rows)>1000) rb_fail(413,'too_many_archive_clips');
-                        usort($rows,fn($a,$b)=>($s['clips'][$a]['createdAt']<=>$s['clips'][$b]['createdAt']) ?: strcmp($a,$b));
-                        if (isset($e['archive']['id']))$this->repo->clearArchiveFiles($id,$e['archive']['id']);
-                        $e['archive']=['id'=>rb_id(),'status'=>'queued','clipIds'=>$rows,'count'=>count($rows),
-                            'bytes'=>$total,'createdAt'=>time(),'parts'=>[],'shareHash'=>'','shareNonce'=>'','shareExpiresAt'=>0,'error'=>''];
-                        return $this->archiveStatus($e);
-                    }
-                    if ($action==='create-link') {
-                        if (($body['confirm']??'')!=='SHARE_ALL_READY') rb_fail(400,'share_confirmation_required');
-                        if (($e['archive']['status']??'')!=='ready') rb_fail(409,'archive_not_ready');
-                        $days=(int)($body['days']??7);if($days<1||$days>30)rb_fail(400,'invalid_share_days');
-                        $expiry=min($e['expiresAt'],time()+$days*86400);
-                        if($expiry<=time())rb_fail(410,'event_expired');
-                        $secret=rb_secret();$e['archive']['shareHash']=rb_hash($secret);$e['archive']['shareNonce']=bin2hex(random_bytes(8));
-                        $e['archive']['shareExpiresAt']=$expiry;
-                        return ['shareUrl'=>$this->cfg['publicOrigin'].'/client/index.html?token='.$e['archive']['id'].'.'.$secret,'expiresAt'=>$expiry,'status'=>'ready'];
-                    }
-                    if ($action==='revoke') {
-                        $e['archive']['shareHash']='';$e['archive']['shareNonce']='';$e['archive']['shareExpiresAt']=0;
-                        return $this->archiveStatus($e);
-                    }
-                    rb_fail(400,'invalid_archive_action');
                 }
                 if ($route==='/api/admin/device' && $method==='POST') {
                     $id=(string)($body['eventId']??'');if (!isset($s['events'][$id])) rb_fail(404,'event_not_found');
@@ -278,7 +157,6 @@ final class CloudApi {
                 if (preg_match('#^/api/admin/event/([a-f0-9]{32})$#D',$route,$m) && $method==='POST') {
                     if (!isset($s['events'][$m[1]])) rb_fail(404,'event_not_found');
                     foreach(['issueOpen','uploadOpen'] as $key) if (array_key_exists($key,$body)) $s['events'][$m[1]][$key]=$body[$key]===true;
-                    if(array_key_exists('title',$body)){$name=trim((string)$body['title']);if($name===''||strlen($name)>240)rb_fail(400,'invalid_event_title');$s['events'][$m[1]]['title']=$name;}
                     return $s['events'][$m[1]];
                 }
                 if ($route==='/api/admin/clips' && $method==='POST') {
@@ -293,12 +171,6 @@ final class CloudApi {
                     if ($m[2]==='moderate') {$s['clips'][$id]['moderation']=($body['approved']??false)===true?'approved':'pending';$s['clips'][$id]['revision']++;return ['moderation'=>$s['clips'][$id]['moderation']];}
                     if ($s['clips'][$id]['status']!=='ready') rb_fail(409,'not_ready');return ['mediaGrant'=>$this->mediaGrant($s['clips'][$id])];
                 }
-                rb_fail(404,'not_found');
-            }
-            if (str_starts_with($route,'/api/client/')) {
-                [$event,$archive]=$this->clientAuth($s,$token);
-                if ($route==='/api/client/status' && $method==='GET') return $this->archiveStatus($event,true);
-                if ($route==='/api/client/authorize' && $method==='POST') return ['archiveGrant'=>$this->archiveGrant($event,$archive)];
                 rb_fail(404,'not_found');
             }
             if (str_starts_with($route,'/api/device/')) {
@@ -345,14 +217,14 @@ final class CloudApi {
                     if ($expected<=0||strlen($binary)!==$expected||!preg_match('/^[a-f0-9]{64}$/D',$chunkHash)||!hash_equals($chunkHash,rb_hash($binary))) rb_fail(400,'chunk_length_or_hash_mismatch');
                     if (isset($c['chunks'][$index])) {if ($c['chunks'][$index]!==$chunkHash) rb_fail(409,'chunk_conflict');return ['accepted'=>true,'duplicate'=>true];}
                     if ($c['status']==='ready') rb_fail(409,'already_complete');
-                    $dir=$this->repo->path($id,$c['eventId']);if (!is_dir($dir) && !mkdir($dir,0700,true)) rb_fail(503,'private_storage_unwritable');
+                    $dir=$this->repo->path($id);if (!is_dir($dir) && !mkdir($dir,0700,true)) rb_fail(503,'private_storage_unwritable');
                     rb_write($dir.'/part-'.$index,$binary);$c['chunks'][$index]=$chunkHash;$c['updatedAt']=time();
                     return ['accepted'=>true,'index'=>$index];
                 }
                 if ($op==='complete' && $method==='POST') {
                     if ($c['status']==='ready') return ['ready'=>true,'sha256'=>$c['sha256'],'size'=>$c['size']];
                     if (!isset($c['size'])) rb_fail(409,'initialize_first');
-                    $count=(int)ceil($c['size']/524288);$dir=$this->repo->path($id,$c['eventId']);
+                    $count=(int)ceil($c['size']/524288);$dir=$this->repo->path($id);
                     for($i=0;$i<$count;$i++) if (!isset($c['chunks'][$i])||!is_file($dir.'/part-'.$i)) rb_fail(409,'chunks_missing');
                     $tmp=$dir.'/assembled-'.rb_id();$out=fopen($tmp,'xb');if (!$out) rb_fail(503,'assembly_failed');
                     $ctx=hash_init('sha256');$written=0;
@@ -369,17 +241,7 @@ final class CloudApi {
                     $valid=$c['mime']==='video/mp4'?substr($head,4,4)==='ftyp':substr($head,0,4)==="\x1a\x45\xdf\xa3";
                     if (!$valid) {@unlink($tmp);rb_fail(415,'media_container_signature_invalid');}
                     if (!rename($tmp,$dir.'/video.bin')) rb_fail(503,'media_commit_failed');chmod($dir.'/video.bin',0600);
-                    $c['status']='ready';$c['uploadedAt']=time();$c['revision']++;
-                    // Snapshot is not a live feed. A late verified upload makes an already
-                    // prepared 'all ready videos' bundle incomplete; revoke until rebuilt.
-                    $archive=&$s['events'][$c['eventId']]['archive'];
-                    if (is_array($archive) && in_array($archive['status']??'',['queued','building','ready'],true)
-                        && !in_array($id,$archive['clipIds']??[],true)) {
-                        $archive['status']='stale';$archive['shareHash']='';$archive['shareNonce']='';
-                        $archive['error']='A late video arrived. Rebuild all ZIP parts to include it.';
-                        $this->repo->clearArchiveFiles($c['eventId'],$archive['id']);
-                    }
-                    unset($archive);$this->repo->persist($s);
+                    $c['status']='ready';$c['uploadedAt']=time();$c['revision']++;$this->repo->persist($s);
                     for($i=0;$i<$count;$i++) @unlink($dir.'/part-'.$i);
                     return ['ready'=>true,'sha256'=>$c['sha256'],'size'=>$c['size']];
                 }
@@ -420,7 +282,7 @@ final class CloudApi {
             $message=$m[1].'.'.$m[2].'.'.$m[3];
             if (!hash_equals(hash_hmac('sha256',$message,$this->cfg['signingKey']),$m[4])) rb_fail(401,'media_authorization_required');
             $this->requireAlive($s,$id);$c=$s['clips'][$id];if ($c['status']!=='ready') rb_fail(409,'not_ready');
-            $path=$this->repo->path($id,$c['eventId']).'/video.bin';
+            $path=$this->repo->path($id).'/video.bin';
             if (!is_file($path)||filesize($path)!==$c['size']) rb_fail(503,'media_file_unavailable');
             // Open under metadata lock. Later revocation stops new requests, not bytes already delivered.
             $handle=fopen($path,'rb');if (!$handle) rb_fail(503,'media_file_unavailable');

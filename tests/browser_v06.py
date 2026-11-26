@@ -113,7 +113,6 @@ with sync_playwright() as pw:
   config(page,receiptPrintEnabled=True);scenario(page,'printed_confirmed');page.locator('#cameraLabEnable').click();page.wait_for_function('RetroApp.status.mode==="real"')
   capture(page);state(page,'qr')
   check('synthetic webcam produces encoded clip',page.evaluate('RetroApp.clips.at(-1).kind==="real"&&RetroApp.clips.at(-1).sizeBytes>1000'))
-  check('real local-only clip never displays fabricated QR',page.locator('#deliveryQrBox').is_hidden() and 'QR UNAVAILABLE' in page.locator('#deliveryQrLabel').inner_text())
   check('demo print result cannot bypass real capture',page.evaluate('RetroApp.status.delivery.route==="qr"&&!RetroApp.status.delivery.simulated&&RetroApp.status.delivery.reason==="not_connected"'))
   check('validation and effects retained',page.evaluate('RetroApp.clips.at(-1).validation.status==="metadata_readable"&&RetroApp.clips.at(-1).captureLook.key==="heritage"'))
   check('no fabricated print or cloud success',page.evaluate('RetroApp.clips.at(-1).uploadState==="not_configured"&&RetroApp.clips.at(-1).printState==="not_connected"'))

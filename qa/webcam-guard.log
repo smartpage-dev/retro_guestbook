@@ -1,7 +1,0 @@
-PASS synthetic webcam produces encoded clip
-PASS demo print result cannot bypass real capture
-PASS validation and effects retained
-PASS no fabricated print or cloud success
-PASS no uncaught JS errors
-PASS no external HTTP requests
-TOTAL 6 PASSED

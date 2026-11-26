@@ -6,7 +6,7 @@
   try{if(window.BroadcastChannel)channel=new BroadcastChannel('luce-retrobooth-v05-updates');}catch{}
   function designForm(){return {
     countdown:Number($('countdownSetting').value),returnSeconds:Number($('returnSeconds').value),
-    receiptStyle:$('receiptStyle').value,ticketCaptureSecond:Number($('ticketCaptureSecond').value),receiptCaption:$('receiptCaption').value,receiptFooter:$('receiptFooter').value,
+    receiptStyle:$('receiptStyle').value,ticketCaptureSecond:Number($('ticketCaptureSecond').value),ticketPhotoAspect:$('ticketPhotoAspect').value,receiptCaption:$('receiptCaption').value,receiptFooter:$('receiptFooter').value,
     logoData:draftLogo,showEnabled:$('showEnabled').checked,showDelay:Number($('showDelay').value)
   };}
   async function previewDesign(){
@@ -133,7 +133,7 @@
     $('deleteAck').onchange=()=>$('deleteConfirm').disabled=!$('deleteAck').checked;
     $('deleteCancel').onclick=()=>{if(!deleteBusy){deleteTarget=null;$('deleteDialog').close();}};
     $('deleteDialog').addEventListener('cancel',e=>{if(deleteBusy)e.preventDefault();else deleteTarget=null;});$('deleteConfirm').onclick=confirmDelete;
-    ['receiptStyle','receiptCaption','receiptFooter','receiptMode','eventTitle','eventDate'].forEach(id=>$(id).addEventListener('input',previewDesign));
+    ['receiptStyle','receiptCaption','receiptFooter','receiptMode','eventTitle','eventDate','ticketPhotoAspect'].forEach(id=>$(id).addEventListener('input',previewDesign));
     $('logoFile').onchange=async()=>{
       const file=$('logoFile').files[0];if(!file)return;
       if(!['image/png','image/jpeg'].includes(file.type)||file.size>2*1024*1024){toast('Choose a PNG/JPEG no larger than 2 MB.');return;}

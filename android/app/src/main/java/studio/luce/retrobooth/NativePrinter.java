@@ -55,7 +55,7 @@ public final class NativePrinter {
         try{JSONObject o=new JSONObject();o.put("id",id);o.put("version",1);if(error!=null)o.put("error",error);else o.put("data",data==null?new JSONObject():data);String text=o.toString();activity.runOnUiThread(()->{try{if(!dead)r.postMessage(text);}catch(Exception ignored){}});}catch(Exception ignored){}
     }
     private JSONObject status() throws Exception {
-        JSONObject o=new JSONObject();o.put("available",true);o.put("profile",QrTicket.PROFILE);o.put("permission",permission());o.put("supported",adapter()!=null);o.put("pinned",pinned);o.put("connected",connected());o.put("connectionEpoch",epoch);o.put("busy",busy.get());o.put("automaticEnabled",autoEnabled);o.put("fastReturnArmed",fast.active(pinned,epoch,System.nanoTime()));o.put("paperStatus","unavailable");o.put("qrOnly",false);o.put("photoRasterTestSupported",true);o.put("photoProfile",QrTicket.PHOTO_ENCODING);o.put("error",ledgerError.isEmpty()?problem:ledgerError);
+        JSONObject o=new JSONObject();o.put("available",true);o.put("profile",QrTicket.PROFILE);o.put("permission",permission());o.put("supported",adapter()!=null);o.put("pinned",pinned);o.put("connected",connected());o.put("connectionEpoch",epoch);o.put("busy",busy.get());o.put("automaticEnabled",autoEnabled);o.put("fastReturnArmed",fast.active(pinned,epoch,System.nanoTime()));o.put("paperStatus","unavailable");o.put("qrOnly",false);o.put("photoRasterTestSupported",true);o.put("photoProfile",QrTicket.PHOTO_ENCODING_43+","+QrTicket.PHOTO_ENCODING_169);o.put("error",ledgerError.isEmpty()?problem:ledgerError);
         return o;
     }
     public void handle(JSONObject m,JavaScriptReplyProxy r){
@@ -142,15 +142,17 @@ public final class NativePrinter {
             String job=m.optString("jobId"),clip=m.optString("clipId");
             if(test){job=UUID.randomUUID().toString().replace("-","");clip=job;}
             byte[] photo=null;String moment="";
+            int imageHeight=0;String imageProfile="";
             if(m.has("photoBase64")||m.has("photoEncoding")||m.has("photoMoment")){
-                if(!QrTicket.PHOTO_ENCODING.equals(m.optString("photoEncoding"))||m.optInt("photoWidth")!=QrTicket.PHOTO_WIDTH||m.optInt("photoHeight")!=QrTicket.PHOTO_HEIGHT)
+                imageHeight=m.optInt("photoHeight");imageProfile=m.optString("photoEncoding");
+                if(!QrTicket.validPhotoProfile(imageProfile,m.optInt("photoWidth"),imageHeight))
                     throw new IllegalArgumentException("Unknown raster image profile");
                 String encoded=m.optString("photoBase64");
                 if(encoded.length()<100||encoded.length()>23000||!encoded.matches("[A-Za-z0-9+/]+={0,2}"))throw new IllegalArgumentException("Invalid bounded raster");
                 photo=Base64.getDecoder().decode(encoded);
                 moment=m.optString("photoMoment");
             }
-            ticket=new QrTicket(job,clip,test?"https://example.invalid/retrobooth-printer-test/"+clip:m.optString("payload"),test?"0":m.optString("label"),test?"":m.optString("parent"),test?"test":"guest",origin,photo,moment);
+            ticket=new QrTicket(job,clip,test?"https://example.invalid/retrobooth-printer-test/"+clip:m.optString("payload"),test?"0":m.optString("label"),test?"":m.optString("parent"),test?"test":"guest",origin,photo,moment,imageProfile,imageHeight,m.optString("ticketTitle"),m.optString("ticketCaption"),m.optString("ticketFooter"),m.optString("ticketStyle","classic"));
             if(automatic&&(!ticket.id.equals(ticket.clipId)||!ticket.parent.isEmpty()))throw new IllegalArgumentException();
         }catch(Exception e){reply(r,requestId,null,"Ticket rejected before sending: verify saved cloud QR and bounded photo image profile. No bytes sent.");return;}
         int waitMs=Math.max(1000,Math.min(15000,m.optInt("waitMs",4000)));
@@ -158,7 +160,7 @@ public final class NativePrinter {
         if(automatic&&(deadlineEpoch<=System.currentTimeMillis()||deadlineEpoch>System.currentTimeMillis()+16000)){reply(r,requestId,null,"Expired or invalid automatic print deadline.");return;}
         Runnable send=()->{pendingPrintRequest="";pendingClip="";int left=automatic?(int)Math.min(waitMs,deadlineEpoch-System.currentTimeMillis()):waitMs;if(left<=0){reply(r,requestId,null,"Print deadline expired; no ticket sent.");return;}send(ticket,automatic,left,r,requestId);};
         if(!automatic){pendingPrintRequest=requestId;pendingClip=ticket.clipId;}
-        if(automatic)send.run();else confirm(ticket.parent.isEmpty()?"Send QR ticket?":"Reprint the SAME private link?",test?"DIAGNOSTIC ONLY: this sends a non-working QR"+(ticket.hasPhoto?" plus a LIVE camera photo":"")+". No cutter command. Check real paper after the test.":"Message "+ticket.label+" to pinned printer "+pinned+".\nThis is a PRIVATE owner QR with delete access.\n"+(ticket.parent.isEmpty()?"An existing ticket ID is never automatically sent again.":"The original may already have printed. This intentionally creates another copy of the SAME link."),send,()->{pendingPrintRequest="";pendingClip="";reply(r,requestId,null,"Print cancelled. Nothing queued.");});
+        if(automatic)send.run();else confirm(ticket.parent.isEmpty()?"Send QR ticket?":"Reprint the SAME private link?",test?"DIAGNOSTIC ONLY: this sends a non-working QR"+(ticket.hasPhoto?" plus a "+ticket.photoMoment+" camera photo":"")+". No cutter command. Check real paper after the test.":"Message "+ticket.label+" to pinned printer "+pinned+".\nThis is a PRIVATE owner QR with delete access.\n"+(ticket.parent.isEmpty()?"An existing ticket ID is never automatically sent again.":"The original may already have printed. This intentionally creates another copy of the SAME link."),send,()->{pendingPrintRequest="";pendingClip="";reply(r,requestId,null,"Print cancelled. Nothing queued.");});
     }
     private void send(QrTicket ticket,boolean automatic,int waitMs,JavaScriptReplyProxy r,String requestId){
         if(!active||!connected()||(automatic&&!autoEnabled)||!busy.compareAndSet(false,true)){reply(r,requestId,null,"Printer no longer ready. No ticket queued.");return;}

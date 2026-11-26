@@ -1,9 +1,0 @@
-PASS heritage synthetic media nonempty
-PASS heritage canvas encoding matches picture dimensions
-PASS heritage synthetic clip playback progresses
-PASS edge synthetic media nonempty
-PASS edge canvas encoding matches picture dimensions
-PASS edge synthetic clip playback progresses
-PASS no JavaScript runtime errors
-PASS no external HTTP requests
-TOTAL 8 PASSED

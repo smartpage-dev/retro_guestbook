@@ -1,0 +1,39 @@
+name: RetroBooth - Source Preflight (Fast)
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: retrobooth-source-preflight-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  preflight:
+    name: Verify complete release before native builds
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Check every canonical source hash and Git-tracked path
+        run: node tools/check-release-integrity.mjs --require-git
+      - name: Release versions, assets, contracts and repository shape
+        run: |
+          python tools/check_release_versions.py
+          npm run desktop:prepare
+          npm test
+          npm run test:native-core
+          python tools/verify-repository.py

@@ -1,4 +1,4 @@
-"""Browser/fixture acceptance for the v0.9.5 countdown still and printer image envelope.
+"""Regression of v0.9.5 countdown capture on current v0.9.6 physical 4:3 raster.
 Not actual Android, ESC/POS hardware, paper, or cloud acceptance.
 """
 from pathlib import Path
@@ -41,7 +41,7 @@ with sync_playwright() as pw:
   for(let i=0;i<bin.length;i++){let n=bin.charCodeAt(i);for(let b=0;b<8;b++)ink+=(n>>b)&1;}
   return {width:x.photoWidth,height:x.photoHeight,encoding:x.photoEncoding,moment:x.photoMoment,bytes:bin.length,ink};
  }''')
- check('Test sends EXACT 384x336 1bpp raster',job['width']==384 and job['height']==336 and job['bytes']==16128 and job['encoding']=='escpos-gsv0-384x336-1bpp-v1')
+ check('Test sends EXACT 384x288 1bpp raster',job['width']==384 and job['height']==288 and job['bytes']==13824 and job['encoding']=='escpos-gsv0-384x288-1bpp-v2')
  check('Test still is current LIVE camera frame, not all blank',0<job['ink']<job['width']*job['height'])
  check('Test ticket distinguishes live probe snapshot',job['moment']=='TEST LIVE')
  page.locator('#applyMicOnly').click();page.wait_for_function('RetroApp.status.mode==="real"')

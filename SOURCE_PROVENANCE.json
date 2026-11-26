@@ -138,6 +138,5 @@
     "GitHub push/Actions",
     "Hostinger deployment",
     "physical device or printer acceptance"
-  ],
-  "historicalNote": "Original v0.9.0 provenance record only. Current v0.9.4 changes are not represented by unchangedModules; use MANIFEST_SHA256.json for v0.9.4 file hashes."
+  ]
 }

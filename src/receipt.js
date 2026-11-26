@@ -1,22 +1,24 @@
 /* Screen receipt compositor; native physical ticket uses a separate QR command + the same pixelPhoto dither. */
 (function () {
   'use strict';
-  function pixelPhoto(source) {
-    const low=document.createElement('canvas');low.width=128;low.height=112;
+  const PHOTO_ASPECTS=Object.freeze({'4:3':{width:384,height:288,lowHeight:96},'16:9':{width:384,height:216,lowHeight:72},legacy:{width:384,height:336,lowHeight:112}});
+  function pixelPhoto(source,aspect='4:3') {
+    const p=PHOTO_ASPECTS[aspect];if(!p)throw new Error('Unsupported ticket photo aspect.');
+    const low=document.createElement('canvas');low.width=128;low.height=p.lowHeight;
     const c=low.getContext('2d',{willReadFrequently:true});
-    const cr=RetroCore.cropRect(source.width,source.height,8/7);c.drawImage(source,cr.x,cr.y,cr.w,cr.h,0,0,128,112);
-    const d=c.getImageData(0,0,128,112).data;const gray=new Uint8Array(128*112);const hist=new Uint32Array(256);
+    const cr=RetroCore.cropRect(source.width,source.height,p.width/p.height);c.drawImage(source,cr.x,cr.y,cr.w,cr.h,0,0,128,p.lowHeight);
+    const d=c.getImageData(0,0,128,p.lowHeight).data;const gray=new Uint8Array(128*p.lowHeight);const hist=new Uint32Array(256);
     for(let i=0;i<gray.length;i++){gray[i]=Math.round(.299*d[4*i]+.587*d[4*i+1]+.114*d[4*i+2]);hist[gray[i]]++;}
     let lo=0,hi=255,acc=0;for(let i=0;i<256;i++){acc+=hist[i];if(acc>=gray.length*.02){lo=i;break;}}
     acc=0;for(let i=255;i>=0;i--){acc+=hist[i];if(acc>=gray.length*.02){hi=i;break;}}
-    const out=document.createElement('canvas');out.width=384;out.height=336;const ctx=out.getContext('2d');
-    const img=ctx.createImageData(384,336);const bayer=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+    const out=document.createElement('canvas');out.width=p.width;out.height=p.height;const ctx=out.getContext('2d');
+    const img=ctx.createImageData(p.width,p.height);const bayer=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
     const order=[0,7,3,6,4,1,2,5,8],counts=[9,6,3,0];
-    for(let y=0;y<112;y++)for(let x=0;x<128;x++){
+    for(let y=0;y<p.lowHeight;y++)for(let x=0;x<128;x++){
       const n=hi-lo>10?Math.max(0,Math.min(1,(gray[y*128+x]-lo)/(hi-lo))):gray[y*128+x]/255;
       const level=Math.max(0,Math.min(3,Math.round(n*3+(bayer[(y%4)*4+x%4]/16-.5)*.65)));
       for(let yy=0;yy<3;yy++)for(let xx=0;xx<3;xx++){
-        const index=(((y*3+yy)*384)+x*3+xx)*4;const val=order[yy*3+xx]<counts[level]?0:255;
+        const index=(((y*3+yy)*p.width)+x*3+xx)*4;const val=order[yy*3+xx]<counts[level]?0:255;
         img.data[index]=img.data[index+1]=img.data[index+2]=val;img.data[index+3]=255;
       }
     }
@@ -48,7 +50,7 @@
     text(settings.title,style==='minimal'?28:25,true,3);text(settings.date,16,false,1);
     if(style!=='minimal')text('LOVE, ON TAPE.',14,false,1);
     divider();text(clip.cloud?'PRIVATE VIDEO / KEEP THIS TICKET':'PROTOTYPE / NOT A LIVE TICKET',16,true,1);y+=10;
-    if(photo){c.drawImage(pixelPhoto(source),0,y);y+=350;}
+    if(photo){const image=pixelPhoto(source,settings.ticketPhotoAspect||'legacy');c.drawImage(image,0,y);y+=image.height+14;}
     text(settings.receiptCaption||'A LITTLE LOVE, TO KEEP.',18,true,3);divider();
     text('MESSAGE No. '+String(clip.seq).padStart(3,'0'),25,true,1);
     text('TAPE '+RetroCore.timeLabel(clip.durationMs)+' / '+(clip.kind==='demo'?'DEMO':'LOCAL'),17,false,1);y+=16;

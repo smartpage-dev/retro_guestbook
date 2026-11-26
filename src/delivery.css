@@ -8,6 +8,3 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 @media(max-height:650px) and (orientation:landscape){.delivery-overlay{padding:5%;gap:3%}.delivery-kicker{margin-bottom:8px}.delivery-copy h2{font-size:clamp(20px,2.8vw,34px);margin-bottom:8px}.delivery-copy>p{margin-bottom:7px}.delivery-clock{margin:12px 0;gap:10px}.delivery-qr-box{height:48vh}.delivery-test-label{margin-top:10px;letter-spacing:0}.delivery-ref{padding:4px 8px}}
 @media(max-width:760px){.delivery-settings-grid{grid-template-columns:1fr;gap:0}}
 @media(orientation:portrait){.delivery-overlay{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);text-align:left;padding:4%;gap:3%;align-content:center}.delivery-kicker{font-size:7px;letter-spacing:.6px;margin-bottom:5px}.delivery-copy h2{font-size:16px;letter-spacing:0;margin-bottom:6px}.delivery-copy>p{display:none}.delivery-ref{font-size:9px;padding:3px 5px}.delivery-clock{justify-content:flex-start;margin:8px 0;gap:6px}.delivery-clock strong{font-size:28px}.delivery-clock span{font-size:7px;letter-spacing:0}.delivery-reason{display:none}.delivery-qr-box{height:min(42vw,150px)}.delivery-test-label{margin-top:5px;font-size:7px;letter-spacing:0;line-height:1.4}.delivery-code>p{display:none}}
-
-/* A local-only recording must never display a scannable placeholder QR. */
-.delivery-qr-box[hidden]{display:none!important}

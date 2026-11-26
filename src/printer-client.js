@@ -2,6 +2,8 @@
 (function(root){
  'use strict';
  const PROFILE='native-qr-model2-m-size4-v1';
+ function asciiLabel(value,max){return [...String(value||'')].map(c=>{const n=c.charCodeAt(0);return n>=32&&n<=126?c:'?';}).join('').slice(0,max);}
+ function ticketDesign(s={}){return {ticketTitle:asciiLabel(s.title,60),ticketCaption:asciiLabel(s.receiptCaption,80),ticketFooter:asciiLabel(s.receiptFooter,100),ticketStyle:['classic','ticket','minimal'].includes(s.receiptStyle)?s.receiptStyle:'classic'};}
  function guestTicket(clip,parent=''){
   if(!clip||clip.kind!=='real'||clip.lifecycle==='deleted'||clip.interrupted||clip.validation?.status!=='metadata_readable'||!clip.cloud||clip.settings?.receipt==='photo')throw new Error('Select a saved, non-deleted cloud recording with a QR receipt.');
   const payload=root.RetroCloud.guestURL(clip.cloud),snapshot=clip.deliverySnapshot;
@@ -26,12 +28,13 @@
    if(!isCurrent()||(automatic&&Date.now()>=end))throw new Error('Print hand-off expired before submission.');
    const photo=await root.RetroTicketPhoto.fromClip(clip);
    if(!isCurrent()||(automatic&&Date.now()>=end))throw new Error('Photo preparation took too long; no ticket sent.');
-   const r=await this.call('print',{...t,...photo,automatic,deadlineEpochMs:end,waitMs:Math.max(1000,Math.min(15000,waitMs))},automatic?Math.max(1,end-Date.now()):90000);
+   const design=Object.hasOwn(clip?.settings||{},'ticketPhotoAspect')?ticketDesign(clip.settings):{}; // Old v0.9.5 journal fingerprint must not change.
+   const r=await this.call('print',{...t,...photo,...design,automatic,deadlineEpochMs:end,waitMs:Math.max(1000,Math.min(15000,waitMs))},automatic?Math.max(1,end-Date.now()):90000);
    if((r?.photoIncluded===true)!==Boolean(photo.photoBase64))throw new Error('Native printer photo acknowledgement mismatch. Inspect paper; do NOT automatically retry.');
    if(r?.jobId!==t.jobId||r.clipId!==t.clipId||r.urlHash!==expected||r.transport!=='android_secure_spp'||r.simulated!==false||r.paperConfirmed!==false||!['sent_unconfirmed','failed_before_send','outcome_unknown'].includes(r.state))throw new Error('Mismatched native result. Keep the screen QR; inspect paper and journal before reprinting.');
    if(r.status)this.status=r.status;
    return {...clip.deliverySnapshot,...r,payload:t.payload,nativeValidated:true,fastReturnEligible:r.fastReturnEligible===true&&!r.duplicate};
   }
  }
- root.RetroPrinter={PROFILE,guestTicket,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
+ root.RetroPrinter={PROFILE,guestTicket,ticketDesign,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
 })(typeof window==='undefined'?globalThis:window);

@@ -76,3 +76,8 @@
 No new physical printer driver, remote projector, native recorder or precompiled APK. Reference H5.3 archive could not be retrieved with authorized raw-byte access; its driver was not reimplemented from old summaries.
 
 Older release records remain in history/. They are not current test evidence.
+
+## v0.9.6 source integrity repair (2026-11-26; no app versionCode change)
+- Canonical Git-repository content audit: 190 critical source files with reproducible SHA-256 checks; safe GitHub Desktop source staging helper, plus automatic fast preflight on push.
+- Rebuilt stale package SHA-256 manifest after source/workflow changes; replaced Android artifact metadata's stale versionCode 13 with Gradle-derived versionCode 15.
+- Android, Windows, and Full Verification retain independent manual workflows. No camera/receipt/printer behavioral modifications. Native APK/EXE builds and real thermal printer output remain external acceptance steps.

@@ -1,8 +1,0 @@
-{
-  "status": "unavailable",
-  "passed": 0,
-  "checks": [],
-  "reason": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:47203/?setup=1\nCall log:\n  - navigating to \"http://127.0.0.1:47203/?setup=1\", waiting until \"load\"\n",
-  "errors": [],
-  "scope": "Real localhost and IndexedDB with Chromium fake devices. NOT physical webcam/permissions prompt/Android acceptance."
-}

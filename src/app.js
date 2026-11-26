@@ -328,7 +328,7 @@
   }
   function captureTicketStill(moment){
     if(ticketSnapshot||!cameraReady()||mode!=='real')return;
-    try{ticketSnapshot=RetroTicketPhoto.capture(renderer.snapshot());ticketPhotoMoment=moment;log('ticket_photo_captured',{moment,format:'jpeg',width:512,height:448});}
+    try{ticketSnapshot=RetroTicketPhoto.capture(renderer.snapshot(),sessionSettings.ticketPhotoAspect);ticketPhotoMoment=moment;log('ticket_photo_captured',{moment,format:'jpeg',aspect:sessionSettings.ticketPhotoAspect});}
     catch(e){log('ticket_photo_capture_failure',{reason:String(e?.name||'Error')});}
   }
   function beginRecorder(){
@@ -456,7 +456,7 @@
     syncAppearanceForm();syncEffects();
     $('eventTitle').value=settings.title;$('eventDate').value=settings.date;$('duration').value=settings.duration;$('preset').value=settings.preset;
     $('grain').value=Math.round(settings.grain*100);$('grainValue').textContent=Math.round(settings.grain*100)+'%';
-    $('countdownSetting').value=settings.countdown;$('returnSeconds').value=settings.returnSeconds;$('ticketCaptureSecond').value=settings.ticketCaptureSecond;
+    $('countdownSetting').value=settings.countdown;$('returnSeconds').value=settings.returnSeconds;$('ticketCaptureSecond').value=settings.ticketCaptureSecond;$('ticketPhotoAspect').value=settings.ticketPhotoAspect;
     $('receiptStyle').value=settings.receiptStyle;$('receiptCaption').value=settings.receiptCaption;$('receiptFooter').value=settings.receiptFooter;draftLogo=settings.logoData;
     $('showEnabled').checked=settings.showEnabled;$('showDelay').value=settings.showDelay;
     $('mirror').checked=settings.mirror;$('osd').checked=settings.osd;$('trigger').value=settings.trigger;$('receiptMode').value=settings.receipt;
@@ -527,7 +527,7 @@
       const native=await nativeDiagnostics();
       let permissions={};
       if(navigator.permissions?.query){for(const name of ['camera','microphone']){try{permissions[name]=(await navigator.permissions.query({name})).state;}catch{permissions[name]='unavailable';}}}
-      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.5-alpha.1',generatedAt:new Date().toISOString(),
+      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.6-alpha.1',generatedAt:new Date().toISOString(),
         notice:'App-scoped diagnostic data, not Android system logcat. Up to 250 sanitized events survive app restarts where browser storage permits. No videos, snapshots, private QR URLs, credentials or device identifiers are intentionally included. Review before sharing.',
         runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
         media:{permissions,cameraReady:cameraReady(),microphoneReady:microphoneReady(),partialPreview:mediaPartiallyReady(),cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
@@ -551,7 +551,7 @@
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.9.5-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,ticketSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.6-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,ticketSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
@@ -611,7 +611,7 @@
       }).catch(()=>{log('tab_lock_unavailable');resolve();});
     });
   }
-  ready=true;log('app_ready',{version:'0.9.5-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
+  ready=true;log('app_ready',{version:'0.9.6-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
   if(surfaceRole==='guest'){openGuest(location.hash.slice(7));}else if(surfaceRole==='show'){go('show');}else{go(new URLSearchParams(location.search).has('setup')?'admin':'booth');}
   if(document.documentElement.dataset.serviceWorker==='true' && location.protocol!=='file:' && 'serviceWorker'in navigator){
     navigator.serviceWorker.register('./sw.js').catch(e=>log('offline_shell_unavailable',{error:e.message}));

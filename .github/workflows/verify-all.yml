@@ -39,6 +39,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Canonical source release integrity (all files and Git tracking)
+        run: |
+          node tools/check-release-integrity.mjs --require-git
       - name: Prepare assets and run unit contracts
         run: |
           python tools/check_release_versions.py

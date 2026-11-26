@@ -394,11 +394,14 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 .cloud-card{margin-top:26px}.cloud-card>p{max-width:850px;margin:12px 0 18px}.cloud-card textarea{display:block;width:100%;border:1px solid #c8ccb9;border-radius:5px;background:#f8f7f0;padding:12px;font:12px/1.5 var(--mono);resize:vertical;margin:8px 0 18px}.cloud-queue{margin:18px 0;max-height:280px;overflow:auto}.cloud-job{padding:12px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.cloud-job button{min-height:40px;padding:8px 12px}.cloud-job span{font-size:12px;overflow-wrap:anywhere}.cloud-card label{display:block;font-size:12px}
 
 .printer-card{margin-top:24px}.printer-card p{margin:12px 0}.printer-card h3{margin:16px 0 12px;font:600 18px var(--sans)}.printer-status{padding:14px 16px;background:#edf0e5;border-radius:5px;font:12px/1.8 var(--mono);overflow-wrap:anywhere}.printer-card .button-row{margin:14px 0}.printer-card .button-row .btn{flex:1 1 150px}.printer-card .form-row{margin:18px 0;align-items:end}.printer-card select,.printer-card input{width:100%;min-width:0}.printer-divider{border-top:1px solid var(--line);margin-top:24px}.printer-card details{margin:20px 0;padding:18px;background:#f0ede3;border:1px solid var(--line);border-radius:5px}.printer-card summary{cursor:pointer;font-weight:600;font-size:13px;line-height:1.6}.printer-journal{max-height:300px;overflow:auto}.printer-job{padding:12px 8px;border-bottom:1px solid var(--line);font:11px/1.8 var(--mono);overflow-wrap:anywhere}.printer-job code{display:block;user-select:all}.printer-card [aria-disabled=true]{opacity:.6}@media(max-width:600px){.printer-card .button-row{flex-direction:column}.printer-card .button-row .btn{flex:auto;min-height:44px}.printer-card details{padding:14px 12px}.printer-card .form-row{grid-template-columns:1fr}}
+
+/* v0.9.6: direct staff receipt test in section 04, also usable on compact Android Admin. */
+.receipt-test-panel{margin:18px 0;padding:16px;border-radius:9px;background:#ede9df;border:1px solid #b9b6aa}.receipt-test-panel .card-number{margin-bottom:10px}.receipt-test-panel .button-row{flex-wrap:wrap}.receipt-test-panel .button-row .btn{min-height:44px;white-space:normal}.receipt-test-panel p{overflow-wrap:anywhere}#receiptTestNotice{padding-top:10px;margin-bottom:0;line-height:1.65}@media(max-width:520px){.receipt-test-panel .button-row{flex-direction:column}.receipt-test-panel .button-row .btn{width:100%}}
 </style>
 </head>
 <body class="kiosk" data-capture-state="idle" data-screen-style="heritage">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="phoneIcon" viewBox="0 0 24 24"><path d="M5 3 2 6c0 7 9 16 16 16l3-3-5-5-3 2c-3-1-5-3-6-6l2-3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol><symbol id="tapeIcon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="8" width="14" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="11" r="1.4"/><circle cx="16" cy="11" r="1.4"/><path d="m6 20 2-4h8l2 4" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol></svg>
-<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.9.5 / NOT EVENT-READY</span></div></header>
+<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.9.6 / NOT EVENT-READY</span></div></header>
 <div class="notice"><span class="dot amber"></span><span id="globalNotice">Demo mode. Camera is off. Printing and cloud are not connected.</span><button id="aboutBtn">What works?</button></div>
 <main>
 <section id="view-booth" class="view active">
@@ -432,7 +435,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
   <div class="panel-hint" id="panelHint">撓一次就得</div>
   <div class="panel-lamps" aria-hidden="true"><span data-lamp="idle"><i></i>READY</span><span data-lamp="recording"><i></i>REC</span><span data-lamp="saving"><i></i>SAVE</span></div>
   <div class="speaker" aria-hidden="true"></div>
-  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.9.5. Tap five times for staff settings">v0.9.5 / PREVIEW</button></div>
+  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.9.6. Tap five times for staff settings">v0.9.6 / PREVIEW</button></div>
 </aside></div>
 <div class="control-strip"><button id="cameraBtn">Enable camera + microphone</button><button id="kioskBtn">Kiosk preview</button><span id="inputHint">Keyboard: [ lift / ] replace</span></div>
 <p class="privacy-line" data-i18n="privacy"></p>
@@ -544,7 +547,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
   <p class="small muted">Windows cloud allowlist: add exactly <code>retrobooth://app</code> to your existing private server configuration. Do not replace keys or erase server data. Export recordings from Tape library before replacing or resetting a device.</p>
 </section>
 
-<div class="admin-card wide designer"><div><div class="card-number">04 / RECEIPT DESIGN</div><h2>Your paper keepsake.</h2><p class="small muted">These fields are saved with the Event & Capture settings. Every captured message keeps its own receipt design snapshot.</p><label>Ticket photo capture moment<select id="ticketCaptureSecond" form="settingsForm"><option value="1">Countdown: 1 second remaining</option><option value="2" selected>Countdown: 2 seconds remaining (default)</option><option value="3">Countdown: 3 seconds remaining</option></select></label><p class="small muted">The image is captured from the LIVE camera canvas during the 3-second countdown, before recording begins. If countdown is disabled, the still is taken at recording start. Snapshot is retained locally for this ticket.</p><label>Template<select id="receiptStyle" form="settingsForm"><option value="classic">Classic memory receipt</option><option value="ticket">Cinema ticket</option><option value="minimal">Minimal</option></select></label><label>Caption<input id="receiptCaption" form="settingsForm" maxlength="80"></label><label>Footer<input id="receiptFooter" form="settingsForm" maxlength="100"></label><label>Logo (PNG/JPEG, up to 2 MB)<input type="file" id="logoFile" accept="image/png,image/jpeg"></label><div class="button-row"><button id="removeLogo" type="button" class="btn secondary">Remove logo</button><button type="submit" form="settingsForm" class="btn primary">Save design + settings</button></div><p class="small muted">58mm ESC/POS test: photo uses a 384-dot monochrome image plus a native QR command. Paper output and logo/layout matching are device-dependent; 80mm printers may center the smaller photo. No cutter command.</p></div><div class="design-preview"><canvas id="designCanvas" width="384" height="900"></canvas><small id="designDimensions"></small></div></div>
+<div class="admin-card wide designer"><div><div class="card-number">04 / RECEIPT DESIGN</div><h2>Your paper keepsake.</h2><p class="small muted">These fields are saved with the Event & Capture settings. Every captured message keeps its own receipt design snapshot.</p><label>Ticket photo capture moment<select id="ticketCaptureSecond" form="settingsForm"><option value="1">Countdown: 1 second remaining</option><option value="2" selected>Countdown: 2 seconds remaining (default)</option><option value="3">Countdown: 3 seconds remaining</option></select></label><p class="small muted">The image is captured from the LIVE camera canvas during the 3-second countdown, before recording begins. If countdown is disabled, the still is taken at recording start. Snapshot is retained locally for this ticket.</p><label>Ticket screenshot aspect ratio<select id="ticketPhotoAspect" form="settingsForm"><option value="4:3" selected>4:3 — classic photo (384 × 288 dots)</option><option value="16:9">16:9 — widescreen photo (384 × 216 dots)</option></select></label><p class="small muted">Controls the ACTUAL printed monochrome photo as well as the Receipt preview and saved countdown still. New sessions keep their selected format; existing v0.9.5 recordings retain their legacy crop.</p><label>Template<select id="receiptStyle" form="settingsForm"><option value="classic">Classic memory receipt</option><option value="ticket">Cinema ticket</option><option value="minimal">Minimal</option></select></label><label>Caption<input id="receiptCaption" form="settingsForm" maxlength="80"></label><label>Footer<input id="receiptFooter" form="settingsForm" maxlength="100"></label><label>Logo (PNG/JPEG, up to 2 MB)<input type="file" id="logoFile" accept="image/png,image/jpeg"></label><div class="button-row"><button id="removeLogo" type="button" class="btn secondary">Remove logo</button><button type="submit" form="settingsForm" class="btn primary">Save design + settings</button></div><div class="receipt-test-panel"><div class="card-number">DIRECT PRINTER TEST / ANDROID</div><p class="small muted">Print a genuine diagnostic QR ticket from THIS section with the current (even unsaved) screenshot ratio, title, caption and footer. Camera ON: live frame. Camera OFF: clearly labelled SAMPLE artwork. The test QR is non-working and grants no video access. If Receipt layout is QR-only, no photo is sent; photo-only layouts still receive a test QR for hardware diagnosis.</p><div class="button-row"><button id="receiptTestPrint" type="button" class="btn primary">Test print PHOTO + QR</button><button id="receiptTestQR" type="button" class="btn secondary">Test print QR only</button><button id="receiptPrinterSetup" type="button" class="btn secondary">Printer settings / 08</button></div><p id="receiptTestNotice" class="small" role="status" aria-live="polite">Android Bluetooth SPP printer must be paired, pinned and connected in 08. Prints require native confirmation.</p></div><p class="small muted">Physical ticket: 384-dot ESC/POS photo (4:3 / 16:9), native printer QR and ASCII label text. Paper fonts / logo / spacing may differ from the on-screen designer preview; Chinese text and artwork logos are not yet sent to the printer. No cutter command. Always scan the printed QR with a phone.</p></div><div class="design-preview"><canvas id="designCanvas" width="384" height="900"></canvas><small id="designDimensions"></small></div></div>
 <div class="admin-card wide"><div class="card-number">05 / LIVE SHOW POLICY</div><h2>Keep control of the big screen.</h2><label class="check"><input type="checkbox" id="showEnabled" form="settingsForm"> Enable same-browser live show preview</label><label>Minimum hold before show<select id="showDelay" form="settingsForm"><option value="0">No added hold (testing)</option><option value="30">30 seconds</option><option value="60">60 seconds</option><option value="120">120 seconds</option></select></label><p>Every clip starts PRIVATE. It needs guest permission AND staff approval before entering this preview. Hiding is reversible. Deletion is not.</p><div class="button-row"><button class="btn secondary" data-view="library">Review tapes</button><button class="btn secondary" data-view="show">Open live show preview</button><button type="submit" form="settingsForm" class="btn primary">Save policy</button></div><p class="small muted">Local proof of interaction only. No remote projector feed, backend moderation or online guest URL is connected.</p></div>
 <div class="admin-card wide"><div class="card-number">06 / READINESS GATES</div><div class="gates"><div><strong>Browser prototype</strong><p>Interaction, shader, recording, local library, receipt artwork.</p><span class="pill green-pill">IMPLEMENTED</span></div><div><strong>Target Android screen</strong><p>Audio routing, 60-second sync, interruptions, 3-hour soak.</p><span class="pill">NOT TESTED</span></div><div><strong>Handset + ticket printer</strong><p>Secure SPP QR-only source; paper and hardware not verified.</p><span class="pill">NOT CONNECTED</span></div><div><strong>Cloud + native shell</strong><p>Resumable uploads, private delivery, native files and signing.</p><span class="pill">NOT IMPLEMENTED</span></div></div></div></div></section>
 <section id="view-guest" class="view" hidden>
@@ -572,7 +575,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 </section>
 
 </main>
-<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.5-alpha.1 · 26 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
+<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.6-alpha.1 · 26 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
 <dialog id="aboutDialog"><button class="dialog-close" data-close="aboutDialog" aria-label="Close">×</button><div class="eyebrow">PROTOTYPE BOUNDARY</div><h2>Real interactions.<br>Honest boundaries.</h2><p><b>Working:</b> demo flow, optional camera and microphone, retro canvas recording, browser-local saved clips, playback/export, pixel receipt composition, settings and failure scenarios.</p><p><b>Not connected:</b> Windows/browser printer hardware, physical handset, native crash-recoverable storage and remote projector. Android has an unverified secure-SPP ESC/POS photo + QR printing pilot. Local Control room is not authenticated; the separate Cloud Admin requires its secret key.</p><p>Demo sessions contain no guest video. Real recordings stay local unless Cloud Delivery is explicitly connected. Existing recordings are not silently enrolled. No analytics or external fonts are used.</p><p>For Android screen testing, serve the static package over HTTPS. Opening an HTML attachment inside a chat or Files preview may not execute the app.</p><button class="btn primary" data-close="aboutDialog">Explore the prototype</button></dialog>
@@ -2060,6 +2063,8 @@ module.exports = QRCode;
 (function(root){
  'use strict';
  const PROFILE='native-qr-model2-m-size4-v1';
+ function asciiLabel(value,max){return [...String(value||'')].map(c=>{const n=c.charCodeAt(0);return n>=32&&n<=126?c:'?';}).join('').slice(0,max);}
+ function ticketDesign(s={}){return {ticketTitle:asciiLabel(s.title,60),ticketCaption:asciiLabel(s.receiptCaption,80),ticketFooter:asciiLabel(s.receiptFooter,100),ticketStyle:['classic','ticket','minimal'].includes(s.receiptStyle)?s.receiptStyle:'classic'};}
  function guestTicket(clip,parent=''){
   if(!clip||clip.kind!=='real'||clip.lifecycle==='deleted'||clip.interrupted||clip.validation?.status!=='metadata_readable'||!clip.cloud||clip.settings?.receipt==='photo')throw new Error('Select a saved, non-deleted cloud recording with a QR receipt.');
   const payload=root.RetroCloud.guestURL(clip.cloud),snapshot=clip.deliverySnapshot;
@@ -2084,16 +2089,17 @@ module.exports = QRCode;
    if(!isCurrent()||(automatic&&Date.now()>=end))throw new Error('Print hand-off expired before submission.');
    const photo=await root.RetroTicketPhoto.fromClip(clip);
    if(!isCurrent()||(automatic&&Date.now()>=end))throw new Error('Photo preparation took too long; no ticket sent.');
-   const r=await this.call('print',{...t,...photo,automatic,deadlineEpochMs:end,waitMs:Math.max(1000,Math.min(15000,waitMs))},automatic?Math.max(1,end-Date.now()):90000);
+   const design=Object.hasOwn(clip?.settings||{},'ticketPhotoAspect')?ticketDesign(clip.settings):{}; // Old v0.9.5 journal fingerprint must not change.
+   const r=await this.call('print',{...t,...photo,...design,automatic,deadlineEpochMs:end,waitMs:Math.max(1000,Math.min(15000,waitMs))},automatic?Math.max(1,end-Date.now()):90000);
    if((r?.photoIncluded===true)!==Boolean(photo.photoBase64))throw new Error('Native printer photo acknowledgement mismatch. Inspect paper; do NOT automatically retry.');
    if(r?.jobId!==t.jobId||r.clipId!==t.clipId||r.urlHash!==expected||r.transport!=='android_secure_spp'||r.simulated!==false||r.paperConfirmed!==false||!['sent_unconfirmed','failed_before_send','outcome_unknown'].includes(r.state))throw new Error('Mismatched native result. Keep the screen QR; inspect paper and journal before reprinting.');
    if(r.status)this.status=r.status;
    return {...clip.deliverySnapshot,...r,payload:t.payload,nativeValidated:true,fastReturnEligible:r.fastReturnEligible===true&&!r.duplicate};
   }
  }
- root.RetroPrinter={PROFILE,guestTicket,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
+ root.RetroPrinter={PROFILE,guestTicket,ticketDesign,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
 })(typeof window==='undefined'?globalThis:window);
-</script><script>/* RetroBooth v0.9.5-alpha.1. Pure, independently testable domain helpers. */
+</script><script>/* RetroBooth v0.9.6-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -2132,6 +2138,7 @@ module.exports = QRCode;
       returnSeconds: [0,1,2,3,5].includes(Number(raw.returnSeconds)) ? Number(raw.returnSeconds) : 2,
       receiptStyle: ['classic','ticket','minimal'].includes(raw.receiptStyle) ? raw.receiptStyle : 'classic',
       ticketCaptureSecond: [1,2,3].includes(Number(raw.ticketCaptureSecond)) ? Number(raw.ticketCaptureSecond) : 2,
+      ticketPhotoAspect: ['4:3','16:9'].includes(raw.ticketPhotoAspect) ? raw.ticketPhotoAspect : '4:3',
       receiptCaption: String(raw.receiptCaption || 'A LITTLE LOVE, TO KEEP.').slice(0,80),
       receiptFooter: String(raw.receiptFooter || 'THANK YOU FOR BEING HERE').slice(0,100),
       logoData: /^data:image\/(png|jpeg);base64,/.test(raw.logoData||'') && raw.logoData.length<300000 ? raw.logoData : '',
@@ -2411,22 +2418,24 @@ module.exports = QRCode;
 </script><script>/* Screen receipt compositor; native physical ticket uses a separate QR command + the same pixelPhoto dither. */
 (function () {
   'use strict';
-  function pixelPhoto(source) {
-    const low=document.createElement('canvas');low.width=128;low.height=112;
+  const PHOTO_ASPECTS=Object.freeze({'4:3':{width:384,height:288,lowHeight:96},'16:9':{width:384,height:216,lowHeight:72},legacy:{width:384,height:336,lowHeight:112}});
+  function pixelPhoto(source,aspect='4:3') {
+    const p=PHOTO_ASPECTS[aspect];if(!p)throw new Error('Unsupported ticket photo aspect.');
+    const low=document.createElement('canvas');low.width=128;low.height=p.lowHeight;
     const c=low.getContext('2d',{willReadFrequently:true});
-    const cr=RetroCore.cropRect(source.width,source.height,8/7);c.drawImage(source,cr.x,cr.y,cr.w,cr.h,0,0,128,112);
-    const d=c.getImageData(0,0,128,112).data;const gray=new Uint8Array(128*112);const hist=new Uint32Array(256);
+    const cr=RetroCore.cropRect(source.width,source.height,p.width/p.height);c.drawImage(source,cr.x,cr.y,cr.w,cr.h,0,0,128,p.lowHeight);
+    const d=c.getImageData(0,0,128,p.lowHeight).data;const gray=new Uint8Array(128*p.lowHeight);const hist=new Uint32Array(256);
     for(let i=0;i<gray.length;i++){gray[i]=Math.round(.299*d[4*i]+.587*d[4*i+1]+.114*d[4*i+2]);hist[gray[i]]++;}
     let lo=0,hi=255,acc=0;for(let i=0;i<256;i++){acc+=hist[i];if(acc>=gray.length*.02){lo=i;break;}}
     acc=0;for(let i=255;i>=0;i--){acc+=hist[i];if(acc>=gray.length*.02){hi=i;break;}}
-    const out=document.createElement('canvas');out.width=384;out.height=336;const ctx=out.getContext('2d');
-    const img=ctx.createImageData(384,336);const bayer=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+    const out=document.createElement('canvas');out.width=p.width;out.height=p.height;const ctx=out.getContext('2d');
+    const img=ctx.createImageData(p.width,p.height);const bayer=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
     const order=[0,7,3,6,4,1,2,5,8],counts=[9,6,3,0];
-    for(let y=0;y<112;y++)for(let x=0;x<128;x++){
+    for(let y=0;y<p.lowHeight;y++)for(let x=0;x<128;x++){
       const n=hi-lo>10?Math.max(0,Math.min(1,(gray[y*128+x]-lo)/(hi-lo))):gray[y*128+x]/255;
       const level=Math.max(0,Math.min(3,Math.round(n*3+(bayer[(y%4)*4+x%4]/16-.5)*.65)));
       for(let yy=0;yy<3;yy++)for(let xx=0;xx<3;xx++){
-        const index=(((y*3+yy)*384)+x*3+xx)*4;const val=order[yy*3+xx]<counts[level]?0:255;
+        const index=(((y*3+yy)*p.width)+x*3+xx)*4;const val=order[yy*3+xx]<counts[level]?0:255;
         img.data[index]=img.data[index+1]=img.data[index+2]=val;img.data[index+3]=255;
       }
     }
@@ -2458,7 +2467,7 @@ module.exports = QRCode;
     text(settings.title,style==='minimal'?28:25,true,3);text(settings.date,16,false,1);
     if(style!=='minimal')text('LOVE, ON TAPE.',14,false,1);
     divider();text(clip.cloud?'PRIVATE VIDEO / KEEP THIS TICKET':'PROTOTYPE / NOT A LIVE TICKET',16,true,1);y+=10;
-    if(photo){c.drawImage(pixelPhoto(source),0,y);y+=350;}
+    if(photo){const image=pixelPhoto(source,settings.ticketPhotoAspect||'legacy');c.drawImage(image,0,y);y+=image.height+14;}
     text(settings.receiptCaption||'A LITTLE LOVE, TO KEEP.',18,true,3);divider();
     text('MESSAGE No. '+String(clip.seq).padStart(3,'0'),25,true,1);
     text('TAPE '+RetroCore.timeLabel(clip.durationMs)+' / '+(clip.kind==='demo'?'DEMO':'LOCAL'),17,false,1);y+=16;
@@ -2478,47 +2487,55 @@ module.exports = QRCode;
   }
   window.Receipt={pixelPhoto,render:renderReceipt,prepare};
 })();
-</script><script>/* Ticket photo is a separately captured local still. Never include raster in diagnostics or cloud API. */
+</script><script>/* Locally captured ticket still. 4:3 or 16:9; legacy 8:7 retained for saved v0.9.5 clips. */
 (function(root){
  'use strict';
- const WIDTH=384, HEIGHT=336, ENCODING='escpos-gsv0-384x336-1bpp-v1';
- function capture(source){
+ const WIDTH=384;
+ const PROFILES=Object.freeze({
+  '4:3':Object.freeze({width:WIDTH,height:288,encoding:'escpos-gsv0-384x288-1bpp-v2',captureHeight:384}),
+  '16:9':Object.freeze({width:WIDTH,height:216,encoding:'escpos-gsv0-384x216-1bpp-v2',captureHeight:288}),
+  legacy:Object.freeze({width:WIDTH,height:336,encoding:'escpos-gsv0-384x336-1bpp-v1',captureHeight:448})
+ });
+ function profile(aspect){const p=PROFILES[aspect];if(!p)throw new Error('Unknown ticket screenshot aspect ratio.');return p;}
+ function capture(source,aspect='4:3'){
   if(!source||!(source.width>0&&source.height>0))throw new Error('No live camera frame for ticket.');
-  const crop=root.RetroCore.cropRect(source.width,source.height,8/7);
-  const c=document.createElement('canvas');c.width=512;c.height=448;
-  c.getContext('2d',{alpha:false}).drawImage(source,crop.x,crop.y,crop.w,crop.h,0,0,512,448);
+  const p=profile(aspect),crop=root.RetroCore.cropRect(source.width,source.height,p.width/p.height);
+  const c=document.createElement('canvas');c.width=512;c.height=p.captureHeight;
+  c.getContext('2d',{alpha:false}).drawImage(source,crop.x,crop.y,crop.w,crop.h,0,0,c.width,c.height);
   return c.toDataURL('image/jpeg',.82);
  }
- function raster(source){
+ function raster(source,aspect='4:3'){
   if(!source||!(source.width>0&&source.height>0))throw new Error('Ticket photo has no pixels.');
-  const monochrome=root.Receipt.pixelPhoto(source);
-  if(monochrome.width!==WIDTH||monochrome.height!==HEIGHT)throw new Error('Unexpected ticket image size.');
-  const pixels=monochrome.getContext('2d',{willReadFrequently:true}).getImageData(0,0,WIDTH,HEIGHT).data;
-  const bytes=new Uint8Array(WIDTH*HEIGHT/8);
-  for(let y=0;y<HEIGHT;y++)for(let x=0;x<WIDTH;x++){
-   const offset=(y*WIDTH+x)*4;
-   if(pixels[offset]<128)bytes[y*(WIDTH/8)+(x>>3)]|=0x80>>(x&7);
+  const p=profile(aspect),monochrome=root.Receipt.pixelPhoto(source,aspect);
+  if(monochrome.width!==p.width||monochrome.height!==p.height)throw new Error('Unexpected ticket image size.');
+  const pixels=monochrome.getContext('2d',{willReadFrequently:true}).getImageData(0,0,p.width,p.height).data;
+  const bytes=new Uint8Array(p.width*p.height/8);
+  for(let y=0;y<p.height;y++)for(let x=0;x<p.width;x++){
+   const offset=(y*p.width+x)*4;
+   if(pixels[offset]<128)bytes[y*(p.width/8)+(x>>3)]|=0x80>>(x&7);
   }
   let data='';for(let i=0;i<bytes.length;i+=2048)data+=String.fromCharCode(...bytes.subarray(i,i+2048));
-  return {photoEncoding:ENCODING,photoWidth:WIDTH,photoHeight:HEIGHT,photoBase64:btoa(data)};
+  return {photoEncoding:p.encoding,photoWidth:p.width,photoHeight:p.height,photoBase64:btoa(data)};
  }
- async function fromDataURL(url){
+ async function fromDataURL(url,aspect='legacy'){
   if(typeof url!=='string'||url.length>600000||!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(url))throw new Error('Saved ticket still missing or unsupported.');
   const im=new Image();im.src=url;
   await Promise.race([im.decode(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Ticket still decode timed out.')),5000))]);
   if(im.width<16||im.height<16||im.width>2048||im.height>2048)throw new Error('Ticket still dimensions invalid.');
-  return raster(im);
+  return raster(im,aspect);
  }
  async function fromClip(clip){
   if(clip?.settings?.receipt==='qr')return {};
   const photo=clip?.ticketSnapshot || clip?.rawSnapshot;
   if(!photo)throw new Error('No saved still for this photo ticket.');
-  const result=await fromDataURL(photo);
+  // v0.9.5 clips did not record a ratio; DO NOT reinterpret their saved paper layout.
+  const aspect=clip.settings&&Object.hasOwn(clip.settings,'ticketPhotoAspect')?clip.settings.ticketPhotoAspect:'legacy';
+  const result=await fromDataURL(photo,aspect);
   const moment=clip.ticketSnapshot?clip.ticketPhotoMoment||'T-2':'LEGACY';
   if(!/^(T-[123]|REC START|LEGACY)$/.test(moment))throw new Error('Unknown saved photo capture point.');
   return {...result,photoMoment:moment};
  }
- const api={WIDTH,HEIGHT,ENCODING,capture,raster,fromDataURL,fromClip};
+ const api={WIDTH,PROFILES,profile,capture,raster,fromDataURL,fromClip};
  root.RetroTicketPhoto=api;
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
@@ -2874,7 +2891,7 @@ return {Ring,safe};
   }
   function captureTicketStill(moment){
     if(ticketSnapshot||!cameraReady()||mode!=='real')return;
-    try{ticketSnapshot=RetroTicketPhoto.capture(renderer.snapshot());ticketPhotoMoment=moment;log('ticket_photo_captured',{moment,format:'jpeg',width:512,height:448});}
+    try{ticketSnapshot=RetroTicketPhoto.capture(renderer.snapshot(),sessionSettings.ticketPhotoAspect);ticketPhotoMoment=moment;log('ticket_photo_captured',{moment,format:'jpeg',aspect:sessionSettings.ticketPhotoAspect});}
     catch(e){log('ticket_photo_capture_failure',{reason:String(e?.name||'Error')});}
   }
   function beginRecorder(){
@@ -3002,7 +3019,7 @@ return {Ring,safe};
     syncAppearanceForm();syncEffects();
     $('eventTitle').value=settings.title;$('eventDate').value=settings.date;$('duration').value=settings.duration;$('preset').value=settings.preset;
     $('grain').value=Math.round(settings.grain*100);$('grainValue').textContent=Math.round(settings.grain*100)+'%';
-    $('countdownSetting').value=settings.countdown;$('returnSeconds').value=settings.returnSeconds;$('ticketCaptureSecond').value=settings.ticketCaptureSecond;
+    $('countdownSetting').value=settings.countdown;$('returnSeconds').value=settings.returnSeconds;$('ticketCaptureSecond').value=settings.ticketCaptureSecond;$('ticketPhotoAspect').value=settings.ticketPhotoAspect;
     $('receiptStyle').value=settings.receiptStyle;$('receiptCaption').value=settings.receiptCaption;$('receiptFooter').value=settings.receiptFooter;draftLogo=settings.logoData;
     $('showEnabled').checked=settings.showEnabled;$('showDelay').value=settings.showDelay;
     $('mirror').checked=settings.mirror;$('osd').checked=settings.osd;$('trigger').value=settings.trigger;$('receiptMode').value=settings.receipt;
@@ -3055,7 +3072,7 @@ return {Ring,safe};
   try{if(window.BroadcastChannel)channel=new BroadcastChannel('luce-retrobooth-v05-updates');}catch{}
   function designForm(){return {
     countdown:Number($('countdownSetting').value),returnSeconds:Number($('returnSeconds').value),
-    receiptStyle:$('receiptStyle').value,ticketCaptureSecond:Number($('ticketCaptureSecond').value),receiptCaption:$('receiptCaption').value,receiptFooter:$('receiptFooter').value,
+    receiptStyle:$('receiptStyle').value,ticketCaptureSecond:Number($('ticketCaptureSecond').value),ticketPhotoAspect:$('ticketPhotoAspect').value,receiptCaption:$('receiptCaption').value,receiptFooter:$('receiptFooter').value,
     logoData:draftLogo,showEnabled:$('showEnabled').checked,showDelay:Number($('showDelay').value)
   };}
   async function previewDesign(){
@@ -3182,7 +3199,7 @@ return {Ring,safe};
     $('deleteAck').onchange=()=>$('deleteConfirm').disabled=!$('deleteAck').checked;
     $('deleteCancel').onclick=()=>{if(!deleteBusy){deleteTarget=null;$('deleteDialog').close();}};
     $('deleteDialog').addEventListener('cancel',e=>{if(deleteBusy)e.preventDefault();else deleteTarget=null;});$('deleteConfirm').onclick=confirmDelete;
-    ['receiptStyle','receiptCaption','receiptFooter','receiptMode','eventTitle','eventDate'].forEach(id=>$(id).addEventListener('input',previewDesign));
+    ['receiptStyle','receiptCaption','receiptFooter','receiptMode','eventTitle','eventDate','ticketPhotoAspect'].forEach(id=>$(id).addEventListener('input',previewDesign));
     $('logoFile').onchange=async()=>{
       const file=$('logoFile').files[0];if(!file)return;
       if(!['image/png','image/jpeg'].includes(file.type)||file.size>2*1024*1024){toast('Choose a PNG/JPEG no larger than 2 MB.');return;}
@@ -3550,11 +3567,12 @@ async function setupCloud(){
 
   /* Only bundled Android can connect SPP. The cloud server never talks to nearby Bluetooth. */
 let printerClient=null,printerActionBusy=false;
-function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. Photo + QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9.5 TEST APK for this pilot.';
+function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. Photo + QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9.6 TEST APK for this pilot.';
  return (s.connected?'CONNECTED (transport only)':'DISCONNECTED')+' / '+(s.pinned||'no pinned device')+' / automatic '+(s.automaticEnabled?'ON':'OFF')+' / fast return '+(s.fastReturnArmed?'OPERATOR RISK ACCEPTED':'OFF; screen QR retained')+' / no electronic paper confirmation'+(s.error?' / '+s.error:'');}
 function renderPrinter(){if(!$('printerStatus'))return;$('printerStatus').textContent=printerText();const available=!!printerClient?.available;
  for(const id of ['printerPermission','printerSettings','printerList','printerPin','printerConnect','printerTest','printerTestPhoto','printerEnableAuto','printerDisableAuto','printerManual','printerReprint','printerObserve','printerFastOff','printerRefresh'])$(id).disabled=!available||printerActionBusy;
  $('printerDisconnect').disabled=!available;
+ if($('receiptTestPrint')){const connected=available&&printerClient?.status?.connected===true;for(const id of ['receiptTestPrint','receiptTestQR'])$(id).disabled=!connected||printerActionBusy;}
 }
 function refreshPrinterClips(){
  const selected=$('printerClip').value;$('printerClip').replaceChildren(new Option('Choose a saved cloud recording',''));
@@ -3604,7 +3622,28 @@ function setupPrinter(){
  act('printerEnableAuto',async()=>{await printerClient.call('automatic',{enabled:true},60000);});
  act('printerDisableAuto',async()=>{await printerClient.call('automatic',{enabled:false});});
  act('printerTest',async()=>{const r=await printerClient.call('test',{waitMs:15000},90000);$('printerNotice').textContent='QR-only diagnostic ticket '+r.jobId+' / '+r.state+'. TEST QR is NOT a video link and does not unlock fast return.';});
- act('printerTestPhoto',async()=>{if(!cameraReady())throw new Error('Apply Camera first in 02 / DEVICE CHECK before printing a LIVE photo.');const photo=RetroTicketPhoto.raster(renderer.snapshot());const r=await printerClient.call('test',{...photo,photoMoment:'TEST LIVE',waitMs:15000},90000);if(r?.photoIncluded!==true)throw new Error('Printer did not acknowledge the image layout. Inspect paper; do not automatically repeat.');$('printerNotice').textContent='LIVE photo + diagnostic QR test '+r.jobId+' / '+r.state+'. Inspect paper and scan the TEST QR; no real video link.';log('ticket_photo_test_sent',{state:r.state,bytes:r.bytes||0});});
+ act('printerTestPhoto',async()=>{if(!cameraReady())throw new Error('Apply Camera first in 02 / DEVICE CHECK before printing a LIVE photo.');const photo=RetroTicketPhoto.raster(renderer.snapshot(),settings.ticketPhotoAspect);const r=await printerClient.call('test',{...photo,...RetroPrinter.ticketDesign(settings),photoMoment:'TEST LIVE',waitMs:15000},90000);if(r?.photoIncluded!==true)throw new Error('Printer did not acknowledge the image layout. Inspect paper; do not automatically repeat.');$('printerNotice').textContent='LIVE photo + diagnostic QR test '+r.jobId+' / '+r.state+'. Inspect paper and scan the TEST QR; no real video link.';log('ticket_photo_test_sent',{state:r.state,bytes:r.bytes||0});});
+ // Section 04 is a real native test, NOT an image download or fake print confirmation.
+ async function testFromReceipt(withPhoto){
+  await printerOperation(async()=>{
+   const notice=$('receiptTestNotice');notice.textContent='Preparing '+(withPhoto?'photo + QR':'QR-only')+' diagnostic ticket...';
+   try{
+    if(!printerClient?.available||!printerClient.status.connected)throw new Error('Connect a paired/pinned Bluetooth SPP printer in 08 first.');
+    const draft=C.safeSettings({...settings,...designForm(),title:$('eventTitle').value,date:$('eventDate').value,receipt:$('receiptMode').value});
+    const live=cameraReady();
+    const image=withPhoto&&draft.receipt!=='qr'?RetroTicketPhoto.raster(renderer.snapshot(),draft.ticketPhotoAspect):{};
+    // Even when the real event is configured photo-only, the diagnostic always has a non-working test QR.
+    const moment=image.photoBase64?(live?'TEST LIVE':'TEST SAMPLE'):undefined;
+    const result=await printerClient.call('test',{...image,...RetroPrinter.ticketDesign(draft),...(moment?{photoMoment:moment}:{}),waitMs:15000},90000);
+    if(result.state!=='sent_unconfirmed'||Boolean(result.photoIncluded)!==Boolean(image.photoBase64))throw new Error('Printer result requires manual paper inspection. Never automatically repeat an uncertain send.');
+    notice.textContent='Sent (paper unconfirmed): '+(image.photoBase64?(live?'LIVE ':'SAMPLE ')+draft.ticketPhotoAspect+' photo + ':'')+'TEST QR. Ticket '+result.jobId+'. Check image proportions and SCAN the printed QR. No video link.';
+    log('receipt_test_ticket_sent',{state:result.state,hasPhoto:!!image.photoBase64,aspect:draft.ticketPhotoAspect,live,bytes:result.bytes||0});
+   }catch(e){notice.textContent='TEST NOT CONFIRMED: '+e.message;throw e;}
+  });
+ }
+ $('receiptTestPrint').onclick=()=>testFromReceipt(true);
+ $('receiptTestQR').onclick=()=>testFromReceipt(false);
+ $('receiptPrinterSetup').onclick=()=>{const card=$('printerCard');if(card){card.scrollIntoView({behavior:'smooth',block:'start'});card.querySelector('summary')?.setAttribute('aria-expanded','true');}};
  $('printerClipRefresh').onclick=()=>refreshPrinterClips();
  act('printerManual',async()=>{await printSavedGuest($('printerClip').value);});
  act('printerReprint',async()=>{await printSavedGuest($('printerClip').value,true);});
@@ -3633,7 +3672,7 @@ function setupPrinter(){
       const native=await nativeDiagnostics();
       let permissions={};
       if(navigator.permissions?.query){for(const name of ['camera','microphone']){try{permissions[name]=(await navigator.permissions.query({name})).state;}catch{permissions[name]='unavailable';}}}
-      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.5-alpha.1',generatedAt:new Date().toISOString(),
+      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.6-alpha.1',generatedAt:new Date().toISOString(),
         notice:'App-scoped diagnostic data, not Android system logcat. Up to 250 sanitized events survive app restarts where browser storage permits. No videos, snapshots, private QR URLs, credentials or device identifiers are intentionally included. Review before sharing.',
         runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
         media:{permissions,cameraReady:cameraReady(),microphoneReady:microphoneReady(),partialPreview:mediaPartiallyReady(),cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
@@ -3657,7 +3696,7 @@ function setupPrinter(){
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.9.5-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,ticketSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.6-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,ticketSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,...designForm()});
@@ -3717,7 +3756,7 @@ function setupPrinter(){
       }).catch(()=>{log('tab_lock_unavailable');resolve();});
     });
   }
-  ready=true;log('app_ready',{version:'0.9.5-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
+  ready=true;log('app_ready',{version:'0.9.6-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
   if(surfaceRole==='guest'){openGuest(location.hash.slice(7));}else if(surfaceRole==='show'){go('show');}else{go(new URLSearchParams(location.search).has('setup')?'admin':'booth');}
   if(document.documentElement.dataset.serviceWorker==='true' && location.protocol!=='file:' && 'serviceWorker'in navigator){
     navigator.serviceWorker.register('./sw.js').catch(e=>log('offline_shell_unavailable',{error:e.message}));

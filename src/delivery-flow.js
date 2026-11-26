@@ -15,7 +15,7 @@ function renderDeliveryVisibility(){
   $('deliveryOverlay').hidden=state!=='qr'||currentView!=='booth'||document.hidden||!deliveryContext;
 }
 function drawDeliveryQr(){
-  if(state!=='qr'||!deliveryContext||(!deliveryContext.ticket.online&&!deliveryContext.demo))return;
+  if(state!=='qr'||!deliveryContext)return;
   const c=$('deliveryQrCanvas'),box=$('deliveryQrBox').getBoundingClientRect();
   const q=new RetroQR(0,0);q.addData(deliveryContext.ticket.payload);q.make();
   const quiet=4,n=q.getModuleCount(),modules=n+quiet*2;
@@ -43,14 +43,12 @@ function showTimedQr(context){
   setState('qr');
   $('deliveryMessage').textContent=context.demo?'\u793a\u7bc4\u7559\u8a00\uff0c\u6c92\u6709\u9304\u4f4e\u5f71\u7247\u3002':'\u5f71\u7247\u5df2\u4fdd\u5b58\u65bc\u6b64\u700f\u89bd\u5668\u3002';
   $('deliveryRef').textContent=context.ticket.label;
-  $('deliveryQrBox').hidden=!context.ticket.online&&!context.demo;
-  $('deliveryQrLabel').textContent=context.ticket.online?'PRIVATE VIDEO / KEEP THIS LINK':context.demo?'TEST QR / NO ONLINE VIDEO':'LOCAL-ONLY / QR UNAVAILABLE';
-  $('deliveryQrHelp').textContent=context.ticket.online?'Scan to view later. Upload may still be pending. This private link can hide or delete the recording.':context.demo?'SIMULATION ONLY. This test pattern does not open a real video. Never share as a guest download link.':'Recording is saved on this device only. Connect an active Hostinger event in Admin before the NEXT recording to provide a guest phone QR.';
-  $('deliveryQrCanvas').setAttribute('aria-label',context.ticket.online?'Private video QR link':context.demo?'Simulation test pattern, not a real URL':'No guest URL is available');
-  if(!context.ticket.online&&!context.demo)log('delivery_no_cloud_qr',{reason:'cloud_not_connected_for_capture',clipId:context.ticket.clipId});
+  $('deliveryQrLabel').textContent=context.ticket.online?'PRIVATE VIDEO / KEEP THIS LINK':'TEST QR / NO ONLINE VIDEO';
+  $('deliveryQrHelp').textContent=context.ticket.online?'Scan to view later. Upload may still be pending. This private link can hide or delete the recording.':'Local test only. No online video for this recording.';
+  $('deliveryQrCanvas').setAttribute('aria-label',context.ticket.online?'Private video QR link':'Local test QR, not an online video link');
   if(context.ticket.online)$('deliveryMessage').textContent='Saved locally. Your private page is reserved; upload continues after returning to Start.';
   const reasons={screen_only:'Screen QR only.',print_disabled:'No printer route enabled.',receipt_has_no_qr:'Photo-only receipt: keep the screen QR.',receipt_artwork_failed:'Receipt preview unavailable; the saved recording is retained.',not_connected:'Printer not connected.',connected_only:'Connection alone does not confirm this ticket.',sent_unconfirmed:'Sent in simulation; paper not confirmed. No automatic reprint.',failed_before_send:'Print failed in simulation. The QR remains available.',outcome_unknown:'Simulated uncertain result. Check paper before any reprint.',timeout:'Print-result wait expired. No automatic resend.',always_screen:'Always show QR, including after simulated printing.'};
-  $('deliveryReason').textContent=!context.ticket.online&&!context.demo?'No online guest page exists. Export recordings from Admin or connect Cloud for new messages.':context.nativeAttempted?'QR ticket '+context.reason+'. Paper not electronically confirmed; scan this QR as backup.':reasons[context.reason]||'Screen QR fallback. No confirmed QR ticket.';
+  $('deliveryReason').textContent=context.nativeAttempted?'QR ticket '+context.reason+'. Paper not electronically confirmed; scan this QR as backup.':reasons[context.reason]||'Screen QR fallback. No confirmed QR ticket.';
   deliveryTick();drawDeliveryQr();requestAnimationFrame(drawDeliveryQr);
   clearInterval(deliveryTimer);deliveryTimer=setInterval(deliveryTick,100);
 }
