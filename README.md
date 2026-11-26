@@ -1,3 +1,11 @@
+# RetroBooth v0.9.6 — Direct Receipt-Designer Test Print & 4:3 / 16:9
+
+New in **Admin → 04 / RECEIPT DESIGN**: photo aspect selector (4:3 default / 16:9), direct **Test print PHOTO + QR** and **Test print QR only** buttons. Hardware transport is Android paired/pinned Bluetooth Classic secure SPP and native ESC/POS. The on-screen preview is richer than the native print layout; logos/Chinese fonts are not yet physically printed. Test QR is deliberately non-working; printer write success is **not paper confirmation**. See `docs/RECEIPT_PRINT_V096_ZH.md`.
+
+**Build:** merge the PATCH into the v0.9.5 repository or use this FULL ROOT package, commit/push `main`, run **RetroBooth - Build Android APK**. Download `RetroBooth-v0.9.6-Android-TEST.apk` from the successful Actions run. Android versionCode **15**; same app ID and signing-key requirements. Windows workflow remains independent with no Bluetooth printer adapter.
+
+---
+
 # RetroBooth v0.9.5 — Android 58mm Photo + QR Ticket Pilot
 
 The latest incremental change adds a REAL printer write path for a **384-dot monochrome guest still + ESC/POS model-2 QR** through the existing Android secure Classic-Bluetooth SPP adapter. It also saves a separate countdown snapshot at **T-2 seconds by default** (Admin > Receipt Design: T-1/T-2/T-3). An immediate **LIVE Photo + QR TEST** in Admin uses the camera and a clearly non-working diagnostic URL. Manual printing of a saved cloud clip prints its frozen countdown still and exact private QR. QR-only receipts remain supported.

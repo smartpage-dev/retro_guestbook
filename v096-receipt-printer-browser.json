@@ -1,0 +1,26 @@
+{
+  "checks": [
+    "04 receipt includes direct native test button",
+    "04 receipt includes QR-only diagnostic",
+    "ratio defaults to 4:3",
+    "countdown screenshot still defaults to T-2",
+    "demo camera is off before first print",
+    "off-camera test is explicit SAMPLE, not LIVE",
+    "4:3 is 384x288 physical 1bpp",
+    "unsaved caption/footer included in native ticket",
+    "demo QR test never sends guest payload",
+    "paper status reported unconfirmed, not printed",
+    "04 QR-only test has zero photo bytes",
+    "16:9 design preview photo becomes 72 dots shorter",
+    "unsaved ratio does not mutate active event",
+    "16:9 real raster 384x216 dots",
+    "16:9 ratio saved as event setting",
+    "live camera test uses TEST LIVE marker",
+    "QR-only event receipt suppresses photo raster in test",
+    "direct print button visible on 32-inch kiosk scaled admin",
+    "no javascript errors"
+  ],
+  "count": 19,
+  "errors": [],
+  "scope": "Chromium synthetic camera and mocked native printer; no Android hardware or physical paper"
+}

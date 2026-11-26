@@ -1,3 +1,11 @@
+# RetroBooth v0.9.6 — 04 Receipt Print Test and Aspect Ratio
+
+**NEW:** Admin → 04 / RECEIPT DESIGN → `Ticket screenshot aspect ratio` choose **4:3** (default) or **16:9**; preview and actual 384-dot thermal photo both update. `Test print PHOTO + QR` uses the current fields, with LIVE camera if available or an explicit SAMPLE if not. `Test print QR only` uses an invalid test QR; neither creates a guest link. Connect your Android secure SPP printer under Admin 08 first. Printed ASCII title/caption/footer are supported; visual layout/Chinese/logo from the screen designer is **not guaranteed** on paper. See `docs/RECEIPT_PRINT_V096_ZH.md`.
+
+**Android:** GitHub Actions → RetroBooth - Build Android APK → Run workflow → install v0.9.6 TEST APK (versionCode 15). Use the same signing key and back up local videos before upgrade. Physical print and QR readability remain unverified until tested with your printer.
+
+---
+
 # RetroBooth v0.9.5 — 32-inch Android CRT frame update
 
 - **01 Modern CRT** now has a proper graphite/silver 1990s television housing. The video screen, bezel, right control-panel width, outer padding and landscape responsive rules exactly follow the proven **02 Heritage TV** layout.

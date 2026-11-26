@@ -1,3 +1,12 @@
+## v0.9.6-alpha.1 — Direct receipt print tests + true 4:3 / 16:9 photo raster (26 Nov 2026)
+
+- Section 04 includes direct **Photo + diagnostic QR** and **QR-only** native Bluetooth ESC/POS test actions, using the current (even unsaved) draft fields. The Android confirmation dialog, transport journal and unknown-outcome safety remain in effect.
+- When camera is unavailable, the photo test deliberately prints the compositor's labelled SAMPLE rather than claiming a live capture; the QR always targets `example.invalid`, never a guest link.
+- Added per-event/per-clip ticket screenshot aspect setting: 4:3 default (384×288 1bpp) or 16:9 (384×216 1bpp) for actual paper, save-point JPEG, and browser receipt preview. T−2 still the default capture moment.
+- Retains 384×336 8:7 raster decoder and unmodified fingerprint behavior for previously saved v0.9.5 guest clips / ticket journal history.
+- Native QR remains an independent Model 2 ESC/POS command. New printed ASCII title/caption/footer and cinema header are **not a pixel-perfect match** for screen preview; Chinese font/logo output and printer cutter not implemented.
+- No printer paper sensor. `sent_unconfirmed` is an output-stream result only. Source and mock validations completed, Android build and physical paper acceptance still outstanding.
+
 ## v0.9.5-alpha.1 — QR ticket bitmap and configurable countdown capture (26 Nov 2026)
 
 - Android secure-SPP test ticket now supports a 384x336 dithered monochrome LIVE still + native model-2 QR (GS v 0 bitmap format); QR-only diagnostic retained. No cutter/status sensor.

@@ -1,4 +1,4 @@
-"""Check RetroBooth v0.9 repository shape and three independent workflows.
+"""Check RetroBooth v0.9.1 repository shape and three independent workflows.
 This is a source-contract check, not proof of native compilation.
 """
 from pathlib import Path
@@ -8,7 +8,10 @@ required = [
     '.github/workflows/build-android.yml',
     '.github/workflows/build-windows.yml',
     '.github/workflows/verify-all.yml',
-    'src/.htaccess', 'src/desktop-admin.html',
+    'src/.htaccess', 'src/desktop-admin.html', 'src/diagnostics.js', 'tests/diagnostics.test.cjs',
+    'tests/media_separation.test.cjs','tests/browser_v093_separated.py','docs/ANDROID_MEDIA_V093.md',
+    'tests/browser_v094_style_fit.py','docs/MODERN_CRT_V094.md',
+    'tests/browser_v096_receipt_printer.py','docs/RECEIPT_PRINT_V096_ZH.md','src/ticket-photo.js',
     'tools/prepare-desktop.mjs',
     'desktop/main.cjs', 'desktop/package.json',
     'desktop/electron-builder.cjs', 'desktop/resources/icon.ico',
