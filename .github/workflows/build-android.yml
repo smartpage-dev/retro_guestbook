@@ -71,28 +71,28 @@ jobs:
       - name: Verify signed test APK and collect outputs
         run: |
           mkdir -p native-artifacts unsigned-artifacts
-          cp android/app/build/outputs/apk/debug/app-debug.apk native-artifacts/RetroBooth-v0.9.5-Android-TEST.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs native-artifacts/RetroBooth-v0.9.5-Android-TEST.apk > native-artifacts/SIGNATURE.txt
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging native-artifacts/RetroBooth-v0.9.5-Android-TEST.apk > native-artifacts/APK_INFO.txt
+          cp android/app/build/outputs/apk/debug/app-debug.apk native-artifacts/RetroBooth-v0.9.6-Android-TEST.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs native-artifacts/RetroBooth-v0.9.6-Android-TEST.apk > native-artifacts/SIGNATURE.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging native-artifacts/RetroBooth-v0.9.6-Android-TEST.apk > native-artifacts/APK_INFO.txt
           grep "name='studio.luce.retrobooth.preview'" native-artifacts/APK_INFO.txt
-          grep "versionCode='14'" native-artifacts/APK_INFO.txt
+          grep "versionCode='15'" native-artifacts/APK_INFO.txt
           python tools/native_build_info.py
           cp docs/ANDROID_QUICK_START.md native-artifacts/READ_ME_FIRST.md
-          cp android/app/build/outputs/apk/release/app-release-unsigned.apk unsigned-artifacts/RetroBooth-v0.9.5-UNSIGNED.apk
-          cp android/app/build/outputs/bundle/release/app-release.aab unsigned-artifacts/RetroBooth-v0.9.5-UNSIGNED.aab
+          cp android/app/build/outputs/apk/release/app-release-unsigned.apk unsigned-artifacts/RetroBooth-v0.9.6-UNSIGNED.apk
+          cp android/app/build/outputs/bundle/release/app-release.aab unsigned-artifacts/RetroBooth-v0.9.6-UNSIGNED.aab
           cd native-artifacts
           sha256sum *.apk *.json > SHA256SUMS.txt
       - name: Upload installable TEST APK
         uses: actions/upload-artifact@v6
         with:
-          name: RetroBooth-Android-APK-v0.9.5-${{ github.run_number }}
+          name: RetroBooth-Android-APK-v0.9.6-${{ github.run_number }}
           path: native-artifacts/*
           if-no-files-found: error
           retention-days: 30
       - name: Upload unsigned developer files (not installable)
         uses: actions/upload-artifact@v6
         with:
-          name: RetroBooth-UNSIGNED-DEVELOPER-FILES-v0.9.5-${{ github.run_number }}
+          name: RetroBooth-UNSIGNED-DEVELOPER-FILES-v0.9.6-${{ github.run_number }}
           path: unsigned-artifacts/*
           if-no-files-found: error
           retention-days: 14
