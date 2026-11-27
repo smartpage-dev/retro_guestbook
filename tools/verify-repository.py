@@ -10,6 +10,7 @@ required = [
     '.github/workflows/verify-all.yml',
     '.github/workflows/source-preflight.yml',
     'tools/check-release-integrity.mjs', 'tools/sync-release-to-repo.mjs',
+    'tools/verify_apk_badging.py', 'tests/test_apk_metadata.py',
     'RELEASE_SOURCE_SHA256.json', 'SYNC_TO_GITHUB.cmd',
     'src/.htaccess', 'src/desktop-admin.html', 'src/diagnostics.js', 'tests/diagnostics.test.cjs',
     'cloud/public_html/show/index.html','cloud/public_html/assets/show.js','cloud/public_html/assets/admin.js',
@@ -43,6 +44,8 @@ for label, text, tokens in [
         assert token in text, f'{label}: missing {token}'
     assert not re.search(r'continue-on-error:\s*true', text), f'{label}: test bypass forbidden'
     assert '    needs: verify' not in text, f'{label}: platform build should not depend on shared Verify'
+assert 'python tools/verify_apk_badging.py native-artifacts/APK_INFO.txt' in android, 'APK version verification must compare signed artifact with Gradle'
+assert 'grep "versionCode=' not in android, 'Do not hardcode obsolete Android versionCode in workflow'
 assert 'versionCode 16' in (R/'docs/ANDROID_QUICK_START.md').read_text(), 'Current Android quick start must say versionCode 16'
 assert 'push:' in (R/'.github/workflows/source-preflight.yml').read_text(), 'Fast source preflight must run on push.'
 for wf in ['build-android.yml', 'build-windows.yml', 'verify-all.yml', 'source-preflight.yml']:

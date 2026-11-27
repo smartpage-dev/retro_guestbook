@@ -37,3 +37,4 @@ jobs:
           npm test
           npm run test:native-core
           python tools/verify-repository.py
+          python tests/test_apk_metadata.py

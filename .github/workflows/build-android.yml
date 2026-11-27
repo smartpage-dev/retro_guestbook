@@ -41,6 +41,7 @@ jobs:
           npm test
           npm run test:native-core
           python tools/verify-repository.py
+          python tests/test_apk_metadata.py
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '8.11.1'
@@ -78,8 +79,7 @@ jobs:
           cp android/app/build/outputs/apk/debug/app-debug.apk native-artifacts/RetroBooth-v0.9.7-Android-TEST.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs native-artifacts/RetroBooth-v0.9.7-Android-TEST.apk > native-artifacts/SIGNATURE.txt
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging native-artifacts/RetroBooth-v0.9.7-Android-TEST.apk > native-artifacts/APK_INFO.txt
-          grep "name='studio.luce.retrobooth.preview'" native-artifacts/APK_INFO.txt
-          grep "versionCode='15'" native-artifacts/APK_INFO.txt
+          python tools/verify_apk_badging.py native-artifacts/APK_INFO.txt
           python tools/native_build_info.py
           cp docs/ANDROID_QUICK_START.md native-artifacts/READ_ME_FIRST.md
           cp android/app/build/outputs/apk/release/app-release-unsigned.apk unsigned-artifacts/RetroBooth-v0.9.7-UNSIGNED.apk
