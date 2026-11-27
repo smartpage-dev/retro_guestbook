@@ -59,7 +59,7 @@ with sync_playwright() as pw:
    if w in [1440,390]:p.screenshot(path=str(Q/f'v07-booth-cloud-admin-{w}.png'))
   p.set_viewport_size({'width':1920,'height':1080});p.locator('#cameraLabEnable').click();p.wait_for_function('RetroApp.status.mode==="real"');p.evaluate('RetroApp.go("booth")');p.locator('#touchBtn').click();state(p,'recording');p.wait_for_timeout(700)
   check('one reserved link consumed before recording',p.evaluate('__aux["cloud-pool"].slots.length===11'))
-  check('camera panel reflects configured cloud mode',p.locator('#panelBoundary').inner_text()=='CAMERA ON / CLOUD ENABLED')
+  check('guest panel shows safe QR ticket readiness', 'QR TICKET' in p.locator('#panelBoundary').inner_text())
   check('no upload requests during capture',p.evaluate('!__api.calls.some(c=>c.url.includes("/chunk/")||c.url.endsWith("/init"))'))
   p.evaluate('RetroApp.start("touch")');check('duplicate Start cannot consume another link',p.evaluate('__aux["cloud-pool"].slots.length===11'))
   state(p,'qr',40000)
@@ -95,7 +95,7 @@ with sync_playwright() as pw:
   p.locator('#delete').click();check('delete has explicit confirmation',p.locator('#deleteDialog').is_visible() and p.locator('#deleteConfirm').is_disabled());p.screenshot(path=str(Q/'v07-guest-delete-dialog-390.png'))
   p.locator('#deleteCancel').click();check('cancel has no delete request',p.evaluate('!__g.calls.some(c=>c.url.endsWith("/delete"))'))
   p.locator('#delete').click();p.locator('#deleteAck').check();p.evaluate('__g.fail=true');p.locator('#deleteConfirm').click();p.wait_for_function('deleteError.textContent.includes("not confirmed")');check('network failure does not claim deleted',p.evaluate('__g.status==="reserved"') and p.locator('#deleteDialog').is_visible())
-  p.evaluate('__g.fail=false');p.locator('#deleteConfirm').click();p.wait_for_function('document.getElementById("status").textContent.includes("DELETED")');check('delete clears guest player and controls',p.locator('#video').is_hidden() and p.locator('#privacy').is_hidden());check('offline booth cleanup explicitly pending','Waiting for booth cleanup' in p.locator('#status').inner_text())
+  p.evaluate('__g.fail=false');p.locator('#deleteConfirm').click();p.wait_for_function('document.getElementById("status").textContent.includes("DELETED")');check('delete clears guest player and controls',p.locator('#video').is_hidden() and p.locator('#privacy').is_hidden());check('offline booth cleanup explicitly pending','Awaiting booth cleanup' in p.locator('#status').inner_text())
   p.evaluate('__g.status="reserved";__g.canManage=false;location.hash="'+('a'*32+'.'+'V'*32)+'"');p.wait_for_function('!viewOnly.hidden');check('view-only has no management controls',p.locator('#privacy').is_hidden())
   for w in [320,390,800]:
    p.set_viewport_size({'width':w,'height':844});check(str(w)+' guest fits viewport',p.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))

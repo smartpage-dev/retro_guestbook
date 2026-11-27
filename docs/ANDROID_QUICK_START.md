@@ -1,12 +1,12 @@
 **Before GitHub build:** see [ONE_TIME_GITHUB_SOURCE_SYNC_ZH.md](ONE_TIME_GITHUB_SOURCE_SYNC_ZH.md); run the automatic Fast Source Preflight after committing the canonical full release.
 
-**Latest v0.9.7 Android versionCode 16.** The printer pilot supports 384-dot QR + live/countdown still raster, with Admin 04 direct test printing and 4:3 / 16:9 screenshot choices. See [RECEIPT_PRINT_V096_ZH.md](RECEIPT_PRINT_V096_ZH.md) and [QR_PHOTO_TICKET_V095_ZH.md](QR_PHOTO_TICKET_V095_ZH.md). This is not BLE/USB, paper-status or cutter support. Android APK compilation and real paper testing are required.
+**Latest v0.9.8 Android versionCode 17.** The printer pilot supports 384-dot QR + live/countdown still raster, with Admin 04 direct test printing and 4:3 / 16:9 screenshot choices. See [RECEIPT_PRINT_V096_ZH.md](RECEIPT_PRINT_V096_ZH.md) and [QR_PHOTO_TICKET_V095_ZH.md](QR_PHOTO_TICKET_V095_ZH.md). This is not BLE/USB, paper-status or cutter support. Android APK compilation and real paper testing are required.
 
 **v0.9.3 onward: Independent media input fix.** Admin > 02 / Device Check > 1 / APPLY CAMERA - LIVE preview. The preview needs no microphone. Then use 2 / APPLY MICROPHONE; until both are ready, guest Start is disabled. See [ANDROID_MEDIA_V093.md](ANDROID_MEDIA_V093.md).
 
 # 03 / Android APK
 
-Same application ID, versionCode 16
+Same application ID, versionCode 17
 
 1. Download and extract the Android-APK artifact after a successful Android job. Use the TEST.apk, not the unsigned APK or AAB.
 2. Before updating an existing installation, export important recordings and retain the same signing identity. Do not uninstall or clear data to get around an update error.

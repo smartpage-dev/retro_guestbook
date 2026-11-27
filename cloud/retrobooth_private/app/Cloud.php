@@ -89,7 +89,8 @@ final class CloudRepo {
 function rb_event_defaults(string $title): array {
     return ['title'=>$title,'date'=>gmdate('Y-m-d'),'duration'=>10,'countdown'=>3,
         'screenStyle'=>'heritage','lookMode'=>'follow','ticketCaptureSecond'=>2,
-        'ticketPhotoAspect'=>'4:3','receiptStyle'=>'classic',
+        'ticketPhotoAspect'=>'4:3','receiptStyle'=>'classic','ticketOrientation'=>'portrait',
+        'panelMaker'=>'LUCE STUDIO','panelProduct'=>'RETROVISION','panelSubtitle'=>'VIDEO GUESTBOOK / RV-04','panelChannel'=>'03',
         'receiptCaption'=>'A LITTLE LOVE, TO KEEP.','receiptFooter'=>'THANK YOU FOR BEING HERE',
         'qrDisplaySeconds'=>10,'showDelay'=>60];
 }
@@ -122,13 +123,14 @@ function rb_valid_event_settings(array $values,array $event): array {
             if(!is_int($value)||!in_array($value,$allowed,true))rb_fail(400,'invalid_event_setting_'.$key);
         } elseif($key==='date') {
             if(!is_string($value)||!preg_match('/^\d{4}-\d{2}-\d{2}$/D',$value))rb_fail(400,'invalid_event_date');
-        } elseif(in_array($key,['screenStyle','lookMode','ticketPhotoAspect','receiptStyle'],true)){
+        } elseif(in_array($key,['screenStyle','lookMode','ticketPhotoAspect','receiptStyle','ticketOrientation'],true)){
             $allowed=match($key){'screenStyle'=>['edge','heritage','space','studio','bubble'],
                 'lookMode'=>['follow','film','heritage','bw','vhs','sepia','cinema','night'],
-                'ticketPhotoAspect'=>['4:3','16:9'],default=>['classic','ticket','minimal']};
+                'ticketPhotoAspect'=>['4:3','16:9'],'ticketOrientation'=>['portrait','landscape'],default=>['classic','ticket','minimal','premiere','filmstrip','boarding']};
             if(!is_string($value)||!in_array($value,$allowed,true))rb_fail(400,'invalid_event_setting_'.$key);
         } else {
-            $limit=$key==='receiptCaption'?80:100;
+            $limit=match($key){'panelMaker'=>32,'panelProduct'=>22,'panelSubtitle'=>55,'panelChannel'=>2,'receiptCaption'=>80,default=>100};
+            if($key==='panelChannel'&&(!preg_match('/^[0-9]{1,2}$/D',(string)$value)))rb_fail(400,'invalid_panel_channel');
             if(!is_string($value)||strlen($value)>$limit*4||strlen($value)>$limit && preg_match('/^[\x00-\x7F]*$/D',$value))rb_fail(400,'invalid_event_text_'.$key);
         }
         $current[$key]=$value;

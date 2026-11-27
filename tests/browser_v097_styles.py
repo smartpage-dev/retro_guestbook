@@ -1,4 +1,4 @@
-"""v0.9.7 5 television shells and 7 effect settings; Chromium CSS viewport simulation."""
+"""v0.9.8 five distinctive television shells and 7 effect settings; Chromium CSS viewport simulation."""
 from pathlib import Path
 import os,json
 from playwright.sync_api import sync_playwright
@@ -22,10 +22,14 @@ with sync_playwright() as pw:
    check(f'{w}x{h} {style} version button in safe area',rect['version'][0]>=0 and rect['version'][4]<=w-8 and rect['version'][5]<=h-10)
    check(f'{w}x{h} {style} start button visible',rect['start'][1]>=0 and rect['start'][5]<=h-5)
    for part in ['bezel','screen','panel']:
-    check(f'{w}x{h} {style} same {part} as heritage',all(abs(rect[part][i]-boxes['heritage'][part][i])<1 for i in range(4)))
+    box=rect[part]
+    check(f'{w}x{h} {style} {part} has usable dimensions',box[2]>40 and box[3]>40)
+    check(f'{w}x{h} {style} {part} within viewport',box[0]>=-2 and box[1]>=-2 and box[4]<=w+2 and box[5]<=h+2)
    if (w,h)==(1280,720):
     path=Q/f'v097-{style}-1280x720.png';p.screenshot(path=str(path));screens.append(str(path))
   check(f'{w}x{h} material variants visually distinct',len({boxes[x]['body'] for x in boxes})==5)
+  shape=p.evaluate('''()=>Object.fromEntries(['heritage','edge','space','studio','bubble'].map(s=>{document.body.dataset.screenStyle=s;const a=document.querySelector('.television'),b=document.querySelector('.tv-bezel'),c=document.querySelector('.panel-start');return [s,[getComputedStyle(a).borderRadius,getComputedStyle(b).borderRadius,getComputedStyle(c).borderRadius,getComputedStyle(c).width].join('|')]}))''')
+  check(f'{w}x{h} new cabinets have distinct shell silhouettes',len({shape[x] for x in ['space','studio','bubble']})==3)
   p.close()
  p=b.new_page(viewport={'width':1280,'height':720});p.on('pageerror',lambda e:errors.append(str(e)))
  p.set_content(html);p.wait_for_function('window.RetroApp?.status.ready')

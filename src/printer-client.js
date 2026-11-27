@@ -3,7 +3,16 @@
  'use strict';
  const PROFILE='native-qr-model2-m-size4-v1';
  function asciiLabel(value,max){return [...String(value||'')].map(c=>{const n=c.charCodeAt(0);return n>=32&&n<=126?c:'?';}).join('').slice(0,max);}
- function ticketDesign(s={}){return {ticketTitle:asciiLabel(s.title,60),ticketCaption:asciiLabel(s.receiptCaption,80),ticketFooter:asciiLabel(s.receiptFooter,100),ticketStyle:['classic','ticket','minimal'].includes(s.receiptStyle)?s.receiptStyle:'classic'};}
+ function ticketDesign(s={}){
+  const design={ticketStyle:['classic','ticket','minimal','premiere','filmstrip','boarding'].includes(s.receiptStyle)?s.receiptStyle:'classic'};
+  for(const [key,value,limit] of [['Title',s.title,60],['Caption',s.receiptCaption,80],['Footer',s.receiptFooter,100]]){
+   const full=String(value||'').trim();if(full.length>limit||/[\x00-\x1f\x7f]/.test(full))throw new Error('Ticket '+key+' text is invalid or too long.');
+   const raster=full&&!/^[\x20-\x7e]*$/.test(full)?root.RetroTicketPhoto.textRaster(full,limit,key==='Title'?2:3):null;
+   design['ticket'+key]=raster?'':full;
+   if(raster){design['ticket'+key+'RasterBase64']=raster.base64;design['ticket'+key+'RasterHeight']=raster.height;}
+  }
+  return design;
+ }
  function guestTicket(clip,parent=''){
   if(!clip||clip.kind!=='real'||clip.lifecycle==='deleted'||clip.interrupted||clip.validation?.status!=='metadata_readable'||!clip.cloud||clip.settings?.receipt==='photo')throw new Error('Select a saved, non-deleted cloud recording with a QR receipt.');
   const payload=root.RetroCloud.guestURL(clip.cloud),snapshot=clip.deliverySnapshot;

@@ -1,3 +1,13 @@
+## v0.9.8-alpha.1 — Android TV guest UI, bilingual Guest Page, Unicode tickets and new cabinet silhouettes (27 Nov 2026)
+
+- Corrected RETROVISION subtitle text overflow on 32-inch Android control panel. Operator-defined TV maker/product/subtitle/channel can sync from Cloud Event Master. Guest-only engineering text is hidden by default; optional concise private-QR text and QR TICKET connected/not-ready status replace the former clutter.
+- Local Admin Camera Lab: Auto/12/15/24/30 *maximum* processed FPS, selectable 360p/540p/720p rendering canvas. No promised frame rate: actual GPU/WebView throughput may remain lower; capture/encoded fps measured separately.
+- Cloud Guest personal-video page now uses Cantonese/English bilingual prompts and permission labels. Private by default; independent show/delete toggles remain enforced by the cloud.
+- Ticket Designer: 6 layouts (Classic, Cinema, Minimal, Premiere, 35mm Filmstrip, Memory Boarding Pass), browser portrait/landscape layout. **Physical 384-dot Android secure SPP prints portrait only; landscape cannot be guaranteed on 58mm paper.**
+- Android native ESC/POS retains model-2 QR and adds bounded 384-dot 1bpp raster blocks for Unicode title/caption/footer on 58mm pilot printers. Actual Chinese print depends on host font rendering and printer GS v 0 support; no Bluetooth printer hardware acceptance, BLE, cutter, or confirmation of paper output.
+- Three newly DISTINCT housings: rounded cream Space-age capsule, right-angle Broadcast Rack with rectangular record switch, and translucent cyan Y2K Jelly body. Retained Modern CRT and Heritage TV. Viewport-safe tests explicitly allow different outer silhouettes, including 5-tap Admin entry.
+- V0.9.8: changed Web/CSS/Java/PHP Cloud definitions, Android Gradle versionCode 17; Cloud API remains PHP (no Node server), do not overwrite private config.php/data. Source and browser simulations do not establish real-device event readiness.
+
 ## v0.9.7-alpha.1 — Cloud Event Master, private consented slideshow, five TV bodies (27 Nov 2026)
 
 - Cloud Admin event settings revisions, idle Android sync, duplicate-create protection, button loading feedback, ready-first recording list, protected JPG thumbnails, Play/Download/Share/View-only QR browser reprint.

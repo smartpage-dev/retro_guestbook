@@ -22,13 +22,14 @@
    this.glCanvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.gl=null;this.mode='Canvas 2D (GPU context lost)';this.backendWarning='GPU lost; CPU fallback active.';});
    this.setAspect(13/9);
    this.loop=t=>{if(!this.running)return;requestAnimationFrame(this.loop);if(!this.active||document.hidden)return;
-    if(t-this.last<(this.recording?30:60))return;this.last=t;
+    const wanted=Number(this.settings.renderMaxFps);const interval=Number.isFinite(wanted)&&wanted>0?1000/wanted:(this.recording?30:60);
+    if(t-this.last<interval-1)return;this.last=t;
     try{this.draw(t/1000);}catch(e){this.running=false;window.dispatchEvent(new CustomEvent('rendererfailure',{detail:'Image processing failed: '+e.message}));return;}
     this.frameCount++;this.fpsCount++;if(t-this.fpsStart>1000){this.fps=this.fpsCount*1000/(t-this.fpsStart);this.fpsCount=0;this.fpsStart=t;}
    };requestAnimationFrame(this.loop);
   }
   setAspect(aspect){
-   if(this.recording)return;const h=720,w=Math.round(h*Math.max(.8,Math.min(3,aspect))/2)*2;
+   if(this.recording)return;const h=[360,540,720].includes(Number(this.settings.renderHeight))?Number(this.settings.renderHeight):720,w=Math.round(h*Math.max(.8,Math.min(3,aspect))/2)*2;
    if(w===this.w&&h===this.h)return;this.w=w;this.h=h;
    for(const c of [this.raw,this.canvas,this.scanlines,this.vignette]){c.width=w;c.height=h;}
    const sc=this.scanlines.getContext('2d');sc.fillStyle='#000';for(let y=0;y<h;y+=4)sc.fillRect(0,y,w,1);

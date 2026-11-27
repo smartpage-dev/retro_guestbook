@@ -1,4 +1,4 @@
-/* RetroBooth v0.9.7-alpha.1. Pure, independently testable domain helpers. */
+/* RetroBooth v0.9.8-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -28,6 +28,13 @@
       date: /^\d{4}-\d{2}-\d{2}$/.test(raw.date || '') ? raw.date : '2026-12-20',
       duration: [10,30,60].includes(Number(raw.duration)) ? Number(raw.duration) : 10,
       screenStyle: ['edge','heritage','space','studio','bubble'].includes(raw.screenStyle) ? raw.screenStyle : 'heritage',
+      panelMaker: String(raw.panelMaker ?? 'LUCE STUDIO').trim().slice(0,32) || 'LUCE STUDIO',
+      panelProduct: String(raw.panelProduct ?? 'RETROVISION').trim().slice(0,22) || 'RETROVISION',
+      panelSubtitle: String(raw.panelSubtitle ?? 'VIDEO GUESTBOOK / RV-04').trim().slice(0,55),
+      panelChannel: /^\d{1,2}$/.test(String(raw.panelChannel ?? '03')) ? String(raw.panelChannel ?? '03').padStart(2,'0') : '03',
+      renderMaxFps: ['auto','12','15','24','30'].includes(String(raw.renderMaxFps ?? 'auto')) ? String(raw.renderMaxFps ?? 'auto') : 'auto',
+      renderHeight: [360,540,720].includes(Number(raw.renderHeight ?? 720)) ? Number(raw.renderHeight ?? 720) : 720,
+      guestScreenInfo: raw.guestScreenInfo === true,
       preset: ['warm','soft','mono'].includes(raw.preset) ? raw.preset : 'warm',
       grain: Math.max(0, Math.min(0.15, Number(raw.grain) || 0)),
       mirror: raw.mirror !== false, osd: raw.osd !== false,
@@ -35,7 +42,8 @@
       receipt: ['both','qr','photo'].includes(raw.receipt) ? raw.receipt : 'both',
       countdown: [0,3].includes(Number(raw.countdown)) ? Number(raw.countdown) : 3,
       returnSeconds: [0,1,2,3,5].includes(Number(raw.returnSeconds)) ? Number(raw.returnSeconds) : 2,
-      receiptStyle: ['classic','ticket','minimal'].includes(raw.receiptStyle) ? raw.receiptStyle : 'classic',
+      receiptStyle: ['classic','ticket','minimal','premiere','filmstrip','boarding'].includes(raw.receiptStyle) ? raw.receiptStyle : 'classic',
+      ticketOrientation: ['portrait','landscape'].includes(raw.ticketOrientation) ? raw.ticketOrientation : 'portrait',
       ticketCaptureSecond: [1,2,3].includes(Number(raw.ticketCaptureSecond)) ? Number(raw.ticketCaptureSecond) : 2,
       ticketPhotoAspect: ['4:3','16:9'].includes(raw.ticketPhotoAspect) ? raw.ticketPhotoAspect : '4:3',
       receiptCaption: String(raw.receiptCaption || 'A LITTLE LOVE, TO KEEP.').slice(0,80),

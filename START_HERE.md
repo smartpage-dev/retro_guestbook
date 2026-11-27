@@ -1,10 +1,10 @@
-# START HERE — RetroBooth v0.9.7 (27 Nov 2026)
+# START HERE — RetroBooth v0.9.8 (27 Nov 2026)
 
-**Use the single verified FULL ROOT ZIP**, stage with `SYNC_TO_GITHUB.cmd`, commit + push all new files, confirm GitHub Source Preflight, then run a NEW Android workflow from the updated commit. Android versionCode **16**; use the same signing key. Do not delete/clear the installed APK without exporting local videos.
+**Use the single verified FULL ROOT ZIP**, stage with `SYNC_TO_GITHUB.cmd`, commit + push all new files, confirm GitHub Source Preflight, then run a NEW Android workflow from the updated commit. Android versionCode **17**; use the same signing key. Do not delete/clear the installed APK without exporting local videos.
 
-Upgrade Hostinger with the separate v0.9.7 **PHP Cloud Update** (not Node): back up existing config.php + data + videos; overwrite Cloud code only, never secrets or live data. Then open Cloud Admin, select the correct existing event (some legacy duplicate event names might exist), save settings, pair Android with the right existing device identity, choose Sync now / await idle sync. Test one 10-second private video and its phone QR before guests use it.
+Upgrade Hostinger with the separate v0.9.8 **PHP Cloud Update** (not Node): back up existing config.php + data + videos; overwrite Cloud code only, never secrets or live data. Then open Cloud Admin, select the correct existing event (some legacy duplicate event names might exist), save settings, pair Android with the right existing device identity, choose Sync now / await idle sync. Test one 10-second private video and its phone QR before guests use it.
 
-Full instructions: `docs/CLOUD_EVENT_MASTER_V097_ZH.md`. Previous v0.9.6 release notes below are historical.
+Full instructions: `docs/RETROBOOTH_V098_UI_TICKET_ZH.md` and `docs/CLOUD_EVENT_MASTER_V097_ZH.md`. Previous v0.9.6 release notes below are historical.
 
 ---
 

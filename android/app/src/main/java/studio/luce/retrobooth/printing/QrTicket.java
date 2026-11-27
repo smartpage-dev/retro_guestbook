@@ -35,8 +35,12 @@ public final class QrTicket {
     public QrTicket(String id,String clipId,String payload,String label,String parent,String kind,String approvedOrigin,byte[] photo,String moment) {
         this(id,clipId,payload,label,parent,kind,approvedOrigin,photo,moment,photo==null?"":PHOTO_ENCODING,photo==null?0:PHOTO_HEIGHT,"","","","classic");
     }
-    /** Raster is 1bpp black=1, MSB first; never stored in ticket ledger or logs. */
+    /** Compatibility constructor: fingerprints of existing v0.9.7 tickets remain stable. */
     public QrTicket(String id,String clipId,String payload,String label,String parent,String kind,String approvedOrigin,byte[] photo,String moment,String encoding,int height,String title,String caption,String footer,String style) {
+        this(id,clipId,payload,label,parent,kind,approvedOrigin,photo,moment,encoding,height,title,caption,footer,style,null,0,null,0,null,0);
+    }
+    /** Optional bounded 384-dot Unicode raster blocks; native exact QR command is unchanged. */
+    public QrTicket(String id,String clipId,String payload,String label,String parent,String kind,String approvedOrigin,byte[] photo,String moment,String encoding,int height,String title,String caption,String footer,String style,byte[] titleRaster,int titleRasterHeight,byte[] captionRaster,int captionRasterHeight,byte[] footerRaster,int footerRasterHeight) {
         if(!hex(id,32)||!hex(clipId,32))throw new IllegalArgumentException("Invalid ticket identity");
         if(!parent.isEmpty()&&!hex(parent,32))throw new IllegalArgumentException("Invalid parent identity");
         if(!kind.equals("guest")&&!kind.equals("test"))throw new IllegalArgumentException("Invalid ticket kind");
@@ -57,25 +61,46 @@ public final class QrTicket {
         if(photo!=null&&(!validPhotoProfile(encoding,PHOTO_WIDTH,height)||photo.length!=PHOTO_WIDTH*height/8))throw new IllegalArgumentException("Ticket raster aspect profile/length invalid");
         if(photo!=null&&!String.valueOf(moment).matches("T-[123]|REC START|LEGACY|TEST LIVE|TEST SAMPLE"))throw new IllegalArgumentException("Invalid capture moment");
         if(photo==null&&((moment!=null&&!moment.isEmpty())||(encoding!=null&&!encoding.isEmpty())||height!=0))throw new IllegalArgumentException("Photo metadata without photo");
-        if(!java.util.Arrays.asList("classic","minimal","ticket").contains(style))throw new IllegalArgumentException("Invalid ticket style");
+        if(!java.util.Arrays.asList("classic","minimal","ticket","premiere","filmstrip","boarding").contains(style))throw new IllegalArgumentException("Invalid ticket style");
+        checkTextRaster(titleRaster,titleRasterHeight);checkTextRaster(captionRaster,captionRasterHeight);checkTextRaster(footerRaster,footerRasterHeight);
+        if(titleRaster!=null&&!title.isEmpty()||captionRaster!=null&&!caption.isEmpty()||footerRaster!=null&&!footer.isEmpty())throw new IllegalArgumentException("Duplicate native and bitmap text");
         this.title=safeAscii(title,60);this.caption=safeAscii(caption,80);this.footer=safeAscii(footer,100);this.style=style;
         this.id=id;this.clipId=clipId;this.payload=payload;this.label=label;this.parent=parent;this.kind=kind;
         this.hasPhoto=photo!=null;this.photoMoment=photo==null?"":moment;this.photoHeight=photo==null?0:height;this.photoEncoding=photo==null?"":encoding;
-        this.bytes=encode(payload,label,kind.equals("test"),photo,photoMoment,photoHeight,this.title,this.caption,this.footer,this.style);
+        this.bytes=encode(payload,label,kind.equals("test"),photo,photoMoment,photoHeight,this.title,this.caption,this.footer,this.style,titleRaster,titleRasterHeight,captionRaster,captionRasterHeight,footerRaster,footerRasterHeight);
         String identity=PROFILE+"\n"+clipId+"\n"+payload+"\n"+label+"\n"+kind;
         // Keep QR-only fingerprints identical to the v0.9.4 journal; preserve old tickets.
         if(photo!=null)identity+="\nphoto:"+photoEncoding+":"+sha(photo)+":"+photoMoment;
         if(!this.title.isEmpty()||!this.caption.isEmpty()||!this.footer.isEmpty())identity+="\ndesign:"+this.style+":"+this.title+":"+this.caption+":"+this.footer;
+        if(titleRaster!=null)identity+="\ntext-title:"+sha(titleRaster);
+        if(captionRaster!=null)identity+="\ntext-caption:"+sha(captionRaster);
+        if(footerRaster!=null)identity+="\ntext-footer:"+sha(footerRaster);
+        // Do not change historical fingerprints without raster labels; with Unicode bitmap
+        // labels, style changes alter physical header even when text pixels are identical.
+        if(titleRaster!=null||captionRaster!=null||footerRaster!=null)identity+="\nunicode-style:"+style;
         this.fingerprint=sha(identity.getBytes(StandardCharsets.UTF_8));
     }
     public static boolean hex(String x,int n){return x!=null&&x.length()==n&&x.matches("[a-f0-9]+");}
     public static String sha(byte[] b){try{byte[] d=MessageDigest.getInstance("SHA-256").digest(b);StringBuilder s=new StringBuilder();for(byte x:d)s.append(String.format(Locale.ROOT,"%02x",x&255));return s.toString();}catch(Exception e){throw new IllegalStateException(e);}}
-    private static byte[] encode(String value,String label,boolean test,byte[] photo,String moment,int height,String title,String caption,String footer,String style){
+    private static void checkTextRaster(byte[] b,int height){
+        if(b==null){if(height!=0)throw new IllegalArgumentException("Raster height without pixels");return;}
+        if(height<16||height>152||height%8!=0||b.length!=48*height)throw new IllegalArgumentException("Invalid 384-dot Unicode text block");
+    }
+    private static void image(ByteArrayOutputStream b,byte[] pixels,int height){
+        if(pixels==null)return;
+        emit(b,0x1d,0x76,0x30,0,PHOTO_WIDTH/8,0,height&255,(height>>>8)&255);
+        b.write(pixels,0,pixels.length);
+        text(b,"\n");
+    }
+    private static byte[] encode(String value,String label,boolean test,byte[] photo,String moment,int height,String title,String caption,String footer,String style,byte[] titleRaster,int titleRasterHeight,byte[] captionRaster,int captionRasterHeight,byte[] footerRaster,int footerRasterHeight){
         ByteArrayOutputStream b=new ByteArrayOutputStream();
         emit(b,0x1b,0x40,0x1b,0x61,1); // initialize; centered ASCII only
         text(b,"RETROBOOTH\n"+(test?"PRINTER TEST - NOT A VIDEO":"PRIVATE VIDEO TICKET")+"\n");
-        if(!title.isEmpty())text(b,title+"\n");
+        if(titleRaster!=null)image(b,titleRaster,titleRasterHeight);else if(!title.isEmpty())text(b,title+"\n");
         if("ticket".equals(style))text(b,"- CINEMA MEMORY TICKET -\n");
+        if("premiere".equals(style))text(b,"* * WORLD PREMIERE * *\n");
+        if("filmstrip".equals(style))text(b,"[ 35MM / FILM MEMORY ]\n");
+        if("boarding".equals(style))text(b,"[ MEMORY BOARDING PASS ]\n");
         text(b,"MESSAGE "+label+"\n\n");
         if(photo!=null){
             text(b,"SNAPSHOT "+moment+"\n");
@@ -85,7 +110,7 @@ public final class QrTicket {
             b.write(photo,0,photo.length);
             text(b,"\n");
         }
-        if(!caption.isEmpty())text(b,caption+"\n\n");
+        if(captionRaster!=null)image(b,captionRaster,captionRasterHeight);else if(!caption.isEmpty())text(b,caption+"\n\n");
         emit(b,0x1d,0x28,0x6b,4,0,49,65,50,0); // Model 2
         emit(b,0x1d,0x28,0x6b,3,0,49,67,4); // 4 dots/module
         emit(b,0x1d,0x28,0x6b,3,0,49,69,49); // error correction M
@@ -93,7 +118,7 @@ public final class QrTicket {
         emit(b,0x1d,0x28,0x6b,n&255,n>>8,49,80,48);b.write(data,0,data.length);
         emit(b,0x1d,0x28,0x6b,3,0,49,81,48);
         text(b,"\n"+(test?"Scan and check the EXACT content":"Keep private - includes delete access")+"\n");
-        if(!footer.isEmpty())text(b,footer+"\n");
+        if(footerRaster!=null)image(b,footerRaster,footerRasterHeight);else if(!footer.isEmpty())text(b,footer+"\n");
         emit(b,0x1b,0x64,4,0x1b,0x61,0); // feed; no cutter command
         return b.toByteArray();
     }

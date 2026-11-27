@@ -57,7 +57,7 @@ async function pullCloudEvent(force=false,knownEvent=null){
 }
 function renderCloudManaged(){
  const connected=!!cloudClient?.connection;
- const managed=['eventTitle','eventDate','duration','countdownSetting','ticketCaptureSecond','ticketPhotoAspect','receiptStyle','receiptCaption','receiptFooter','qrDisplaySeconds','showDelay','showEnabled','lookMode'];
+ const managed=['eventTitle','eventDate','duration','countdownSetting','ticketCaptureSecond','ticketPhotoAspect','receiptStyle','ticketOrientation','receiptCaption','receiptFooter','panelMakerInput','panelProductInput','panelSubtitleInput','panelChannelInput','qrDisplaySeconds','showDelay','showEnabled','lookMode'];
  for(const id of managed){const node=$(id);if(node){node.disabled=connected;node.title=connected?'Cloud Event Master: change this field from Hostinger Cloud Admin, then sync.':'';}}
  document.querySelectorAll('input[name=screenStyle]').forEach(node=>{node.disabled=connected;});
  const notice=$('cloudMasterNotice');if(notice)notice.textContent=connected?'EVENT SETTINGS MANAGED BY CLOUD · idle sync every 15 seconds. Hardware inputs and printer stay local.':'LOCAL ONLY · event settings can be edited on this device.';

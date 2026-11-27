@@ -46,7 +46,28 @@
   if(!/^(T-[123]|REC START|LEGACY)$/.test(moment))throw new Error('Unknown saved photo capture point.');
   return {...result,photoMoment:moment};
  }
- const api={WIDTH,PROFILES,profile,capture,raster,fromDataURL,fromClip};
+ /** Android rasterizes Unicode label text on its own system font canvas before SPP.
+     Native QR remains a model-2 QR and is validated separately, never raster-only. */
+ function textRaster(value,maximum=80,maxLines=3){
+  const v=String(value||'').trim();if(!v||v.length>maximum||/[\x00-\x1f\x7f]/.test(v))throw new Error('Invalid printer caption text.');
+  const ascii=/^[\x20-\x7e]*$/.test(v);if(ascii)return null;
+  if(typeof document==='undefined')throw new Error('Unicode printer labels require the Android/web canvas.');
+  const c=document.createElement('canvas'),fontSize=23,lineHeight=31,padding=13;
+  c.width=384;let scratch=c.getContext('2d');scratch.font='bold 23px "Noto Sans CJK TC","PingFang HK","Microsoft JhengHei",sans-serif';
+  const lines=[];let line='';for(const char of v){if(scratch.measureText(line+char).width>350&&line){lines.push(line);line=char;}else line+=char;}
+  if(line)lines.push(line);
+  if(lines.length>maxLines)throw new Error('Chinese printer text is too long for this 58mm ticket block. Shorten the label.');
+  const height=Math.ceil((lines.length*lineHeight+padding*2)/8)*8;
+  if(height>152)throw new Error('Printer label block too tall.');
+  c.height=height;scratch=c.getContext('2d',{willReadFrequently:true});scratch.fillStyle='#fff';scratch.fillRect(0,0,384,height);
+  scratch.fillStyle='#000';scratch.font='bold 23px "Noto Sans CJK TC","PingFang HK","Microsoft JhengHei",sans-serif';scratch.textAlign='center';scratch.textBaseline='top';
+  lines.forEach((text,i)=>scratch.fillText(text,192,padding+i*lineHeight));
+  const px=scratch.getImageData(0,0,384,height).data,bytes=new Uint8Array(height*48);
+  for(let y=0;y<height;y++)for(let x=0;x<384;x++)if(px[(y*384+x)*4]<128)bytes[y*48+(x>>3)]|=0x80>>(x&7);
+  let binary='';for(let i=0;i<bytes.length;i+=2048)binary+=String.fromCharCode(...bytes.subarray(i,i+2048));
+  return {base64:btoa(binary),height};
+ }
+ const api={WIDTH,PROFILES,profile,capture,raster,fromDataURL,fromClip,textRaster};
  root.RetroTicketPhoto=api;
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window==='undefined'?globalThis:window);

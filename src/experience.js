@@ -6,7 +6,7 @@
   try{if(window.BroadcastChannel)channel=new BroadcastChannel('luce-retrobooth-v05-updates');}catch{}
   function designForm(){return {
     countdown:Number($('countdownSetting').value),returnSeconds:Number($('returnSeconds').value),
-    receiptStyle:$('receiptStyle').value,ticketCaptureSecond:Number($('ticketCaptureSecond').value),ticketPhotoAspect:$('ticketPhotoAspect').value,receiptCaption:$('receiptCaption').value,receiptFooter:$('receiptFooter').value,
+    receiptStyle:$('receiptStyle').value,ticketOrientation:$('ticketOrientation').value,ticketCaptureSecond:Number($('ticketCaptureSecond').value),ticketPhotoAspect:$('ticketPhotoAspect').value,receiptCaption:$('receiptCaption').value,receiptFooter:$('receiptFooter').value,
     logoData:draftLogo,showEnabled:$('showEnabled').checked,showDelay:Number($('showDelay').value)
   };}
   async function previewDesign(){
@@ -15,7 +15,7 @@
     try{
       await Receipt.prepare(draft);if(gen!==designGeneration)return;
       const result=Receipt.render($('designCanvas'),sample,renderer.snapshot(),draft);
-      $('designDimensions').textContent=result.width+' dots wide / approx. '+Math.round(result.estimatedLengthMm)+' mm long at 203 dpi (unverified head)';
+      $('designDimensions').textContent=result.width+'px web design / '+result.orientation+' / '+(result.native58mmCompatible?'58mm portrait photo + QR pilot':'LANDSCAPE PREVIEW ONLY: 58mm native printer stays portrait, QR upright')+' / paper length estimate '+Math.round(result.estimatedLengthMm)+'mm';
     }catch(e){$('designDimensions').textContent='Preview failed: '+e.message;}
   }
   function announceChange(id){channel?.postMessage({type:'changed',id});}
@@ -133,7 +133,7 @@
     $('deleteAck').onchange=()=>$('deleteConfirm').disabled=!$('deleteAck').checked;
     $('deleteCancel').onclick=()=>{if(!deleteBusy){deleteTarget=null;$('deleteDialog').close();}};
     $('deleteDialog').addEventListener('cancel',e=>{if(deleteBusy)e.preventDefault();else deleteTarget=null;});$('deleteConfirm').onclick=confirmDelete;
-    ['receiptStyle','receiptCaption','receiptFooter','receiptMode','eventTitle','eventDate','ticketPhotoAspect'].forEach(id=>$(id).addEventListener('input',previewDesign));
+    ['receiptStyle','ticketOrientation','receiptCaption','receiptFooter','receiptMode','eventTitle','eventDate','ticketPhotoAspect'].forEach(id=>$(id).addEventListener('input',previewDesign));
     $('logoFile').onchange=async()=>{
       const file=$('logoFile').files[0];if(!file)return;
       if(!['image/png','image/jpeg'].includes(file.type)||file.size>2*1024*1024){toast('Choose a PNG/JPEG no larger than 2 MB.');return;}
@@ -152,5 +152,5 @@
       refreshShared();
     };
     setInterval(()=>{if(['show','guest','library'].includes(currentView))refreshShared();if(currentView==='show'&&!store.available)reconcileShow();},1500);
-    document.querySelector('[data-i18n="privacy"]').textContent="\u7559\u8a00\u4f9b\u4e3b\u8fa6\u4eba\u4fdd\u5b58\uff1b\u5927\u5c4f\u5e55\u64ad\u653e\u9700\u53e6\u884c\u5141\u8a31\u3002\u5148\u5b58\u672c\u6a5f\uff1b\u96f2\u7aef\u6309 Admin \u8a2d\u5b9a\u555f\u7528\u3002\u6253\u5370\u672a\u9023\u63a5\u3002";
+    $('privacyNoticeCompact').textContent="\u7559\u8a00\u4f9b\u4e3b\u8fa6\u4eba\u4fdd\u5b58\uff1b\u5927\u5c4f\u5e55\u64ad\u653e\u9700\u53e6\u884c\u5141\u8a31\u3002\u5148\u5b58\u672c\u6a5f\uff1b\u96f2\u7aef\u6309 Admin \u8a2d\u5b9a\u555f\u7528\u3002\u6253\u5370\u672a\u9023\u63a5\u3002";
   }

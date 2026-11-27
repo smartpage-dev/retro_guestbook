@@ -131,6 +131,13 @@ public final class NativePrinter {
             finally{if(timeout!=null)timeout.cancel(false);if(activeCancel==cancel)activeCancel=null;busy.set(false);try{reply(r,id,status(),connected()?null:problem);}catch(Exception ignored){}}
         });
     }
+    /** Bounded 384-dot raster only; cannot contain ESC/POS commands or override QR payload. */
+    private static byte[] labelRaster(JSONObject m,String name) {
+        String field="ticket"+name+"RasterBase64",raw=m.optString(field,"");int height=m.optInt("ticket"+name+"RasterHeight",0);
+        if(raw.isEmpty()) {if(height!=0)throw new IllegalArgumentException("Text raster height without data");return null;}
+        if(height<16||height>152||height%8!=0||raw.length()>11000||!raw.matches("[A-Za-z0-9+/]+={0,2}"))throw new IllegalArgumentException("Invalid Unicode raster profile");
+        byte[] b=Base64.getDecoder().decode(raw);if(b.length!=48*height)throw new IllegalArgumentException("Unicode raster byte length invalid");return b;
+    }
     private void print(JSONObject m,JavaScriptReplyProxy r,String requestId,boolean test){
         if(dialogOpen||busy.get()){reply(r,requestId,null,"Printer busy. No ticket queued.");return;}
         if(!connected()||!permission()){reply(r,requestId,null,"Printer disconnected. Use the screen QR.");return;}
@@ -152,7 +159,7 @@ public final class NativePrinter {
                 photo=Base64.getDecoder().decode(encoded);
                 moment=m.optString("photoMoment");
             }
-            ticket=new QrTicket(job,clip,test?"https://example.invalid/retrobooth-printer-test/"+clip:m.optString("payload"),test?"0":m.optString("label"),test?"":m.optString("parent"),test?"test":"guest",origin,photo,moment,imageProfile,imageHeight,m.optString("ticketTitle"),m.optString("ticketCaption"),m.optString("ticketFooter"),m.optString("ticketStyle","classic"));
+            ticket=new QrTicket(job,clip,test?"https://example.invalid/retrobooth-printer-test/"+clip:m.optString("payload"),test?"0":m.optString("label"),test?"":m.optString("parent"),test?"test":"guest",origin,photo,moment,imageProfile,imageHeight,m.optString("ticketTitle"),m.optString("ticketCaption"),m.optString("ticketFooter"),m.optString("ticketStyle","classic"),labelRaster(m,"Title"),m.optInt("ticketTitleRasterHeight",0),labelRaster(m,"Caption"),m.optInt("ticketCaptionRasterHeight",0),labelRaster(m,"Footer"),m.optInt("ticketFooterRasterHeight",0));
             if(automatic&&(!ticket.id.equals(ticket.clipId)||!ticket.parent.isEmpty()))throw new IllegalArgumentException();
         }catch(Exception e){reply(r,requestId,null,"Ticket rejected before sending: verify saved cloud QR and bounded photo image profile. No bytes sent.");return;}
         int waitMs=Math.max(1000,Math.min(15000,m.optInt("waitMs",4000)));

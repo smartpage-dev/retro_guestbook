@@ -36,7 +36,7 @@ with sync_playwright() as pw:
                 check(f'{w}x{h} Modern CRT start accessible',0<measured['button']['y'] and measured['button']['bottom']<h-5)
                 check(f'{w}x{h} Modern CRT no horizontal scroll',measured['docWidth']<=w+1)
                 check(f'{w}x{h} Modern CRT glass bezel present',measured['bezel']['x']>0 and measured['screen']['x']>measured['bezel']['x'] and measured['shape']!='0px')
-                check(f'{w}x{h} Version text updated', '0.9.7' in measured['versionText'])
+                check(f'{w}x{h} Version text updated', '0.9.8' in measured['versionText'])
             measures.append({'style':style,**measured})
         for field in ('shell','bezel','screen','panel'):
             for prop in ('x','y','width','height'):

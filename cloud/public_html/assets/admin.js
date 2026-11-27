@@ -45,7 +45,7 @@
   if(!events.some(e=>e.id===active))active=events[0]?.id||'';select.value=active;}
  function bindSettings(e){if(!e)return;const s=e.settings||{};const fields={settingTitle:s.title||e.title,settingDate:s.date,settingDuration:s.duration,settingCountdown:s.countdown,
   settingScreenStyle:s.screenStyle,settingLookMode:s.lookMode,settingAspect:s.ticketPhotoAspect,settingCapture:s.ticketCaptureSecond,
-  settingQrSeconds:s.qrDisplaySeconds,settingReceiptStyle:s.receiptStyle,settingCaption:s.receiptCaption,settingFooter:s.receiptFooter,
+  settingQrSeconds:s.qrDisplaySeconds,settingReceiptStyle:s.receiptStyle,settingOrientation:s.ticketOrientation,settingPanelMaker:s.panelMaker,settingPanelProduct:s.panelProduct,settingPanelSubtitle:s.panelSubtitle,settingPanelChannel:s.panelChannel,settingCaption:s.receiptCaption,settingFooter:s.receiptFooter,
   settingShowDelay:s.showDelay};for(const [id,value] of Object.entries(fields))if($(id)&&value!==undefined)$(id).value=value;
   $('revisionBadge').textContent='CLOUD REV '+(e.settingsRevision||1);$('settingsSaveMessage').textContent='Idle Android booths check Cloud for this revision.';}
  function bindPolicy(e){if(!e)return;markToggle('issueToggle',e.issueOpen,'Accepting NEW QR reservations','Reservations closed');
@@ -129,7 +129,7 @@
  $('copyBundle').onclick=()=>run($('copyBundle'),async()=>{await navigator.clipboard.writeText($('bundle').value);},'Device bundle copied. Do not post it publicly.');
  $('eventSettingsForm').onsubmit=e=>{e.preventDefault();run($('saveSettings'),async()=>{const currentEvent=current();if(!currentEvent)throw new Error('Select an event first.');
   const settings={title:$('settingTitle').value,date:$('settingDate').value,duration:Number($('settingDuration').value),countdown:Number($('settingCountdown').value),screenStyle:$('settingScreenStyle').value,lookMode:$('settingLookMode').value,
-   ticketPhotoAspect:$('settingAspect').value,ticketCaptureSecond:Number($('settingCapture').value),qrDisplaySeconds:Number($('settingQrSeconds').value),receiptStyle:$('settingReceiptStyle').value,
+   ticketPhotoAspect:$('settingAspect').value,ticketCaptureSecond:Number($('settingCapture').value),qrDisplaySeconds:Number($('settingQrSeconds').value),receiptStyle:$('settingReceiptStyle').value,ticketOrientation:$('settingOrientation').value,panelMaker:$('settingPanelMaker').value,panelProduct:$('settingPanelProduct').value,panelSubtitle:$('settingPanelSubtitle').value,panelChannel:$('settingPanelChannel').value,
    receiptCaption:$('settingCaption').value,receiptFooter:$('settingFooter').value,showDelay:Number($('settingShowDelay').value)};
   await api('event/'+active+'/settings',{expectedRevision:currentEvent.settingsRevision||1,settings});await load();$('settingsSaveMessage').textContent='Saved to Cloud; next idle Android sync will apply this revision.';
  },'Event settings saved and versioned in Cloud.');};

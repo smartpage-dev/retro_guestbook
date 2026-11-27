@@ -38,7 +38,7 @@ BrowserStore.prototype.setSettings=async function(value){await new Promise(r=>se
     check(prefix+'no horizontal overflow',page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
     check(prefix+'one enabled guest action',page.locator('.guest-actions button:visible').count()==1 and page.locator('#touchBtn').is_enabled())
     check(prefix+'staff and receipt hidden',page.locator('.site-header').is_hidden() and page.locator('.receipt-column').is_hidden())
-    check(prefix+'privacy disclosure visible',page.locator('.privacy-line').is_visible())
+    check(prefix+'verbose privacy disclosure hidden by default; can enable via Admin',page.locator('.privacy-line').is_hidden())
     check(prefix+'button is a usable touch target',page.locator('#touchBtn').evaluate('e=>e.offsetWidth>=44&&e.offsetHeight>=44'))
     check(prefix+'screen appearance applied',page.locator('body').get_attribute('data-screen-style')==style)
     if w>h:

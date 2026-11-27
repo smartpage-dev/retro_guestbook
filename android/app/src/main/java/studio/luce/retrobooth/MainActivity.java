@@ -150,10 +150,11 @@ public final class MainActivity extends Activity {
                 (view,message,sourceOrigin,isMainFrame,reply)->{
                     if(!isMainFrame||!trusted(sourceOrigin)||view.getUrl()==null||!"/assets/www/index.html".equals(Uri.parse(view.getUrl()).getPath()))return;
                     try{
-                        String data=message.getData();if(data==null||data.length()>30000)return;
+                        String data=message.getData();if(data==null||data.length()>65536)return;
                         JSONObject command=new JSONObject(data);
                         // QR-only control commands remain 4 KiB. Only the two print operations
-                        // may carry an explicitly bounded 384x216/288/336 1bpp raster (up to ~22 KiB base64).
+                        // may carry a bounded 384x216/288/336 photo PLUS at most three 384-dot Unicode text raster blocks.
+                        // Strict total envelope 64 KiB; no other operation gains this larger cap.
                         if(data.length()>4096&&!("print".equals(command.optString("op"))||"test".equals(command.optString("op"))))return;
                         printer.handle(command,reply);
                     }catch(Exception e){toast("Printer request rejected.");}

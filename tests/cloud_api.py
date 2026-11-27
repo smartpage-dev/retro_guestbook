@@ -51,11 +51,13 @@ with tempfile.TemporaryDirectory(prefix='retro-cloud-api-') as tmp:
   check('new event permissions are private and disabled by default',event['showEnabled'] is False and event['allowGuestDelete'] is False and event['autoApproveShow'] is False)
   check('duplicate event name case-insensitive rejected',request('/api/admin/events',admin,{'title':'synthetic test event','days':30})[0]==409)
   check('event starts at Cloud settings revision 1',event['settingsRevision']==1)
-  settings1={**event['settings'],'duration':30,'screenStyle':'bubble','lookMode':'vhs','receiptCaption':'STAY A WHILE'}
+  settings1={**event['settings'],'duration':30,'screenStyle':'bubble','lookMode':'vhs','receiptCaption':'STAY A WHILE','panelMaker':'LUCE STUDIO','panelProduct':'RETROVISION HK','panelSubtitle':'WELCOME TO THE VIDEO GUESTBOOK','panelChannel':'07','ticketOrientation':'landscape','receiptStyle':'premiere'}
   code,updated,_=request('/api/admin/event/'+eid+'/settings',admin,{'expectedRevision':1,'settings':settings1})
   check('Cloud Event Master accepts and versions safe kiosk settings',code==200 and updated['settingsRevision']==2 and updated['settings']['screenStyle']=='bubble')
+  check('Cloud Event Master syncs TV labels and paper template',updated['settings']['panelProduct']=='RETROVISION HK' and updated['settings']['panelChannel']=='07' and updated['settings']['ticketOrientation']=='landscape' and updated['settings']['receiptStyle']=='premiere')
   check('stale Cloud settings edits fail rather than overwrite',request('/api/admin/event/'+eid+'/settings',admin,{'expectedRevision':1,'settings':settings1})[0]==409)
   check('unsafe look mode rejected',request('/api/admin/event/'+eid+'/settings',admin,{'expectedRevision':2,'settings':{'lookMode':'arbitrary-js'}})[0]==400)
+  check('unsafe TV channel rejected',request('/api/admin/event/'+eid+'/settings',admin,{'expectedRevision':2,'settings':{'panelChannel':'99;DROP'}})[0]==400)
   check('Web slideshow route exists but token required for playlist',request('/show/')[0]==200 and request('/api/show/playlist')[0]==401)
   _,bundle,_=request('/api/admin/device',admin,{'eventId':eid,'label':'TEST ONLY'});device=bundle['deviceToken']
   check('device scoped verify',request('/api/device/verify',device)[1]['event']['id']==eid)
