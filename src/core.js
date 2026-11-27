@@ -1,4 +1,4 @@
-/* RetroBooth v0.9.8-alpha.1. Pure, independently testable domain helpers. */
+/* RetroBooth v0.9.9-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -32,8 +32,8 @@
       panelProduct: String(raw.panelProduct ?? 'RETROVISION').trim().slice(0,22) || 'RETROVISION',
       panelSubtitle: String(raw.panelSubtitle ?? 'VIDEO GUESTBOOK / RV-04').trim().slice(0,55),
       panelChannel: /^\d{1,2}$/.test(String(raw.panelChannel ?? '03')) ? String(raw.panelChannel ?? '03').padStart(2,'0') : '03',
-      renderMaxFps: ['auto','12','15','24','30'].includes(String(raw.renderMaxFps ?? 'auto')) ? String(raw.renderMaxFps ?? 'auto') : 'auto',
-      renderHeight: [360,540,720].includes(Number(raw.renderHeight ?? 720)) ? Number(raw.renderHeight ?? 720) : 720,
+      renderMaxFps: ['auto','8','10','12','15','18','20','24','30'].includes(String(raw.renderMaxFps ?? '24')) ? String(raw.renderMaxFps ?? '24') : '24',
+      renderHeight: [360,540,720].includes(Number(raw.renderHeight ?? 360)) ? Number(raw.renderHeight ?? 360) : 360,
       guestScreenInfo: raw.guestScreenInfo === true,
       preset: ['warm','soft','mono'].includes(raw.preset) ? raw.preset : 'warm',
       grain: Math.max(0, Math.min(0.15, Number(raw.grain) || 0)),

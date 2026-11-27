@@ -11,7 +11,7 @@
    this.noise=document.createElement('canvas');this.noise.width=this.noise.height=128;
    this.nc=this.noise.getContext('2d');this.nd=this.nc.createImageData(128,128);this.noiseTick=-1;
    this.scanlines=document.createElement('canvas');this.vignette=document.createElement('canvas');
-   this.active=true;this.live=false;this.recording=false;this.frameCount=0;this.last=0;this.running=true;this.fps=0;
+   this.active=true;this.live=false;this.recording=false;this.frameCount=0;this.last=0;this.nextFrameAt=0;this.running=true;this.fps=0;
    this.fpsStart=performance.now();this.fpsCount=0;this.backendWarning='';
    this.glCanvas=document.createElement('canvas');this.gl=null;
    if(options.backend!=='2d'){
@@ -22,14 +22,18 @@
    this.glCanvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.gl=null;this.mode='Canvas 2D (GPU context lost)';this.backendWarning='GPU lost; CPU fallback active.';});
    this.setAspect(13/9);
    this.loop=t=>{if(!this.running)return;requestAnimationFrame(this.loop);if(!this.active||document.hidden)return;
-    const wanted=Number(this.settings.renderMaxFps);const interval=Number.isFinite(wanted)&&wanted>0?1000/wanted:(this.recording?30:60);
-    if(t-this.last<interval-1)return;this.last=t;
+    const wanted=Number(this.settings.renderMaxFps);const interval=1000/(Number.isFinite(wanted)&&wanted>0?wanted:(this.recording?30:24));
+    // Deadline cadence: on 60Hz displays 24 FPS alternates 2/3 vsyncs (not 20 FPS).
+    // Drop overdue frames after tab suspension; never draw a catch-up burst.
+    if(!this.nextFrameAt||t-this.nextFrameAt>interval*2)this.nextFrameAt=t;
+    if(t+0.5<this.nextFrameAt)return;
+    this.nextFrameAt+=interval;this.last=t;
     try{this.draw(t/1000);}catch(e){this.running=false;window.dispatchEvent(new CustomEvent('rendererfailure',{detail:'Image processing failed: '+e.message}));return;}
     this.frameCount++;this.fpsCount++;if(t-this.fpsStart>1000){this.fps=this.fpsCount*1000/(t-this.fpsStart);this.fpsCount=0;this.fpsStart=t;}
    };requestAnimationFrame(this.loop);
   }
   setAspect(aspect){
-   if(this.recording)return;const h=[360,540,720].includes(Number(this.settings.renderHeight))?Number(this.settings.renderHeight):720,w=Math.round(h*Math.max(.8,Math.min(3,aspect))/2)*2;
+   if(this.recording)return;const h=[360,540,720].includes(Number(this.settings.renderHeight))?Number(this.settings.renderHeight):360,w=Math.round(h*Math.max(.8,Math.min(3,aspect))/2)*2;
    if(w===this.w&&h===this.h)return;this.w=w;this.h=h;
    for(const c of [this.raw,this.canvas,this.scanlines,this.vignette]){c.width=w;c.height=h;}
    const sc=this.scanlines.getContext('2d');sc.fillStyle='#000';for(let y=0;y<h;y+=4)sc.fillRect(0,y,w,1);

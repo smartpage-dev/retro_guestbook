@@ -258,7 +258,7 @@ body.kiosk[data-screen-style=edge]{background:#20262a}
  .kiosk[data-screen-style=edge] .control-panel .staff-entry{margin-bottom:0;min-height:36px}
 }
 
-/* v0.9.8: styles 03–05 only change materials, never screen geometry or hit targets. */
+/* v0.9.9: styles 03–05 only change materials, never screen geometry or hit targets. */
 .swatch-space{padding:9px;gap:8px;background:linear-gradient(130deg,#f9f0d6,#ddd4b7 32%,#fff6e2 70%,#9a9988)}
 .swatch-space .mini-picture{border:8px solid #c4c2ac;border-radius:26px / 28px;box-shadow:0 0 0 2px #e3d6aa;background:radial-gradient(#5e6556,#243531);color:#f1e6bc}
 .swatch-space .mini-panel{width:22%;padding:12px 9px;background:linear-gradient(100deg,#ddd4b7,#f2ebd3,#acae9f)}
@@ -293,7 +293,7 @@ body.kiosk[data-screen-style=edge]{background:#20262a}
 .kiosk[data-screen-style=bubble] .control-panel .staff-entry{background:#183e6a;color:#ecfaff;border:1px solid #99cde1}
 /* All five cabinets retain the same safe-area and version entry geometry. */
 .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel .staff-entry{min-height:clamp(22px,3.3vh,36px);padding:5px 12px;touch-action:manipulation;cursor:pointer}
-/* v0.9.8 compact-landscape safety: all TV shells use Modern CRT's proven footer spacing.
+/* v0.9.9 compact-landscape safety: all TV shells use Modern CRT's proven footer spacing.
    This only applies to short landscape viewports; the 32-inch 1920x1080 layout is untouched. */
 @media (max-height:650px) and (orientation:landscape){
  .kiosk:is([data-screen-style=heritage],[data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel .speaker{margin-top:8px;min-height:0}
@@ -307,7 +307,7 @@ body.kiosk[data-screen-style=edge]{background:#20262a}
  .kiosk:is([data-screen-style=heritage],[data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-lamps{margin-top:7px}
  .kiosk:is([data-screen-style=heritage],[data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel .staff-entry{min-height:22px;margin-bottom:4px;padding:2px 10px}
 }
-/* v0.9.8 actual-display hotfix: all controls remain in the same accessible grid. */
+/* v0.9.9 actual-display hotfix: all controls remain in the same accessible grid. */
 .kiosk .panel-brand{min-width:0;max-width:100%;overflow-wrap:anywhere}
 .kiosk .panel-brand strong{display:block;max-width:100%;font-size:clamp(15px,1.6vw,26px)!important;line-height:1.06;letter-spacing:-.035em;white-space:normal!important;overflow-wrap:anywhere;word-break:normal}
 .kiosk .panel-brand .model{display:block;max-width:100%;white-space:normal!important;overflow-wrap:anywhere;word-break:normal;letter-spacing:.035em;line-height:1.45;margin-top:6px;font-size:clamp(7px,.60vw,11px)}

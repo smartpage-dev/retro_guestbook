@@ -1,0 +1,488 @@
+/* RetroBooth 0.9.9: three deliberately different physical cabinets.
+ * 03: 1970s mustard portable; 04: rusted 1950s asymmetric set;
+ * 05: 1960s walnut living-room console on legs.
+ * All decoration is aria-hidden/pointer-events:none. Actual screen remains the
+ * same live canvas, and START / version are real HTML buttons. No stock photos.
+ */
+.kiosk .antique-top,.kiosk .antique-feet,.kiosk .vintage-sidecar{display:none}
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .antique-top,
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .antique-feet{display:block;position:absolute;inset:0;pointer-events:none}
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .television{
+ position:relative;isolation:isolate;overflow:visible;max-width:none!important;
+ box-sizing:border-box;align-items:stretch;filter:drop-shadow(0 22px 22px #0e0d0c64);
+}
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .tv-bezel,
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel{position:relative;z-index:2;min-width:0;min-height:0}
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .cabinet-details{z-index:5;overflow:hidden;border-radius:inherit}
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .tv-screen{overflow:hidden}
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel .staff-entry{
+ position:relative;z-index:6;display:flex;align-items:center;justify-content:center;max-width:100%;
+ margin-bottom:5px;min-height:34px;padding:5px 9px;border-radius:5px;touch-action:manipulation
+}
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-start{min-width:76px;min-height:74px;position:relative;z-index:6}
+.kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-brand{
+ width:100%;max-width:100%;overflow-wrap:anywhere
+}
+/* Selected models are display-size props, never print or encode overlays. */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   03  |  MUSTARD PORTABLE TELEVISION  |  reference: yellow travel TV
+   Curved, three-dimensional injection-moulded case and chromed carry grip.
+   ───────────────────────────────────────────────────────────────────────── */
+body.kiosk[data-screen-style=space]{
+ background:radial-gradient(ellipse at 50% 20%,#b5aa89,#787964 52%,#33352d 100%);
+ --panel-width:clamp(174px,22vw,366px);
+}
+.kiosk[data-screen-style=space] .television{
+ width:92%!important;height:82%!important;margin:10vh auto 0!important;
+ grid-template-columns:minmax(0,1fr) var(--panel-width);gap:clamp(8px,.95vw,18px);
+ padding:clamp(15px,1.7vw,33px)!important;
+ border:clamp(7px,1vw,18px) solid #d1a329!important;
+ border-radius:clamp(25px,3.4vw,65px)!important;
+ background:
+  radial-gradient(ellipse at 3% 5%,#ffed80bd 0 2%,transparent 34%),
+  radial-gradient(ellipse at 88% 98%,#7b491b79 0 1%,transparent 55%),
+  repeating-linear-gradient(110deg,transparent 0 6px,#ffffff08 7px 8px,transparent 9px 18px),
+  linear-gradient(125deg,#ffe45f 0%,#dcaf2f 12%,#f9d34b 41%,#bb861f 83%,#795625 100%);
+ box-shadow:inset 0 0 0 2px #fff0a855,inset 0 0 0 9px #975e19,
+  inset 0 13px 21px #fff9b64f,inset 0 -17px 24px #7041169e,0 26px 40px #2019109b;
+}
+.kiosk[data-screen-style=space] .television::after{
+ content:'';position:absolute;inset:1.7% 1.2%;z-index:1;pointer-events:none;
+ border:2px solid #794a2599;border-radius:inherit;box-shadow:inset 0 2px 5px #fff9b74f,0 1px 0 #f9edb19e
+}
+.kiosk[data-screen-style=space] .tv-bezel{
+ margin:0!important;padding:clamp(19px,2vw,42px)!important;
+ border:clamp(9px,1.1vw,22px) solid #222522;
+ border-radius:clamp(24px,3vw,60px) / clamp(32px,4.7vw,90px);
+ background:linear-gradient(138deg,#73766b 0%,#101818 5%,#1c221f 14%,#0e1110 79%,#525a4f 94%,#0b1415 100%);
+ box-shadow:0 0 0 3px #fff3a6,0 0 0 9px #ab7a24,11px 12px 17px #654112a0,
+  inset 2px 2px 4px #c5c9ac66,inset -6px -6px 12px #000c;
+}
+.kiosk[data-screen-style=space] .tv-screen{
+ border-radius:clamp(17px,2.2vw,43px)/clamp(23px,3.5vw,70px);
+ box-shadow:inset 0 0 22px #000b,0 0 0 5px #080d0c,0 0 0 8px #787b6c
+}
+.kiosk[data-screen-style=space] .control-panel{
+ margin:clamp(4px,.5vw,10px) clamp(2px,.3vw,7px) clamp(5px,.6vw,12px) 0;
+ padding:clamp(10px,1.5vw,28px) clamp(10px,1.5vw,29px);
+ border:clamp(3px,.45vw,8px) solid #181d1a;border-radius:clamp(15px,2.1vw,36px);
+ background:repeating-linear-gradient(0deg,#c6cfbd08 0 1px,transparent 1px 6px),
+  linear-gradient(105deg,#484f45,#232a28 12%,#151c1b 63%,#3d473e 98%);
+ box-shadow:0 0 0 4px #e2b744,0 8px 16px #4f371abc,
+  inset 1px 2px 4px #a1a89866,inset -5px -6px 12px #020807c4;
+ color:#e5e7cb;
+}
+.kiosk[data-screen-style=space] .control-panel:before{
+ content:'PORTABLE / B&W';position:absolute;right:6%;top:1%;font:8px var(--mono);letter-spacing:.7px;color:#b1b8a2;opacity:.8;
+ border:0;box-shadow:none;inset:auto 6% auto auto
+}
+.kiosk[data-screen-style=space] .control-panel>*{z-index:2}
+.kiosk[data-screen-style=space] .panel-brand{
+ padding:clamp(6px,.7vw,13px);border:1px solid #858b75;border-radius:2px;
+ background:linear-gradient(140deg,#bbc0a5,#e6ddaf,#929c85);color:#26342b;
+ box-shadow:inset 0 1px 2px #fff9,0 2px 7px #0007;
+}
+.kiosk[data-screen-style=space] .panel-brand .maker,.kiosk[data-screen-style=space] .panel-brand .model,
+.kiosk[data-screen-style=space] .panel-brand strong{color:#243329}
+.kiosk[data-screen-style=space] .channel-display{border-color:#81917a88}
+.kiosk[data-screen-style=space] .display-label,.kiosk[data-screen-style=space] .dial-caption{color:#d8c487}
+.kiosk[data-screen-style=space] .tuning-dial{
+ width:clamp(61px,8vh,92px);height:clamp(61px,8vh,92px);
+ border:clamp(5px,.55vw,10px) solid #bfc3b5;outline:3px solid #0f1716;
+ background:repeating-conic-gradient(#303a32 0 6deg,#070a09 6deg 12deg);
+ box-shadow:0 0 0 3px #858b77,0 7px 9px #000b,inset 1px 2px 3px #d2dbcb88
+}
+.kiosk[data-screen-style=space] .tuning-dial:before{inset:12%;background:radial-gradient(ellipse at 34% 26%,#4b5950,#171d1a 55%,#030706 78%,#87938a 81%);border-color:#8b9b8b}
+.kiosk[data-screen-style=space] .tuning-dial span{background:linear-gradient(90deg,#9ca29b,#f1f1e0,#444b42);width:12%;height:68%}
+.kiosk[data-screen-style=space] .panel-session{
+ border:2px solid #8b9280;background:linear-gradient(130deg,#070f0e,#141f19);color:#cad1aa
+}
+.kiosk[data-screen-style=space] .panel-time,.kiosk[data-screen-style=space] .channel-number{color:#d1d3a3}
+.kiosk[data-screen-style=space] .panel-start{
+ border:clamp(5px,.6vw,10px) solid #b9c0aa;outline:3px solid #0e1716;
+ border-radius:50%;background:radial-gradient(ellipse at 35% 24%,#535e4a,#171e1a 60%,#070d0c);
+ box-shadow:0 0 0 5px #3c453b,0 0 0 10px #c7b36b,0 7px 0 9px #1d271e,0 10px 14px #000a,
+  inset 0 3px 4px #b9caaf77,inset 0 -6px 7px #000;
+ color:#fbefc8
+}
+.kiosk[data-screen-style=space] .panel-start:not(:disabled):active{transform:translateY(3px);box-shadow:0 0 0 5px #3c453b,0 0 0 10px #c7b36b,0 3px 0 9px #1d271e,inset 0 5px 9px #000}
+.kiosk[data-screen-style=space] .panel-start:disabled{background:radial-gradient(#454a3e,#141b17 75%)}
+.kiosk[data-screen-style=space] .panel-hint,.kiosk[data-screen-style=space] .panel-lamps{color:#d9ca96}
+.kiosk[data-screen-style=space] .control-panel .speaker{
+ border:4px solid #9ea395;border-radius:9px;background:repeating-linear-gradient(0deg,#080e0c 0 4px,#a6ad9166 4px 5px,#151e1a 5px 7px);
+ box-shadow:0 0 0 2px #171d18,inset 0 4px 9px #0009
+}
+.kiosk[data-screen-style=space] .control-panel .staff-entry{background:#e0cb8d;color:#252c23;border:1px solid #151f19;font-weight:700}
+.kiosk[data-screen-style=space] #panelBoundary{color:#d5c28b}
+.kiosk[data-screen-style=space] #panelBoundary[data-ready=true]{color:#b2d196}
+.kiosk[data-screen-style=space] .carry-handle{
+ display:block;position:absolute;z-index:0;left:23%;top:clamp(-69px,-6.3vh,-25px);
+ width:33%;height:clamp(53px,8vh,112px);border:clamp(10px,1.2vw,23px) solid #44463b;
+ border-bottom:0;border-radius:48% 48% 0 0/68% 68% 0 0;
+ background:none;box-shadow:inset 0 5px 6px #969b83,0 -5px 0 #b8ab83,0 -9px 4px #29281d88
+}
+.kiosk[data-screen-style=space] .carry-handle:after{
+ content:'';position:absolute;left:24%;right:24%;top:-4px;height:22px;
+ border-radius:8px;background:linear-gradient(#383c36,#0c1312 60%,#696e5c);box-shadow:0 1px 2px #0009
+}
+.kiosk[data-screen-style=space] .antenna-rod-right{
+ display:block;position:absolute;left:73%;top:clamp(-91px,-8.5vh,-29px);height:clamp(91px,13vh,170px);
+ width:clamp(4px,.35vw,7px);transform:rotate(-8deg);transform-origin:bottom;
+ border-radius:4px;background:linear-gradient(90deg,#4c504a,#f1f0d3 45%,#343a36 90%);
+ box-shadow:3px 0 3px #0004
+}
+.kiosk[data-screen-style=space] .antenna-hinge{display:block;position:absolute;left:71%;top:1%;width:27px;height:27px;border-radius:50%;background:radial-gradient(circle,#ccd2c4 0 24%,#393e38 25% 54%,#c6cbbc 56% 71%,#373c35 73%);box-shadow:1px 2px 4px #0009}
+.kiosk[data-screen-style=space] .antique-feet{display:none}
+.kiosk[data-screen-style=space] .cabinet-details i{width:12px;height:12px;background:radial-gradient(circle,#44412e 0 20%,#ddca82 22% 54%,#5c4a25 56%)}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   04  |  RUSTED 1950s STEEL / BAKELITE KNOBS  |  asymmetrical three-part cabinet
+   Left speaker/control tower + central CRT + right real START/timer controls.
+   ───────────────────────────────────────────────────────────────────────── */
+body.kiosk[data-screen-style=studio]{
+ background:radial-gradient(ellipse at 48% 45%,#8b7458,#514339 60%,#241d1a 100%);
+ --panel-width:clamp(165px,17.5vw,330px);
+}
+.kiosk[data-screen-style=studio] .television{
+ width:95%!important;height:89%!important;margin:5.6vh auto 0!important;
+ grid-template-columns:clamp(76px,12vw,220px) minmax(0,1fr) var(--panel-width);
+ gap:clamp(8px,.85vw,17px);padding:clamp(12px,1.55vw,32px)!important;
+ border:clamp(7px,.8vw,16px) solid #64402b!important;border-radius:clamp(17px,2.5vw,46px);
+ background:
+  radial-gradient(circle at 11% 13%,#2a2a205f 0 .7%,transparent 1.2%),
+  radial-gradient(circle at 86% 72%,#201d1963 0 1.2%,transparent 2%),
+  repeating-radial-gradient(circle at 27% 30%,transparent 0 13px,#1e1d153d 15px 16px,transparent 18px 43px),
+  repeating-linear-gradient(170deg,transparent 0 6px,#21140b2b 7px 9px,transparent 12px 23px),
+  linear-gradient(126deg,#d2a14c 0%,#ab622d 19%,#de9947 41%,#7a3b24 72%,#49251c 100%);
+ box-shadow:inset 0 0 0 3px #edc67570,inset 0 0 0 8px #4c2b20,inset 0 17px 21px #fae0a54a,
+  inset 0 -15px 25px #1a100cd6,0 26px 33px #130e0d91;
+}
+.kiosk[data-screen-style=studio] .television::after{
+ content:'';position:absolute;inset:2%;border-radius:inherit;pointer-events:none;z-index:1;
+ border:2px dashed #3b211b60;box-shadow:inset 0 0 0 3px #c6904b45
+}
+.kiosk[data-screen-style=studio] .vintage-sidecar{
+ display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;
+ min-width:0;min-height:0;position:relative;z-index:2;grid-column:1;grid-row:1;
+ padding:clamp(12px,1.2vw,26px) clamp(6px,.7vw,14px);
+ background:repeating-linear-gradient(12deg,transparent 0 4px,#261a1240 5px 6px,transparent 9px 21px),
+  linear-gradient(90deg,#754327,#c4833c 16%,#bd7432 53%,#592f20 100%);
+ border:3px solid #422a1d;border-radius:clamp(8px,1.2vw,22px);
+ box-shadow:inset 2px 3px 7px #ffb95467,inset -7px -2px 11px #27130ebb,0 0 0 3px #b78b54
+}
+.kiosk[data-screen-style=studio] .sidecar-dial,
+.kiosk[data-screen-style=studio] .sidecar-knob{
+ display:block;flex:none;position:relative;border-radius:50%;
+ width:clamp(36px,5vw,94px);height:clamp(36px,5vw,94px);
+ border:clamp(5px,.6vw,11px) solid #c8ad76;
+ background:radial-gradient(circle at 38% 28%,#cab88c 0 13%,#625745 24% 38%,#272923 46% 63%,#9c8658 72%,#1d231e 84%);
+ box-shadow:0 0 0 4px #3e2d23,0 0 0 6px #d4a35c,0 5px 7px #160c09bd,inset 0 2px 4px #e9ca9366
+}
+.kiosk[data-screen-style=studio] .sidecar-dial:after,.kiosk[data-screen-style=studio] .sidecar-knob:after{
+ content:'';position:absolute;left:47%;top:17%;width:7%;height:66%;border-radius:2px;
+ background:#e4d9ac;transform:rotate(24deg);box-shadow:1px 1px 2px #0006
+}
+.kiosk[data-screen-style=studio] .sidecar-scale{
+ flex:none;width:85%;height:clamp(14px,3vh,32px);border:2px solid #3f2d21;border-radius:2px;
+ background:repeating-linear-gradient(90deg,#b29b6c 0 1px,transparent 1px 7px),linear-gradient(#27241e,#44362a);
+ box-shadow:inset 0 0 6px #000b
+}
+.kiosk[data-screen-style=studio] .sidecar-grille{
+ display:block;flex:1;min-height:22px;max-height:26%;width:93%;border:clamp(3px,.35vw,6px) ridge #9f7a4c;
+ background:repeating-linear-gradient(0deg,#211b15 0 4px,#bb865044 5px 6px,#291d15 7px 10px);
+ box-shadow:inset 0 2px 11px #000b,0 2px 5px #3f271c70
+}
+.kiosk[data-screen-style=studio] .sidecar-knob{width:clamp(24px,3vw,58px);height:clamp(24px,3vw,58px)}
+.kiosk[data-screen-style=studio] .tv-bezel{
+ grid-column:2;grid-row:1;margin:0!important;
+ padding:clamp(18px,2vw,42px)!important;
+ border:clamp(11px,1.3vw,28px) solid #51362a!important;
+ border-radius:clamp(17px,2.2vw,43px)/clamp(22px,3.4vw,67px)!important;
+ background:linear-gradient(129deg,#f0bb75,#5d3d28 3%,#271d19 9%,#111717 16%,#111b18 85%,#bc8b58 96%);
+ box-shadow:0 0 0 3px #dfb375,0 0 0 9px #603922,7px 12px 17px #24120a9f,
+  inset 3px 5px 9px #000a,inset -3px -3px 6px #f2cd9470;
+}
+.kiosk[data-screen-style=studio] .tv-screen{
+ border-radius:clamp(20px,2.8vw,56px)/clamp(28px,3.8vw,80px);
+ box-shadow:inset 0 0 35px #000c,0 0 0 4px #0e1613,0 0 0 7px #8a6e4c
+}
+.kiosk[data-screen-style=studio] .control-panel{
+ grid-column:3;grid-row:1;margin:0;
+ border:clamp(4px,.65vw,12px) solid #68402c;border-radius:clamp(7px,.8vw,15px);
+ padding:clamp(12px,1.3vw,27px) clamp(9px,1.1vw,22px);
+ background:radial-gradient(circle at 70% 80%,#2e1b126c 0%,transparent 39%),
+  repeating-linear-gradient(175deg,#3f281623 0 3px,transparent 4px 14px),
+  linear-gradient(108deg,#d6a24e 0%,#a9692d 30%,#e0a451 63%,#5b2f1d 100%);
+ box-shadow:0 0 0 3px #3a291e,inset 3px 3px 8px #ffce7969,inset -5px -6px 9px #271310ad;
+ color:#422b1b
+}
+.kiosk[data-screen-style=studio] .control-panel:after{
+ content:'';position:absolute;right:4%;top:5%;width:2px;height:90%;opacity:.45;
+ background:repeating-linear-gradient(0deg,#241b15 0 1px,transparent 1px 11px);pointer-events:none
+}
+.kiosk[data-screen-style=studio] .panel-brand{
+ border:2px solid #6b4d2d;border-radius:3px;
+ color:#493521;background:linear-gradient(145deg,#e4bf73,#d4a663 53%,#b78243);
+ box-shadow:inset 0 2px 2px #fff1b26b,0 2px 3px #401b0b63
+}
+.kiosk[data-screen-style=studio] .panel-brand .maker,.kiosk[data-screen-style=studio] .panel-brand .model,
+.kiosk[data-screen-style=studio] .panel-brand strong{color:#482b1e}
+.kiosk[data-screen-style=studio] .channel-display{border-color:#643b2866}
+.kiosk[data-screen-style=studio] .channel-number{color:#493021;text-shadow:0 1px 1px #f4d18b7a}
+.kiosk[data-screen-style=studio] .display-label,.kiosk[data-screen-style=studio] .panel-hint,.kiosk[data-screen-style=studio] .panel-lamps{color:#5b3422}
+.kiosk[data-screen-style=studio] .panel-session{
+ background:linear-gradient(135deg,#2e251c,#171e18);border:3px solid #b38c59;color:#f6d99b;
+ box-shadow:0 0 0 2px #51351f,inset 0 3px 11px #000c
+}
+.kiosk[data-screen-style=studio] .panel-time,.kiosk[data-screen-style=studio] .session-label{color:#eed099}
+.kiosk[data-screen-style=studio] .tuning-dial{
+ display:grid;outline-color:#523822;
+ border-color:#bc9a63;background:repeating-conic-gradient(#bfa16d 0 4deg,#604a2d 4deg 8deg)
+}
+.kiosk[data-screen-style=studio] .panel-start{
+ border:clamp(6px,.6vw,11px) solid #a88e61;outline:3px solid #462d1c;border-radius:50%!important;
+ width:clamp(96px,13.7vh,155px);height:clamp(96px,13.7vh,155px);
+ background:radial-gradient(ellipse at 35% 30%,#8e5c3a,#4b301f 47%,#241e17 87%);
+ box-shadow:0 0 0 4px #4a3323,0 0 0 8px #d0ad6d,0 6px 0 8px #2d221a,0 11px 14px #000a,
+  inset 0 2px 3px #d1ab777b,inset 0 -4px 7px #000;
+ color:#ffe0aa
+}
+.kiosk[data-screen-style=studio] .panel-start:not(:disabled):active{transform:translateY(3px);box-shadow:0 0 0 4px #4a3323,0 0 0 8px #d0ad6d,0 3px 0 8px #2d221a,inset 0 4px 9px #000a}
+.kiosk[data-screen-style=studio] .panel-start:disabled{filter:saturate(.5)}
+.kiosk[data-screen-style=studio] .control-panel .speaker{
+ border:5px ridge #9e7545;border-radius:2px;background:repeating-linear-gradient(90deg,#170f0b 0 3px,#bf925c55 4px 5px,#1c140e 6px 8px);
+ box-shadow:inset 0 4px 12px #000a
+}
+.kiosk[data-screen-style=studio] .control-panel .staff-entry{background:#422a1e;color:#ffe2ae;border:1px solid #bd955c}
+.kiosk[data-screen-style=studio] #panelBoundary{color:#704522}
+.kiosk[data-screen-style=studio] #panelBoundary[data-ready=true]{color:#315d36}
+.kiosk[data-screen-style=studio] .cabinet-details i{width:14px;height:14px;background:radial-gradient(circle,#221912 0 28%,#ac824e 30% 52%,#40291d 54%)}
+.kiosk[data-screen-style=studio] .antique-top,.kiosk[data-screen-style=studio] .antique-feet{display:none}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   05  |  1960s WALNUT CONSOLE  |  four tapered feet and rabbit-ear aerial
+   Woodgrain frame / silver bezel / real right-hand speaker and controls.
+   ───────────────────────────────────────────────────────────────────────── */
+body.kiosk[data-screen-style=bubble]{
+ background:linear-gradient(180deg,#c3beb3 0%,#ece5d7 70%,#7a6650 70.2%,#372f26 100%);
+ --panel-width:clamp(172px,20.5vw,375px);
+}
+.kiosk[data-screen-style=bubble] .television{
+ width:91%!important;height:73%!important;margin:9vh auto 0!important;
+ grid-template-columns:minmax(0,1fr) var(--panel-width);gap:clamp(6px,.75vw,17px);
+ padding:clamp(13px,1.4vw,27px)!important;
+ border:clamp(11px,1.45vw,29px) solid #6a3b21!important;border-radius:clamp(9px,1.15vw,21px);
+ background:
+  repeating-linear-gradient(2deg,transparent 0 3px,#2a160d39 3px 4px,transparent 5px 11px),
+  repeating-linear-gradient(91deg,#5b311b 0 21px,#854e2a 23px 31px,#4e2919 35px 45px,#a06034 47px 50px,#422819 52px 67px),
+  linear-gradient(125deg,#be8552,#442516 92%);
+ box-shadow:inset 0 0 0 2px #d2a16b,inset 0 0 0 7px #3d2113,
+  inset 0 11px 13px #d9aa745b,inset 0 -9px 11px #1b130ba8,
+  0 21px 28px #130d0a88;
+}
+.kiosk[data-screen-style=bubble] .television::after{
+ content:'';z-index:1;position:absolute;inset:-1%;border:clamp(3px,.5vw,9px) ridge #a97343;border-radius:inherit;
+ box-shadow:inset 0 0 0 2px #311c11,0 3px 4px #19110b67;pointer-events:none
+}
+.kiosk[data-screen-style=bubble] .tv-bezel{
+ margin:0!important;padding:clamp(15px,1.6vw,32px)!important;
+ border:clamp(9px,1.25vw,23px) solid #a0a29b;
+ border-radius:clamp(13px,1.7vw,34px);
+ background:linear-gradient(120deg,#f5efdb 0%,#6e7679 3%,#293236 8%,#121717 14%,#111b1b 87%,#9ca4a0 96%,#e9e2cc 100%);
+ box-shadow:0 0 0 3px #35291e,0 0 0 8px #9d7046,0 8px 15px #190c0899,
+  inset 2px 2px 5px #edede16e,inset -5px -4px 8px #050707c7;
+}
+.kiosk[data-screen-style=bubble] .tv-screen{
+ border-radius:clamp(34px,5vw,97px)/clamp(30px,4.9vw,94px);
+ box-shadow:inset 0 0 29px #000b,0 0 0 4px #111716,0 0 0 7px #b9b8a6
+}
+.kiosk[data-screen-style=bubble] .control-panel{
+ margin:clamp(3px,.5vw,10px) clamp(2px,.25vw,5px);
+ padding:clamp(10px,1.2vw,22px) clamp(8px,1vw,19px);
+ border:clamp(4px,.5vw,10px) solid #6c4c32;border-radius:clamp(3px,.5vw,9px);
+ background:repeating-linear-gradient(0deg,#cabd9248 0 1px,transparent 2px 8px),
+  linear-gradient(100deg,#b8b39c,#ece3cb 24%,#c9bfa5 72%,#91876f);
+ box-shadow:inset 2px 2px 3px #fff5dc8c,inset -3px -4px 6px #67553d87,
+  0 0 0 2px #2e241a,0 5px 9px #2014086e;color:#3a392d;
+}
+.kiosk[data-screen-style=bubble] .control-panel:before{
+ content:'HI-FI · 1963';position:absolute;top:2.2%;right:5%;inset:auto 5% auto auto;
+ font:8px var(--mono);letter-spacing:.9px;color:#77674e;border:0;box-shadow:none
+}
+.kiosk[data-screen-style=bubble] .control-panel>*{z-index:2}
+.kiosk[data-screen-style=bubble] .panel-brand{
+ border:1px solid #aea080;border-radius:2px;
+ background:linear-gradient(120deg,#e2d7bd,#9e9173 30%,#f0e8d2 75%,#a49677);
+ box-shadow:inset 0 1px 0 #fffad3a9,0 2px 4px #40342175
+}
+.kiosk[data-screen-style=bubble] .panel-brand .maker,.kiosk[data-screen-style=bubble] .panel-brand .model,
+.kiosk[data-screen-style=bubble] .panel-brand strong{color:#3c443a}
+.kiosk[data-screen-style=bubble] .channel-display{border-color:#93866c74}
+.kiosk[data-screen-style=bubble] .channel-number,.kiosk[data-screen-style=bubble] .display-label{color:#4b4939;text-shadow:0 1px 1px #fff2c3}
+.kiosk[data-screen-style=bubble] .tuning-dial{
+ border:clamp(6px,.7vw,13px) solid #d3c5a5;outline:2px solid #6c624f;
+ background:repeating-conic-gradient(#dfe3d9 0 3deg,#777f7c 3deg 6deg);
+ box-shadow:0 0 0 3px #645949,0 4px 7px #0006,inset 0 1px 3px #fff
+}
+.kiosk[data-screen-style=bubble] .tuning-dial:before{
+ background:radial-gradient(ellipse at 32% 24%,#f9f5e8,#a0a8a1 54%,#4c5857 72%,#f4f0df 77%);border-color:#85867a
+}
+.kiosk[data-screen-style=bubble] .tuning-dial span{background:linear-gradient(90deg,#565f5c,#faf8e8,#53625b)}
+.kiosk[data-screen-style=bubble] .dial-caption{color:#696550}
+.kiosk[data-screen-style=bubble] .panel-session{
+ background:linear-gradient(145deg,#222d26,#111c19);border:2px solid #9a9179;color:#e0e6cc
+}
+.kiosk[data-screen-style=bubble] .panel-time,.kiosk[data-screen-style=bubble] .session-label{color:#e2e3ca}
+.kiosk[data-screen-style=bubble] .panel-start{
+ border:clamp(5px,.6vw,11px) solid #d4c5a4;
+ outline:3px solid #635b46;border-radius:50%!important;
+ width:clamp(92px,13.5vh,155px);height:clamp(92px,13.5vh,155px);
+ background:radial-gradient(ellipse at 35% 27%,#ab8864,#664b34 56%,#34291f 87%);
+ box-shadow:0 0 0 4px #8b826d,0 0 0 8px #e1d7be,0 7px 0 8px #504637,0 12px 13px #0007,
+  inset 0 4px 5px #ffe5b288,inset 0 -6px 7px #130d07aa;
+ color:#fff0ce
+}
+.kiosk[data-screen-style=bubble] .panel-start:not(:disabled):active{transform:translateY(3px);box-shadow:0 0 0 4px #8b826d,0 0 0 8px #e1d7be,0 3px 0 8px #504637,inset 0 4px 9px #080706}
+.kiosk[data-screen-style=bubble] .panel-start:disabled{filter:saturate(.6)}
+.kiosk[data-screen-style=bubble] .panel-hint,.kiosk[data-screen-style=bubble] .panel-lamps{color:#625744}
+.kiosk[data-screen-style=bubble] .control-panel .speaker{
+ border:clamp(4px,.5vw,10px) ridge #a99b82;border-radius:3px;
+ background:repeating-linear-gradient(90deg,#342b20 0 2px,#8c7961 2px 3px,#322b22 3px 5px),
+  repeating-linear-gradient(0deg,#b7a17c 0 1px,#534532 1px 3px);
+ opacity:1;box-shadow:inset 0 4px 9px #211a12a1,0 0 0 2px #7b7058
+}
+.kiosk[data-screen-style=bubble] .control-panel .staff-entry{background:#514536;color:#f4e9cb;border:1px solid #8f8166}
+.kiosk[data-screen-style=bubble] #panelBoundary{color:#796344}
+.kiosk[data-screen-style=bubble] #panelBoundary[data-ready=true]{color:#406e48}
+.kiosk[data-screen-style=bubble] .antenna-rod-left,
+.kiosk[data-screen-style=bubble] .antenna-rod-right{
+ display:block;position:absolute;top:clamp(-98px,-9vh,-28px);left:49%;width:clamp(3px,.28vw,6px);
+ height:clamp(87px,13vh,174px);border-radius:3px;transform-origin:bottom;
+ transform:rotate(-38deg);background:linear-gradient(90deg,#55534b,#f4f0d9 45%,#77746a);box-shadow:2px 1px 4px #0003
+}
+.kiosk[data-screen-style=bubble] .antenna-rod-right{left:51%;transform:rotate(38deg)}
+.kiosk[data-screen-style=bubble] .antenna-hinge{display:block;position:absolute;left:48%;top:0;width:clamp(25px,2.7vw,51px);height:clamp(17px,1.7vw,33px);border-radius:30% 30% 15% 15%;background:radial-gradient(ellipse at 32% 24%,#f2e7c8,#817565 64%,#342e24);box-shadow:0 2px 4px #0007}
+.kiosk[data-screen-style=bubble] .antique-feet{display:block;inset:auto 0 auto;height:clamp(48px,13vh,174px);top:calc(100% - 9px);z-index:0}
+.kiosk[data-screen-style=bubble] .antique-feet i{
+ display:block;position:absolute;top:-2px;width:clamp(13px,1.6vw,32px);height:100%;
+ background:linear-gradient(90deg,#3c2416,#b07944 35%,#6d3d22 69%,#2e1c13);border:1px solid #3b2215;
+ box-shadow:inset 2px 0 2px #d3a46b7d,4px 4px 5px #140c087b;
+ clip-path:polygon(9% 0,100% 0,83% 96%,25% 100%);
+ transform-origin:top
+}
+.kiosk[data-screen-style=bubble] .antique-feet i:nth-child(1){left:9%;transform:rotate(13deg)}
+.kiosk[data-screen-style=bubble] .antique-feet i:nth-child(2){left:19%;transform:rotate(-7deg);opacity:.57;z-index:-1}
+.kiosk[data-screen-style=bubble] .antique-feet i:nth-child(3){right:19%;transform:rotate(7deg);opacity:.57;z-index:-1}
+.kiosk[data-screen-style=bubble] .antique-feet i:nth-child(4){right:9%;transform:rotate(-13deg)}
+.kiosk[data-screen-style=bubble] .cabinet-details i{width:11px;height:11px;background:radial-gradient(circle,#272821 0 25%,#e1b57a 28% 62%,#52391f 65%)}
+
+/* Admin cards are honest miniature silhouettes, not three recoloured CRTs. */
+.style-swatch.swatch-space{padding:25px 10px 9px;gap:7px;border:7px solid #c79728;border-radius:19px;
+ background:linear-gradient(125deg,#f6df67,#d6a130 44%,#a97720);box-shadow:inset 0 0 0 3px #ffef9c}
+.style-swatch.swatch-space:before{content:'';position:absolute;left:26%;top:2px;width:34%;height:20px;
+ border:6px solid #38413b;border-bottom:0;border-radius:50% 50% 0 0}
+.style-swatch.swatch-space:after{content:'';position:absolute;right:18%;top:0;width:3px;height:41px;background:#d4d8c9;transform:rotate(12deg)}
+.swatch-space .mini-picture{border:9px solid #202522;border-radius:28px / 40px;background:radial-gradient(#677a5c,#101d1a);box-shadow:0 0 0 3px #e6c768;color:#faf1b9}
+.swatch-space .mini-panel{padding:9px 6px;width:25%;border-radius:14px;background:linear-gradient(#48524a,#151f1b);color:#eef1d2}
+.swatch-space .mini-panel i{background:radial-gradient(circle,#40483e 0 34%,#080e0b 40% 64%,#acb5a3 67%)}
+.swatch-space .mini-panel strong{border-color:#afb6a1;background:radial-gradient(#747e62,#171d19)}
+.style-swatch.swatch-studio{padding:9px 8px 9px 31px;gap:7px;border:6px solid #724227;border-radius:17px;
+ background:repeating-linear-gradient(35deg,#b37838 0 7px,#8e4a27 8px 11px,#d99b45 13px 21px)}
+.style-swatch.swatch-studio:before{content:'';position:absolute;z-index:2;left:7px;top:16px;width:20px;height:32px;border-radius:50%;background:radial-gradient(circle,#caa97c 0 24%,#2e3028 27% 48%,#ab946f 50% 70%,#513525 74%);box-shadow:0 52px 0 -2px #47382a,0 63px 0 1px #b9965a}
+.style-swatch.swatch-studio:after{content:'';position:absolute;left:7px;top:110px;width:22px;height:40px;border:2px solid #ab8552;background:repeating-linear-gradient(0deg,#311a13 0 3px,#b07c3d 4px 5px)}
+.swatch-studio .mini-picture{border:9px solid #63412e;border-radius:24px / 33px;box-shadow:0 0 0 3px #d4a26b;background:radial-gradient(#6d795b,#121c18);color:#f6e2ae}
+.swatch-studio .mini-panel{width:24%;padding:10px 4px;border:3px solid #6c4324;border-radius:4px;background:linear-gradient(#d9ad62,#a36332)}
+.swatch-studio .mini-panel i{background:radial-gradient(circle,#bd9b65,#3c3027 50%,#e5bb72 53%)}
+.swatch-studio .mini-panel strong{border-color:#d7bb86;background:radial-gradient(#956743,#33251d)}
+.style-swatch.swatch-bubble{padding:16px 10px 28px;gap:8px;border:11px ridge #91582e;border-radius:9px;
+ background:repeating-linear-gradient(87deg,#703c21 0 14px,#a16538 15px 20px,#5d341c 22px 26px)}
+.style-swatch.swatch-bubble:before{content:'';position:absolute;left:48%;top:0;height:18px;width:3px;background:#a9aaa0;transform:rotate(-40deg);box-shadow:12px 5px 0 #8d9289}
+.style-swatch.swatch-bubble:after{content:'';position:absolute;z-index:0;bottom:2px;left:15%;height:22px;width:9px;background:#88532d;transform:rotate(17deg);box-shadow:140px -4px 0 #88532d}
+.swatch-bubble .mini-picture{border:9px solid #b5b9b1;border-radius:21px / 32px;box-shadow:0 0 0 3px #4b2c19;background:radial-gradient(#6e7865,#101d1a);color:#f7e4ba}
+.swatch-bubble .mini-panel{width:25%;padding:9px 6px;border:3px solid #7b5b3c;border-radius:3px;background:linear-gradient(#e4dfc8,#a59c83)}
+.swatch-bubble .mini-panel i{background:radial-gradient(circle,#ebebd8,#87918b 43%,#343a35 58%,#d0cbb8 64%)}
+.swatch-bubble .mini-panel strong{border-color:#e6dbc0;background:radial-gradient(#b39972,#62503a)}
+.swatch-bubble .mini-panel small{background:repeating-linear-gradient(90deg,#4d4434 0 2px,#b0a083 2px 4px)}
+
+/* 32-inch landscape is primary. On 720p or shorter screens keep real buttons
+ * readable, sacrificing ornamental dial/speaker rather than hiding START/version.
+ */
+@media (max-height:800px) and (orientation:landscape){
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .tuner-assembly{display:none}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel .speaker{display:none}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-lamps{display:none}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-hint{display:none}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-session{margin-top:clamp(8px,2vh,17px)}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .guest-actions{margin-top:clamp(13px,3vh,28px)}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-footer{margin-top:auto;padding-top:8px}
+ .kiosk[data-screen-style=space] .television{height:85%!important;margin-top:8.5vh!important}
+ .kiosk[data-screen-style=studio] .television{height:92%!important;margin-top:4vh!important}
+ .kiosk[data-screen-style=bubble] .television{height:78%!important;margin-top:7vh!important}
+}
+@media (max-height:590px) and (orientation:landscape){
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .channel-display{display:none}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel{padding:clamp(7px,1vh,12px)}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-brand{padding:5px 6px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-session{margin-top:8px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .guest-actions{margin-top:15px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-start{width:clamp(80px,18vh,101px);height:clamp(80px,18vh,101px)}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-footer{padding-top:5px}
+ .kiosk[data-screen-style=space] .tv-bezel,.kiosk[data-screen-style=studio] .tv-bezel,.kiosk[data-screen-style=bubble] .tv-bezel{padding:9px!important}
+ .kiosk[data-screen-style=studio] .vintage-sidecar{padding:8px 3px}
+ .kiosk[data-screen-style=studio] .sidecar-knob{display:none}
+ .kiosk[data-screen-style=bubble] .antique-feet{height:clamp(24px,8vh,55px)}
+}
+@media (max-height:420px) and (orientation:landscape){
+ .kiosk[data-screen-style=space] .television{width:96%!important;height:91%!important;margin-top:4vh!important;padding:8px!important;gap:6px}
+ .kiosk[data-screen-style=studio] .television{width:98%!important;height:95%!important;margin-top:2vh!important;padding:6px!important;gap:5px;grid-template-columns:clamp(58px,10vw,100px) minmax(0,1fr) var(--panel-width)}
+ .kiosk[data-screen-style=bubble] .television{width:97%!important;height:90%!important;margin-top:3vh!important;padding:6px!important;gap:6px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel{border-radius:5px;padding:7px!important;margin:0}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .tv-bezel{margin:0!important;border-width:6px;padding:5px!important}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-brand .model{display:none}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-time{font-size:26px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-start{width:76px;height:76px;border-width:5px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .guest-actions{margin-top:9px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-footer{margin-top:auto}
+ .kiosk[data-screen-style=bubble] .antenna-rod-left,.kiosk[data-screen-style=bubble] .antenna-rod-right{height:35px;top:-22px}
+ .kiosk[data-screen-style=space] .carry-handle{height:26px;top:-21px}
+ .kiosk[data-screen-style=space] .antenna-rod-right{height:38px;top:-28px}
+}
+/* Portrait is a diagnostic fallback; keep controls in document flow and no cut-off. */
+@media (orientation:portrait){
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .television{width:94%!important;min-height:0;height:auto!important;margin:7vh auto 24vh!important;display:flex;flex-direction:column;padding:12px!important}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .tv-bezel{width:100%;height:min(65vw,460px);min-height:220px;flex:none;margin:0!important;padding:10px!important}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel{display:grid;grid-template-columns:minmax(0,1fr) 125px;gap:12px;padding:17px!important;margin:9px 0 0;min-height:350px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-footer{grid-column:1/-1}
+ .kiosk[data-screen-style=studio] .vintage-sidecar{display:none}
+ .kiosk[data-screen-style=bubble] .antique-feet{height:13vh}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .privacy-line{position:static!important;max-width:none;width:auto;left:auto}
+}
+/* At the full 1920×1080 target keep the footer and five-tap Admin INSIDE the
+ * TV cabinet. The legacy controller had >1000px of stacked fixed margins. */
+@media (min-height:801px) and (orientation:landscape){
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel{padding-top:clamp(13px,1.3vw,22px);padding-bottom:12px;overflow:visible}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .channel-display{margin-top:8px;padding-top:8px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .channel-number{font-size:clamp(30px,2.5vw,45px)}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .tuner-assembly{margin-top:8px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .tuning-dial{width:clamp(61px,7.5vh,88px);height:clamp(61px,7.5vh,88px)}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .dial-caption{margin-top:4px;font-size:8px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-session{margin-top:12px;padding:9px 12px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-time{font-size:clamp(32px,2.9vw,52px);margin:3px 0}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .guest-actions{margin-top:18px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-hint{margin-top:10px;font-size:11px;letter-spacing:.4px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-lamps{margin-top:9px}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .control-panel .speaker{margin-top:10px;max-height:54px;min-height:12px;flex:1}
+ .kiosk:is([data-screen-style=space],[data-screen-style=studio],[data-screen-style=bubble]) .panel-footer{margin-top:9px;gap:4px}
+ .kiosk[data-screen-style=studio] .tuner-assembly{display:none}
+ .kiosk[data-screen-style=bubble] .channel-display{display:none}
+ .kiosk[data-screen-style=bubble] .panel-lamps{display:none}
+ .kiosk[data-screen-style=bubble] .panel-hint{display:none}
+ .kiosk[data-screen-style=bubble] .control-panel .speaker{min-height:42px;max-height:62px}
+}
+
+/* Original procedural rust/paint pitting. No external/watermarked reference image. */
+body.kiosk[data-screen-style=studio]{--oxidation: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTAiIGhlaWdodD0iMTkwIiB2aWV3Qm94PSIwIDAgMTkwIDE5MCI+PGVsbGlwc2UgY3g9IjE2OCIgY3k9IjE1IiByeD0iMS4xIiByeT0iMS4wIiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjYzIi8+PGVsbGlwc2UgY3g9IjEwMiIgY3k9IjE4NyIgcng9IjEuOCIgcnk9IjIuMSIgZmlsbD0iIzI2MTcwZiIgb3BhY2l0eT0iMC41MCIvPjxlbGxpcHNlIGN4PSIyIiBjeT0iMTUyIiByeD0iMi42IiByeT0iMy41IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjUzIi8+PGVsbGlwc2UgY3g9Ijk3IiBjeT0iMTA0IiByeD0iMC44IiByeT0iMC42IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjYzIi8+PGVsbGlwc2UgY3g9IjE0NSIgY3k9IjE4IiByeD0iMS4xIiByeT0iMS41IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjM2Ii8+PGVsbGlwc2UgY3g9IjEyOSIgY3k9IjI3IiByeD0iMC44IiByeT0iMS4zIiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjE2Ii8+PGVsbGlwc2UgY3g9IjE3MSIgY3k9IjI0IiByeD0iMC45IiByeT0iMC42IiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjY0Ii8+PGVsbGlwc2UgY3g9IjU5IiBjeT0iMTM2IiByeD0iMy41IiByeT0iNC4yIiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjI1Ii8+PGVsbGlwc2UgY3g9IjU4IiBjeT0iMTEwIiByeD0iMy41IiByeT0iNS41IiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjQ3Ii8+PGVsbGlwc2UgY3g9IjQyIiBjeT0iNzYiIHJ4PSIxLjciIHJ5PSIxLjgiIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuNjkiLz48ZWxsaXBzZSBjeD0iMTM0IiBjeT0iMTIyIiByeD0iNC40IiByeT0iNi4zIiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjYxIi8+PGVsbGlwc2UgY3g9IjU3IiBjeT0iMTA3IiByeD0iMS4zIiByeT0iMS43IiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjQ0Ii8+PGVsbGlwc2UgY3g9IjE0MSIgY3k9IjExOCIgcng9IjEuOSIgcnk9IjEuMiIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC40NiIvPjxlbGxpcHNlIGN4PSI3NSIgY3k9Ijg4IiByeD0iMS42IiByeT0iMi40IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjMzIi8+PGVsbGlwc2UgY3g9IjI5IiBjeT0iNzEiIHJ4PSIzLjAiIHJ5PSIzLjUiIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuNjciLz48ZWxsaXBzZSBjeD0iMTM5IiBjeT0iMzYiIHJ4PSIwLjkiIHJ5PSIxLjAiIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuNDQiLz48ZWxsaXBzZSBjeD0iMiIgY3k9IjE0MSIgcng9IjMuNSIgcnk9IjQuNiIgZmlsbD0iI2U1YjM3OSIgb3BhY2l0eT0iMC42MyIvPjxlbGxpcHNlIGN4PSI5MyIgY3k9IjU0IiByeD0iNC4zIiByeT0iNC44IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjI4Ii8+PGVsbGlwc2UgY3g9IjY0IiBjeT0iMTAxIiByeD0iMy4zIiByeT0iMy4xIiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjQ0Ii8+PGVsbGlwc2UgY3g9IjAiIGN5PSIxMTkiIHJ4PSI0LjIiIHJ5PSI0LjkiIGZpbGw9IiM3ODRhMjkiIG9wYWNpdHk9IjAuNDciLz48ZWxsaXBzZSBjeD0iMTM4IiBjeT0iMTA5IiByeD0iMi4zIiByeT0iMi41IiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjY4Ii8+PGVsbGlwc2UgY3g9Ijg2IiBjeT0iOTUiIHJ4PSI0LjUiIHJ5PSI2LjQiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuMjgiLz48ZWxsaXBzZSBjeD0iMTM2IiBjeT0iMzQiIHJ4PSI0LjYiIHJ5PSI2LjkiIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuNDEiLz48ZWxsaXBzZSBjeD0iNjUiIGN5PSIxNDciIHJ4PSIzLjQiIHJ5PSI0LjgiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuMzgiLz48ZWxsaXBzZSBjeD0iMTQwIiBjeT0iMTIiIHJ4PSI0LjYiIHJ5PSI2LjkiIGZpbGw9IiM0ZTJlMWMiIG9wYWNpdHk9IjAuNTQiLz48ZWxsaXBzZSBjeD0iMTYwIiBjeT0iMTE2IiByeD0iMS4xIiByeT0iMS4yIiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjQ5Ii8+PGVsbGlwc2UgY3g9IjE0IiBjeT0iMTUiIHJ4PSIzLjAiIHJ5PSI0LjAiIGZpbGw9IiM3ODRhMjkiIG9wYWNpdHk9IjAuNDAiLz48ZWxsaXBzZSBjeD0iMTU0IiBjeT0iMTgyIiByeD0iMy4xIiByeT0iMS42IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjY5Ii8+PGVsbGlwc2UgY3g9IjE2MSIgY3k9IjE4NCIgcng9IjQuMSIgcnk9IjYuMSIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC41MSIvPjxlbGxpcHNlIGN4PSIyIiBjeT0iODUiIHJ4PSIzLjQiIHJ5PSI0LjQiIGZpbGw9IiM0ZTJlMWMiIG9wYWNpdHk9IjAuMzkiLz48ZWxsaXBzZSBjeD0iMTI5IiBjeT0iODYiIHJ4PSI0LjUiIHJ5PSIzLjQiIGZpbGw9IiM3ODRhMjkiIG9wYWNpdHk9IjAuNTkiLz48ZWxsaXBzZSBjeD0iMTQ3IiBjeT0iMTI4IiByeD0iMy4wIiByeT0iMS44IiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjExMCIgY3k9IjE1NCIgcng9IjQuMCIgcnk9IjIuNCIgZmlsbD0iIzQxMjcxYSIgb3BhY2l0eT0iMC42MiIvPjxlbGxpcHNlIGN4PSI2NiIgY3k9Ijk5IiByeD0iMS4zIiByeT0iMS40IiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjIzIi8+PGVsbGlwc2UgY3g9IjE3MiIgY3k9IjE5MCIgcng9IjEuNCIgcnk9IjEuMyIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC42MyIvPjxlbGxpcHNlIGN4PSIxMDMiIGN5PSIxNzAiIHJ4PSI0LjIiIHJ5PSI0LjciIGZpbGw9IiNjNzhmNGMiIG9wYWNpdHk9IjAuNjIiLz48ZWxsaXBzZSBjeD0iNTYiIGN5PSI3OSIgcng9IjMuMSIgcnk9IjIuMSIgZmlsbD0iIzI2MTcwZiIgb3BhY2l0eT0iMC41NSIvPjxlbGxpcHNlIGN4PSIxNjkiIGN5PSIxNzMiIHJ4PSIyLjIiIHJ5PSIxLjMiIGZpbGw9IiNjNzhmNGMiIG9wYWNpdHk9IjAuNDAiLz48ZWxsaXBzZSBjeD0iMTE0IiBjeT0iMTUwIiByeD0iMy45IiByeT0iMi4yIiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjMyIi8+PGVsbGlwc2UgY3g9IjE2NSIgY3k9IjIyIiByeD0iNC40IiByeT0iNS44IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjYzIi8+PGVsbGlwc2UgY3g9Ijc2IiBjeT0iOTUiIHJ4PSIwLjYiIHJ5PSIwLjYiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuNjUiLz48ZWxsaXBzZSBjeD0iOCIgY3k9IjMyIiByeD0iNC4wIiByeT0iMi40IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjY2Ii8+PGVsbGlwc2UgY3g9IjYzIiBjeT0iMTMzIiByeD0iMy43IiByeT0iNS40IiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjQ0Ii8+PGVsbGlwc2UgY3g9Ijc0IiBjeT0iNTAiIHJ4PSIzLjEiIHJ5PSIzLjMiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuNTAiLz48ZWxsaXBzZSBjeD0iMTMiIGN5PSIxMzkiIHJ4PSI0LjYiIHJ5PSI1LjQiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuNTkiLz48ZWxsaXBzZSBjeD0iMjAiIGN5PSI0NyIgcng9IjMuMCIgcnk9IjIuNyIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC43MCIvPjxlbGxpcHNlIGN4PSIzOSIgY3k9IjUwIiByeD0iNC4xIiByeT0iNS43IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjY3Ii8+PGVsbGlwc2UgY3g9IjEzNCIgY3k9IjE2IiByeD0iMS4yIiByeT0iMS4wIiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjM4Ii8+PGVsbGlwc2UgY3g9IjgyIiBjeT0iMiIgcng9IjEuMCIgcnk9IjEuMSIgZmlsbD0iIzI2MTcwZiIgb3BhY2l0eT0iMC41NSIvPjxlbGxpcHNlIGN4PSIxMDgiIGN5PSI3IiByeD0iMy4zIiByeT0iMy45IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjM3Ii8+PGVsbGlwc2UgY3g9Ijg5IiBjeT0iOSIgcng9IjIuMiIgcnk9IjIuMSIgZmlsbD0iI2M3OGY0YyIgb3BhY2l0eT0iMC42MyIvPjxlbGxpcHNlIGN4PSIxNjUiIGN5PSIxMzMiIHJ4PSIyLjUiIHJ5PSIzLjEiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuMjkiLz48ZWxsaXBzZSBjeD0iNDAiIGN5PSIyNSIgcng9IjQuNiIgcnk9IjQuMCIgZmlsbD0iI2U1YjM3OSIgb3BhY2l0eT0iMC42OSIvPjxlbGxpcHNlIGN4PSIxMTciIGN5PSI2MyIgcng9IjEuMCIgcnk9IjEuMCIgZmlsbD0iIzQxMjcxYSIgb3BhY2l0eT0iMC40MCIvPjxlbGxpcHNlIGN4PSI3IiBjeT0iMTU1IiByeD0iMi41IiByeT0iMS43IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjE4Ii8+PGVsbGlwc2UgY3g9IjE1NSIgY3k9IjQ1IiByeD0iNC4zIiByeT0iNS41IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjMyIi8+PGVsbGlwc2UgY3g9IjU3IiBjeT0iNjMiIHJ4PSIxLjEiIHJ5PSIxLjciIGZpbGw9IiM0ZTJlMWMiIG9wYWNpdHk9IjAuNjMiLz48ZWxsaXBzZSBjeD0iNDciIGN5PSIxMSIgcng9IjEuNiIgcnk9IjEuNyIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC4xOCIvPjxlbGxpcHNlIGN4PSIxMTUiIGN5PSIxNjgiIHJ4PSIyLjciIHJ5PSIzLjciIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuNDYiLz48ZWxsaXBzZSBjeD0iNDQiIGN5PSIxIiByeD0iMy42IiByeT0iMy4xIiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjMwIi8+PGVsbGlwc2UgY3g9IjE4MiIgY3k9IjE1MSIgcng9IjAuMyIgcnk9IjAuNSIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC40OCIvPjxlbGxpcHNlIGN4PSIyMiIgY3k9IjQ5IiByeD0iMi41IiByeT0iMi4xIiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjQ4Ii8+PGVsbGlwc2UgY3g9IjUxIiBjeT0iMTA2IiByeD0iNC4wIiByeT0iNC42IiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjYwIi8+PGVsbGlwc2UgY3g9IjE3OCIgY3k9IjU0IiByeD0iMy45IiByeT0iMy4wIiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjIwIi8+PGVsbGlwc2UgY3g9IjgxIiBjeT0iMTE4IiByeD0iMi44IiByeT0iMy40IiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjM4IiBjeT0iMTE3IiByeD0iMy45IiByeT0iNC45IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjQ1Ii8+PGVsbGlwc2UgY3g9IjgxIiBjeT0iNjkiIHJ4PSIxLjYiIHJ5PSIxLjciIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuMzkiLz48ZWxsaXBzZSBjeD0iMTYiIGN5PSI4NyIgcng9IjAuNCIgcnk9IjAuNCIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC40NCIvPjxlbGxpcHNlIGN4PSIxNzAiIGN5PSIxMjIiIHJ4PSIzLjgiIHJ5PSIzLjciIGZpbGw9IiM0ZTJlMWMiIG9wYWNpdHk9IjAuMzEiLz48ZWxsaXBzZSBjeD0iMjMiIGN5PSIxODciIHJ4PSIxLjciIHJ5PSIxLjQiIGZpbGw9IiM3ODRhMjkiIG9wYWNpdHk9IjAuNTAiLz48ZWxsaXBzZSBjeD0iMzIiIGN5PSI0OCIgcng9IjQuMiIgcnk9IjMuMSIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC40NSIvPjxlbGxpcHNlIGN4PSIxMjMiIGN5PSI4NiIgcng9IjIuMSIgcnk9IjMuMCIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC4zNSIvPjxlbGxpcHNlIGN4PSI1NyIgY3k9IjUyIiByeD0iMy4zIiByeT0iNC40IiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjE4Ii8+PGVsbGlwc2UgY3g9IjQ1IiBjeT0iOTAiIHJ4PSIzLjQiIHJ5PSIzLjciIGZpbGw9IiM3ODRhMjkiIG9wYWNpdHk9IjAuNzAiLz48ZWxsaXBzZSBjeD0iOTAiIGN5PSI1NSIgcng9IjMuMyIgcnk9IjQuMSIgZmlsbD0iIzQxMjcxYSIgb3BhY2l0eT0iMC4xNiIvPjxlbGxpcHNlIGN4PSIxMjYiIGN5PSIxNzMiIHJ4PSIyLjQiIHJ5PSIxLjUiIGZpbGw9IiM0ZTJlMWMiIG9wYWNpdHk9IjAuNTQiLz48ZWxsaXBzZSBjeD0iMTA5IiBjeT0iNDMiIHJ4PSIzLjAiIHJ5PSIzLjciIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuNTUiLz48ZWxsaXBzZSBjeD0iMjciIGN5PSIyOCIgcng9IjIuNyIgcnk9IjMuMiIgZmlsbD0iI2U1YjM3OSIgb3BhY2l0eT0iMC4yNSIvPjxlbGxpcHNlIGN4PSI1NSIgY3k9IjU1IiByeD0iNC4zIiByeT0iNC43IiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjI2Ii8+PGVsbGlwc2UgY3g9IjEzMyIgY3k9IjE3NCIgcng9IjIuMyIgcnk9IjEuNSIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC4yOSIvPjxlbGxpcHNlIGN4PSI3OCIgY3k9Ijc5IiByeD0iMy4wIiByeT0iMy43IiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjI5Ii8+PGVsbGlwc2UgY3g9IjEzMyIgY3k9IjEyNCIgcng9IjQuNyIgcnk9IjUuNCIgZmlsbD0iI2U1YjM3OSIgb3BhY2l0eT0iMC42OSIvPjxlbGxpcHNlIGN4PSIxNTQiIGN5PSI4MCIgcng9IjQuNCIgcnk9IjQuNiIgZmlsbD0iI2M3OGY0YyIgb3BhY2l0eT0iMC4zMiIvPjxlbGxpcHNlIGN4PSIyMSIgY3k9IjE1NyIgcng9IjEuOCIgcnk9IjIuMCIgZmlsbD0iIzI2MTcwZiIgb3BhY2l0eT0iMC42MiIvPjxlbGxpcHNlIGN4PSIxMjMiIGN5PSIxMTUiIHJ4PSIxLjUiIHJ5PSIxLjgiIGZpbGw9IiM0ZTJlMWMiIG9wYWNpdHk9IjAuMzgiLz48ZWxsaXBzZSBjeD0iNzciIGN5PSIxMzQiIHJ4PSIzLjciIHJ5PSIzLjMiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuNjkiLz48ZWxsaXBzZSBjeD0iMTQyIiBjeT0iNjMiIHJ4PSIzLjUiIHJ5PSI1LjIiIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuNDgiLz48ZWxsaXBzZSBjeD0iNyIgY3k9IjEwMyIgcng9IjAuOCIgcnk9IjAuOSIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC42OCIvPjxlbGxpcHNlIGN4PSIxMjYiIGN5PSIxODYiIHJ4PSIzLjUiIHJ5PSI1LjMiIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuNjEiLz48ZWxsaXBzZSBjeD0iMTc4IiBjeT0iODEiIHJ4PSI0LjQiIHJ5PSIzLjgiIGZpbGw9IiM3ODRhMjkiIG9wYWNpdHk9IjAuMzQiLz48ZWxsaXBzZSBjeD0iNjUiIGN5PSIxNiIgcng9IjIuMCIgcnk9IjMuMCIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC42MSIvPjxlbGxpcHNlIGN4PSIxMjYiIGN5PSIxMzkiIHJ4PSIyLjgiIHJ5PSIzLjgiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuNTUiLz48ZWxsaXBzZSBjeD0iMTYyIiBjeT0iMTYzIiByeD0iNC4zIiByeT0iNS45IiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjI2Ii8+PGVsbGlwc2UgY3g9Ijk0IiBjeT0iMTE3IiByeD0iNC40IiByeT0iNS4wIiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjU0Ii8+PGVsbGlwc2UgY3g9IjE4MiIgY3k9IjE3NCIgcng9IjQuNCIgcnk9IjYuNCIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC4zMCIvPjxlbGxpcHNlIGN4PSI3OSIgY3k9IjE1MiIgcng9IjIuMCIgcnk9IjIuMSIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC4zOCIvPjxlbGxpcHNlIGN4PSI4MyIgY3k9IjEzNyIgcng9IjMuOSIgcnk9IjMuMSIgZmlsbD0iIzQxMjcxYSIgb3BhY2l0eT0iMC40MCIvPjxlbGxpcHNlIGN4PSIxNzUiIGN5PSI2OSIgcng9IjIuNSIgcnk9IjEuNiIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC4xOCIvPjxlbGxpcHNlIGN4PSI3MyIgY3k9IjEzOCIgcng9IjMuNSIgcnk9IjMuNiIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC41MiIvPjxlbGxpcHNlIGN4PSIzMSIgY3k9IjEzIiByeD0iMS4xIiByeT0iMC45IiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjYwIi8+PGVsbGlwc2UgY3g9IjEzNyIgY3k9Ijc4IiByeD0iMy43IiByeT0iMi42IiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjQwIi8+PGVsbGlwc2UgY3g9IjY3IiBjeT0iNzUiIHJ4PSIxLjIiIHJ5PSIwLjgiIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuMjAiLz48ZWxsaXBzZSBjeD0iMjgiIGN5PSI5MyIgcng9IjEuNCIgcnk9IjIuMCIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC40MyIvPjxlbGxpcHNlIGN4PSIzMiIgY3k9IjE5IiByeD0iMi4yIiByeT0iMi40IiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjUxIi8+PGVsbGlwc2UgY3g9IjE2NiIgY3k9IjEzMyIgcng9IjEuNiIgcnk9IjIuMSIgZmlsbD0iIzI2MTcwZiIgb3BhY2l0eT0iMC4xOCIvPjxlbGxpcHNlIGN4PSIxNzkiIGN5PSIzMCIgcng9IjQuMCIgcnk9IjQuNSIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC4yMyIvPjxlbGxpcHNlIGN4PSIxMzQiIGN5PSI3NiIgcng9IjIuOCIgcnk9IjIuOCIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC40NSIvPjxlbGxpcHNlIGN4PSIxMTEiIGN5PSIzOSIgcng9IjQuNCIgcnk9IjQuMiIgZmlsbD0iIzI2MTcwZiIgb3BhY2l0eT0iMC4zMSIvPjxlbGxpcHNlIGN4PSIxNTEiIGN5PSI3NCIgcng9IjAuNCIgcnk9IjAuMiIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC4zOSIvPjxlbGxpcHNlIGN4PSI5OSIgY3k9IjE2OSIgcng9IjEuNyIgcnk9IjIuNyIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC40NyIvPjxlbGxpcHNlIGN4PSIxODciIGN5PSIxODkiIHJ4PSI0LjIiIHJ5PSI0LjQiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuMjkiLz48ZWxsaXBzZSBjeD0iMTg2IiBjeT0iMTI5IiByeD0iMS44IiByeT0iMS45IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjI1Ii8+PGVsbGlwc2UgY3g9IjEzNSIgY3k9IjQyIiByeD0iMS42IiByeT0iMi41IiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjI4Ii8+PGVsbGlwc2UgY3g9IjEwOSIgY3k9IjkzIiByeD0iMC44IiByeT0iMS4yIiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjY1Ii8+PGVsbGlwc2UgY3g9IjE3OCIgY3k9Ijk0IiByeD0iMy42IiByeT0iMi4zIiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjQyIi8+PGVsbGlwc2UgY3g9IjEwNCIgY3k9IjE2MyIgcng9IjEuMSIgcnk9IjAuNiIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC4zNSIvPjxlbGxpcHNlIGN4PSIxNDUiIGN5PSIxMDYiIHJ4PSIzLjciIHJ5PSI0LjgiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuNTYiLz48ZWxsaXBzZSBjeD0iODUiIGN5PSIxMDYiIHJ4PSIxLjIiIHJ5PSIyLjAiIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuNTEiLz48ZWxsaXBzZSBjeD0iMzQiIGN5PSI5NSIgcng9IjMuOSIgcnk9IjUuMSIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC4yNyIvPjxlbGxpcHNlIGN4PSI0NiIgY3k9Ijc4IiByeD0iMi4zIiByeT0iMS44IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjQ1Ii8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMSIgcng9IjEuNSIgcnk9IjEuMiIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC4xNyIvPjxlbGxpcHNlIGN4PSI5MSIgY3k9IjM4IiByeD0iMC40IiByeT0iMC4zIiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjI2Ii8+PGVsbGlwc2UgY3g9IjY3IiBjeT0iMTA5IiByeD0iNC4xIiByeT0iNC43IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjQzIi8+PGVsbGlwc2UgY3g9IjgwIiBjeT0iNjIiIHJ4PSIxLjQiIHJ5PSIyLjAiIGZpbGw9IiNjNzhmNGMiIG9wYWNpdHk9IjAuNDUiLz48ZWxsaXBzZSBjeD0iMTQ3IiBjeT0iNjUiIHJ4PSIxLjkiIHJ5PSIyLjEiIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuNDEiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxMjkiIHJ4PSIzLjYiIHJ5PSIzLjciIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuNjciLz48ZWxsaXBzZSBjeD0iMjAiIGN5PSIyOCIgcng9IjQuNSIgcnk9IjYuMSIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC4zMSIvPjxlbGxpcHNlIGN4PSIxNSIgY3k9Ijk3IiByeD0iMi4zIiByeT0iMi4wIiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjM4Ii8+PGVsbGlwc2UgY3g9IjQiIGN5PSIxNjIiIHJ4PSIwLjUiIHJ5PSIwLjUiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuNDUiLz48ZWxsaXBzZSBjeD0iMTUiIGN5PSIxMzMiIHJ4PSI0LjEiIHJ5PSI2LjMiIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuNTMiLz48ZWxsaXBzZSBjeD0iMTI1IiBjeT0iMCIgcng9IjMuOSIgcnk9IjIuNSIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC41OSIvPjxlbGxpcHNlIGN4PSIxNDUiIGN5PSIxMTIiIHJ4PSIyLjYiIHJ5PSIyLjMiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuNDQiLz48ZWxsaXBzZSBjeD0iMTgiIGN5PSIxODQiIHJ4PSIwLjgiIHJ5PSIxLjIiIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuNjgiLz48ZWxsaXBzZSBjeD0iMTQ2IiBjeT0iMTYzIiByeD0iMS43IiByeT0iMi40IiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjY5Ii8+PGVsbGlwc2UgY3g9IjIyIiBjeT0iMTA0IiByeD0iNC40IiByeT0iNS43IiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjE2Ii8+PGVsbGlwc2UgY3g9IjY2IiBjeT0iMiIgcng9IjEuNCIgcnk9IjEuMyIgZmlsbD0iI2M3OGY0YyIgb3BhY2l0eT0iMC40NCIvPjxlbGxpcHNlIGN4PSIxMDkiIGN5PSI5MCIgcng9IjEuNCIgcnk9IjIuMCIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC43MCIvPjxlbGxpcHNlIGN4PSIxNzYiIGN5PSIxODIiIHJ4PSI0LjAiIHJ5PSIyLjMiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuNDYiLz48ZWxsaXBzZSBjeD0iMCIgY3k9IjYyIiByeD0iNC40IiByeT0iNS4zIiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjMxIi8+PGVsbGlwc2UgY3g9IjQzIiBjeT0iMTA0IiByeD0iMy45IiByeT0iNC45IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjUzIi8+PGVsbGlwc2UgY3g9IjExNiIgY3k9IjE1NiIgcng9IjQuNCIgcnk9IjQuMiIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC40NiIvPjxlbGxpcHNlIGN4PSI5MCIgY3k9IjkxIiByeD0iMi44IiByeT0iNC4yIiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjMyIi8+PGVsbGlwc2UgY3g9IjgwIiBjeT0iMTY0IiByeD0iMS42IiByeT0iMi40IiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjYwIi8+PGVsbGlwc2UgY3g9IjMzIiBjeT0iMTEwIiByeD0iMy42IiByeT0iNC40IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjUyIi8+PGVsbGlwc2UgY3g9IjE0OSIgY3k9Ijk2IiByeD0iMy42IiByeT0iNC45IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjEyNiIgY3k9IjE0NCIgcng9IjEuMyIgcnk9IjEuMSIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC4zNSIvPjxlbGxpcHNlIGN4PSIzNSIgY3k9IjEyMCIgcng9IjEuNyIgcnk9IjIuMiIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC42NSIvPjxlbGxpcHNlIGN4PSIxNjQiIGN5PSIxMzUiIHJ4PSIyLjYiIHJ5PSIyLjIiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuMTYiLz48ZWxsaXBzZSBjeD0iMTczIiBjeT0iMTQ4IiByeD0iMS43IiByeT0iMi4yIiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjM2Ii8+PGVsbGlwc2UgY3g9IjEyMiIgY3k9Ijg0IiByeD0iMi40IiByeT0iMi4zIiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjUyIiBjeT0iMTAxIiByeD0iMS43IiByeT0iMS42IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjI0Ii8+PGVsbGlwc2UgY3g9IjEzNCIgY3k9IjM3IiByeD0iMi40IiByeT0iMS41IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjI0Ii8+PGVsbGlwc2UgY3g9IjY2IiBjeT0iMzgiIHJ4PSIwLjMiIHJ5PSIwLjIiIGZpbGw9IiNjNzhmNGMiIG9wYWNpdHk9IjAuMTgiLz48ZWxsaXBzZSBjeD0iNzEiIGN5PSI3MiIgcng9IjMuNiIgcnk9IjIuMiIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC41MyIvPjxlbGxpcHNlIGN4PSIxMyIgY3k9IjI4IiByeD0iMC45IiByeT0iMS40IiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjU1Ii8+PGVsbGlwc2UgY3g9IjM2IiBjeT0iMTAyIiByeD0iMi44IiByeT0iNC4xIiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjE3Ii8+PGVsbGlwc2UgY3g9IjE1MCIgY3k9IjE3NiIgcng9IjIuOCIgcnk9IjMuOCIgZmlsbD0iI2M3OGY0YyIgb3BhY2l0eT0iMC4zOSIvPjxlbGxpcHNlIGN4PSI1OSIgY3k9IjE0NiIgcng9IjEuNiIgcnk9IjEuNyIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC40OCIvPjxlbGxpcHNlIGN4PSIzMSIgY3k9IjE2OSIgcng9IjIuNCIgcnk9IjMuNCIgZmlsbD0iI2U1YjM3OSIgb3BhY2l0eT0iMC41OSIvPjxlbGxpcHNlIGN4PSI3OCIgY3k9Ijk3IiByeD0iMy4xIiByeT0iNC4wIiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjI3Ii8+PGVsbGlwc2UgY3g9IjMiIGN5PSI2MSIgcng9IjIuMSIgcnk9IjIuMiIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC41MyIvPjxlbGxpcHNlIGN4PSIxMzMiIGN5PSI5MiIgcng9IjAuNSIgcnk9IjAuNyIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC41NSIvPjxlbGxpcHNlIGN4PSIxNzYiIGN5PSIzMCIgcng9IjQuMiIgcnk9IjYuNCIgZmlsbD0iIzI2MTcwZiIgb3BhY2l0eT0iMC40MyIvPjxlbGxpcHNlIGN4PSI0IiBjeT0iNzEiIHJ4PSIwLjgiIHJ5PSIwLjciIGZpbGw9IiM3ODRhMjkiIG9wYWNpdHk9IjAuNTMiLz48ZWxsaXBzZSBjeD0iNTIiIGN5PSI2OCIgcng9IjQuMCIgcnk9IjMuOSIgZmlsbD0iI2U1YjM3OSIgb3BhY2l0eT0iMC41MiIvPjxlbGxpcHNlIGN4PSIxMzciIGN5PSIxNDEiIHJ4PSIyLjQiIHJ5PSIxLjMiIGZpbGw9IiM3ODRhMjkiIG9wYWNpdHk9IjAuMjAiLz48ZWxsaXBzZSBjeD0iMTYyIiBjeT0iMTc2IiByeD0iMy4wIiByeT0iMi45IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjU5Ii8+PGVsbGlwc2UgY3g9IjgxIiBjeT0iODQiIHJ4PSI0LjYiIHJ5PSI2LjkiIGZpbGw9IiM0ZTJlMWMiIG9wYWNpdHk9IjAuNTgiLz48ZWxsaXBzZSBjeD0iMTU3IiBjeT0iMTc2IiByeD0iMi4xIiByeT0iMS4yIiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjU0Ii8+PGVsbGlwc2UgY3g9IjE0MSIgY3k9IjExIiByeD0iMC44IiByeT0iMC43IiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9Ijg5IiBjeT0iMTUzIiByeD0iMS45IiByeT0iMi42IiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjE1Ii8+PGVsbGlwc2UgY3g9IjM5IiBjeT0iNzIiIHJ4PSIwLjgiIHJ5PSIxLjIiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuNzAiLz48ZWxsaXBzZSBjeD0iMTY3IiBjeT0iMzQiIHJ4PSIzLjAiIHJ5PSIyLjEiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuMjUiLz48ZWxsaXBzZSBjeD0iNzMiIGN5PSIxNzYiIHJ4PSIzLjciIHJ5PSI0LjQiIGZpbGw9IiNjNzhmNGMiIG9wYWNpdHk9IjAuNjMiLz48ZWxsaXBzZSBjeD0iMTMyIiBjeT0iMTU4IiByeD0iMi43IiByeT0iNC4yIiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjQ1Ii8+PGVsbGlwc2UgY3g9IjgiIGN5PSI5MyIgcng9IjIuMSIgcnk9IjIuNiIgZmlsbD0iIzI2MTcwZiIgb3BhY2l0eT0iMC4zMyIvPjxlbGxpcHNlIGN4PSI3IiBjeT0iMTI1IiByeD0iMS41IiByeT0iMS43IiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjYwIi8+PGVsbGlwc2UgY3g9IjE0NSIgY3k9IjExNiIgcng9IjMuMCIgcnk9IjQuNyIgZmlsbD0iIzQxMjcxYSIgb3BhY2l0eT0iMC42MSIvPjxlbGxpcHNlIGN4PSIxMTAiIGN5PSIxODkiIHJ4PSIzLjciIHJ5PSI0LjciIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuMzMiLz48ZWxsaXBzZSBjeD0iMTAiIGN5PSIxNTUiIHJ4PSIyLjUiIHJ5PSIyLjciIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuMzkiLz48ZWxsaXBzZSBjeD0iODkiIGN5PSIxMjMiIHJ4PSI0LjIiIHJ5PSIzLjYiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuNDciLz48ZWxsaXBzZSBjeD0iODAiIGN5PSIxNTYiIHJ4PSIzLjMiIHJ5PSI0LjYiIGZpbGw9IiM3ODRhMjkiIG9wYWNpdHk9IjAuNjAiLz48ZWxsaXBzZSBjeD0iOTYiIGN5PSI4MSIgcng9IjIuNiIgcnk9IjEuNCIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC41NCIvPjxlbGxpcHNlIGN4PSIxODkiIGN5PSIxMSIgcng9IjEuNiIgcnk9IjEuMiIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC40MCIvPjxlbGxpcHNlIGN4PSIzOCIgY3k9Ijc3IiByeD0iMC43IiByeT0iMC40IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjQzIi8+PGVsbGlwc2UgY3g9IjEzNCIgY3k9IjQzIiByeD0iMy45IiByeT0iMy4wIiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjIyIi8+PGVsbGlwc2UgY3g9IjE2NSIgY3k9IjkxIiByeD0iMy4zIiByeT0iMy40IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjE3Ii8+PGVsbGlwc2UgY3g9IjcyIiBjeT0iMTYiIHJ4PSIwLjciIHJ5PSIwLjciIGZpbGw9IiM0ZTJlMWMiIG9wYWNpdHk9IjAuNTIiLz48ZWxsaXBzZSBjeD0iMTQxIiBjeT0iMTUxIiByeD0iNC4wIiByeT0iMy41IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjYxIi8+PGVsbGlwc2UgY3g9IjQ1IiBjeT0iNDYiIHJ4PSIzLjkiIHJ5PSI0LjEiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuMjkiLz48ZWxsaXBzZSBjeD0iNTEiIGN5PSIzMSIgcng9IjEuMSIgcnk9IjEuNyIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC40OSIvPjxlbGxpcHNlIGN4PSIxMDAiIGN5PSI1NyIgcng9IjQuNiIgcnk9IjQuOSIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC42MiIvPjxlbGxpcHNlIGN4PSI0MCIgY3k9IjMyIiByeD0iMi44IiByeT0iMi4xIiBmaWxsPSIjNzg0YTI5IiBvcGFjaXR5PSIwLjQ5Ii8+PGVsbGlwc2UgY3g9IjE2NyIgY3k9IjEyNCIgcng9IjIuNiIgcnk9IjMuNiIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC40NiIvPjxlbGxpcHNlIGN4PSIxODgiIGN5PSIzOSIgcng9IjIuMSIgcnk9IjEuMiIgZmlsbD0iI2U1YjM3OSIgb3BhY2l0eT0iMC41NCIvPjxlbGxpcHNlIGN4PSI2NSIgY3k9IjMiIHJ4PSIyLjciIHJ5PSIyLjQiIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuNjUiLz48ZWxsaXBzZSBjeD0iMTQyIiBjeT0iMTI0IiByeD0iMC40IiByeT0iMC41IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjU0Ii8+PGVsbGlwc2UgY3g9IjEyOSIgY3k9IjEwNyIgcng9IjEuMyIgcnk9IjEuMyIgZmlsbD0iI2U1YjM3OSIgb3BhY2l0eT0iMC41OSIvPjxlbGxpcHNlIGN4PSI0OCIgY3k9IjEzOSIgcng9IjIuMCIgcnk9IjIuMiIgZmlsbD0iI2U1YjM3OSIgb3BhY2l0eT0iMC40MCIvPjxlbGxpcHNlIGN4PSI5MSIgY3k9IjEyIiByeD0iMC40IiByeT0iMC4yIiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjY4Ii8+PGVsbGlwc2UgY3g9IjExMiIgY3k9IjEyIiByeD0iMC4zIiByeT0iMC4zIiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjQ0Ii8+PGVsbGlwc2UgY3g9IjEwMyIgY3k9IjE2MCIgcng9IjQuNSIgcnk9IjIuNyIgZmlsbD0iIzQxMjcxYSIgb3BhY2l0eT0iMC41NSIvPjxlbGxpcHNlIGN4PSI2MyIgY3k9IjEwOCIgcng9IjEuNCIgcnk9IjEuNSIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC4xOSIvPjxlbGxpcHNlIGN4PSIxNTAiIGN5PSIxODYiIHJ4PSIzLjAiIHJ5PSI0LjYiIGZpbGw9IiNjNzhmNGMiIG9wYWNpdHk9IjAuNDUiLz48ZWxsaXBzZSBjeD0iMTE1IiBjeT0iMTM5IiByeD0iMy4wIiByeT0iMi40IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjMyIi8+PGVsbGlwc2UgY3g9IjM3IiBjeT0iODYiIHJ4PSIzLjMiIHJ5PSIyLjEiIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuNjEiLz48ZWxsaXBzZSBjeD0iOTAiIGN5PSIxNDMiIHJ4PSIwLjYiIHJ5PSIwLjkiIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuNDQiLz48ZWxsaXBzZSBjeD0iMTU5IiBjeT0iNTEiIHJ4PSI0LjIiIHJ5PSI1LjgiIGZpbGw9IiMyNjE3MGYiIG9wYWNpdHk9IjAuMjMiLz48ZWxsaXBzZSBjeD0iMTAiIGN5PSIyIiByeD0iMy44IiByeT0iMy43IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjAiIGN5PSI2NyIgcng9IjEuMyIgcnk9IjEuNCIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC43MCIvPjxlbGxpcHNlIGN4PSIxMjYiIGN5PSI0OCIgcng9IjEuNSIgcnk9IjEuOCIgZmlsbD0iI2M3OGY0YyIgb3BhY2l0eT0iMC42NyIvPjxlbGxpcHNlIGN4PSIxMzIiIGN5PSI4NiIgcng9IjQuMyIgcnk9IjUuMCIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC40NCIvPjxlbGxpcHNlIGN4PSI1OSIgY3k9IjMyIiByeD0iNC4zIiByeT0iNS43IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjI4Ii8+PGVsbGlwc2UgY3g9IjE0NCIgY3k9IjYzIiByeD0iMy44IiByeT0iNC4yIiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjU4Ii8+PGVsbGlwc2UgY3g9IjE0MiIgY3k9IjE2MiIgcng9IjEuMCIgcnk9IjAuOSIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC42NCIvPjxlbGxpcHNlIGN4PSI5OSIgY3k9IjE4NyIgcng9IjAuMyIgcnk9IjAuNCIgZmlsbD0iIzc4NGEyOSIgb3BhY2l0eT0iMC41MSIvPjxlbGxpcHNlIGN4PSIxMDQiIGN5PSI1MyIgcng9IjEuNCIgcnk9IjEuNiIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC4xNSIvPjxlbGxpcHNlIGN4PSIxNjgiIGN5PSIxNzQiIHJ4PSIxLjIiIHJ5PSIxLjMiIGZpbGw9IiNlZGMxODAiIG9wYWNpdHk9IjAuNDciLz48ZWxsaXBzZSBjeD0iMTE5IiBjeT0iMTg5IiByeD0iNC4wIiByeT0iMi42IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjM4Ii8+PGVsbGlwc2UgY3g9IjIyIiBjeT0iMTUwIiByeD0iMC45IiByeT0iMS4zIiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjQzIi8+PGVsbGlwc2UgY3g9IjE4NCIgY3k9Ijk0IiByeD0iNC4wIiByeT0iNS44IiBmaWxsPSIjZTViMzc5IiBvcGFjaXR5PSIwLjM1Ii8+PGVsbGlwc2UgY3g9IjE3NSIgY3k9IjEzMiIgcng9IjEuOSIgcnk9IjEuMyIgZmlsbD0iIzI2MTcwZiIgb3BhY2l0eT0iMC4yMyIvPjxlbGxpcHNlIGN4PSI1MyIgY3k9IjI1IiByeD0iMi44IiByeT0iMi4zIiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjYzIi8+PGVsbGlwc2UgY3g9IjEwNiIgY3k9IjEzIiByeD0iMi41IiByeT0iMS41IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjYyIi8+PGVsbGlwc2UgY3g9IjE2MiIgY3k9IjUiIHJ4PSIyLjIiIHJ5PSIzLjAiIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuNDMiLz48ZWxsaXBzZSBjeD0iMTM0IiBjeT0iMTQ0IiByeD0iMC42IiByeT0iMC40IiBmaWxsPSIjNDEyNzFhIiBvcGFjaXR5PSIwLjQwIi8+PGVsbGlwc2UgY3g9IjE3NSIgY3k9IjQyIiByeD0iMy4yIiByeT0iMS42IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjI5Ii8+PGVsbGlwc2UgY3g9IjEwNyIgY3k9IjQwIiByeD0iMi43IiByeT0iMi42IiBmaWxsPSIjMjYxNzBmIiBvcGFjaXR5PSIwLjI3Ii8+PGVsbGlwc2UgY3g9IjEyNSIgY3k9IjEyMCIgcng9IjEuMCIgcnk9IjEuNiIgZmlsbD0iI2M3OGY0YyIgb3BhY2l0eT0iMC40NSIvPjxlbGxpcHNlIGN4PSIxMDIiIGN5PSI4NiIgcng9IjMuNCIgcnk9IjIuNCIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC4yNSIvPjxlbGxpcHNlIGN4PSI4NCIgY3k9IjE1OSIgcng9IjAuNyIgcnk9IjAuNyIgZmlsbD0iI2VkYzE4MCIgb3BhY2l0eT0iMC4yNCIvPjxlbGxpcHNlIGN4PSIyNyIgY3k9IjkwIiByeD0iMy42IiByeT0iNC42IiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjE4Ii8+PGVsbGlwc2UgY3g9IjE0IiBjeT0iMTA5IiByeD0iMS44IiByeT0iMi4zIiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjM1Ii8+PGVsbGlwc2UgY3g9IjUzIiBjeT0iMTgxIiByeD0iMy4yIiByeT0iMi40IiBmaWxsPSIjYzc4ZjRjIiBvcGFjaXR5PSIwLjQ3Ii8+PGVsbGlwc2UgY3g9IjE0MiIgY3k9IjE1IiByeD0iMC43IiByeT0iMC44IiBmaWxsPSIjNGUyZTFjIiBvcGFjaXR5PSIwLjM4Ii8+PGVsbGlwc2UgY3g9IjEyMCIgY3k9Ijc2IiByeD0iMi41IiByeT0iMi4xIiBmaWxsPSIjZWRjMTgwIiBvcGFjaXR5PSIwLjMwIi8+PGVsbGlwc2UgY3g9Ijg0IiBjeT0iMCIgcng9IjIuNCIgcnk9IjEuNCIgZmlsbD0iIzRlMmUxYyIgb3BhY2l0eT0iMC42NSIvPjxlbGxpcHNlIGN4PSIxNjgiIGN5PSIxMjIiIHJ4PSI0LjQiIHJ5PSIzLjIiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuNTQiLz48ZWxsaXBzZSBjeD0iMTA1IiBjeT0iNTYiIHJ4PSIyLjkiIHJ5PSIyLjkiIGZpbGw9IiM0MTI3MWEiIG9wYWNpdHk9IjAuMjAiLz48ZWxsaXBzZSBjeD0iNDgiIGN5PSIxMDciIHJ4PSIyLjIiIHJ5PSIzLjUiIGZpbGw9IiNlNWIzNzkiIG9wYWNpdHk9IjAuMjciLz48cGF0aCBkPSJNMzUgMzggbDE4IC0yIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC4zIiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik04MSA4NSBsNSAtMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTM4IDE4OCBsNiAtMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjEuMCIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTUyIDEwMyBsNiAtMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuMyIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTY4IDk4IGwyMSAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC4yIiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0zOSA4OSBsNSAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMS4wIiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xMTQgMzYgbDE2IC0zIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC45IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xNTcgNDMgbDE3IC0zIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC43IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik02MCA5MCBsMTIgLTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjYiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTUxIDE2OCBsMTIgLTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjgiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTExMiA4OSBsNSAtMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuMiIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTMxIDg5IGwxOCAtMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNCIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTE2IDE2NCBsMTIgLTQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjYiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTgyIDE1OCBsNiAtMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNyIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNNTAgNTMgbDE4IC0yIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC45IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xIDEwNCBsMTcgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuMyIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMjAgMTMgbDIyIC00IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xNDQgMTU3IGw2IC0xIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC45IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xNDMgOSBsNSAtNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNiIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNNzUgMTg3IGw1IC0zIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC42IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xNTAgMTc2IGwxMyAtMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTc2IDExNiBsMyAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC42IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xNTcgODcgbDEwIC0zIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC44IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xNTcgNDkgbDE4IC0yIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC4zIiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik02NiAzMCBsMTUgLTQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjkiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTEyMSAxNDYgbDYgLTIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjYiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTE1NyAxMTQgbDEyIC00IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC4yIiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik03MyA2MiBsMTkgLTIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjQiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTczIDIyIGwyMSAtMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNNzIgMTIyIGwxNyAtMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTI1IDM1IGwyMCAtMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuOCIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTgyIDE3OSBsMiAtMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNNzUgMTY2IGwxNyAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0yOSAxNTUgbDIxIDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjYiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTgxIDc5IGw1IC0yIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC42IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xNDQgMTUgbDcgLTIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTEwNSA0IGwxNyAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC40IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik03MCA3OSBsMjEgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuMyIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTMyIDEwNiBsOSAtMSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuOSIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNODUgMTQ4IGwxMyAtMyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuMiIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNNTYgODkgbDE1IC0zIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC4zIiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xNzAgNDAgbDE4IC0yIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC43IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik03MiAxNjMgbDIyIDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjkiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTE0OCA3NyBsMTYgLTIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjQiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTE2NCAxMzIgbDMgLTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjYiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTI2IDg0IGwxOSAtNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNCIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNNjIgOTUgbDIgLTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjciIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTE4MSA2NyBsOCAtNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNyIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNMTQ5IDE1OCBsMTIgLTIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjciIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTU2IDI0IGw1IC0xIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0xNDEgNjcgbDUgLTEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2YyY2M4YyIgc3Ryb2tlLXdpZHRoPSIwLjIiIG9wYWNpdHk9Ii4zIi8+PHBhdGggZD0iTTY4IDE5IGwxMCAtMSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuOSIgb3BhY2l0eT0iLjMiLz48cGF0aCBkPSJNNTkgODYgbDE4IC0xIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC42IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik0zMyAxMDggbDE0IC0zIiBmaWxsPSJub25lIiBzdHJva2U9IiNmMmNjOGMiIHN0cm9rZS13aWR0aD0iMC45IiBvcGFjaXR5PSIuMyIvPjxwYXRoIGQ9Ik03OCA1IGwxNSAtNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjJjYzhjIiBzdHJva2Utd2lkdGg9IjAuNSIgb3BhY2l0eT0iLjMiLz48L3N2Zz4=") }
+.kiosk[data-screen-style=studio] .television::before{content:"";position:absolute;inset:1%;z-index:1;pointer-events:none;border-radius:inherit;background-image:var(--oxidation);background-size:190px 190px;mix-blend-mode:multiply;opacity:.72}
+.kiosk[data-screen-style=studio] .vintage-sidecar::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:inherit;background-image:var(--oxidation);background-size:190px 190px;opacity:.8;mix-blend-mode:multiply}
+.kiosk[data-screen-style=studio] .control-panel::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background-image:var(--oxidation);background-size:190px 190px;opacity:.52;mix-blend-mode:multiply}

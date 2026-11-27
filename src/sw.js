@@ -1,6 +1,6 @@
 /* Offline shell only, scoped cache. Never caches media or guest credentials. */
 const PREFIX='luce-retrobooth-v05-'+encodeURIComponent(new URL(self.registration.scope).pathname)+'-';
-const CACHE=PREFIX+'0.9.8-alpha.1';
+const CACHE=PREFIX+'0.9.9-alpha.1';
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html']))));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(PREFIX)&&k!==CACHE).map(k=>caches.delete(k))))));
 self.addEventListener('fetch',e=>{

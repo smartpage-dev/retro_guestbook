@@ -1,22 +1,24 @@
-# RetroBooth v0.9.8 — Android/Windows + Hostinger PHP Cloud
+# RetroBooth v0.9.9-alpha.1 — Android/Windows + Hostinger PHP Cloud
 
-**Current complete source:** use this one FULL GitHub root archive with `SYNC_TO_GITHUB.cmd`, not old partial patches. Android `versionCode 17`, package `studio.luce.retrobooth.preview`; 4 GitHub Actions workflows (fast preflight, Android APK, Windows EXE, full verification). The actual APK/EXE binaries must be produced by successful GitHub Actions runs, not included in this archive.
+**Current full source ZIP:** build target Android `versionCode 18`, unchanged package ID `studio.luce.retrobooth.preview`, GitHub Actions for Android APK / Windows EXE / source preflight / full verification. **ZIP contains source, not compiled APK/EXE.** Keep existing signing identity to upgrade without uninstalling or losing stored videos.
 
-**v0.9.8 changes:** 32-inch guest TV `RETROVISION` typography fixed, configurable brand/subtitle/channel, clean status-only footer, selectable 12/15/24/30 render FPS *cap* + 360/540/720 processing dimensions, bilingual Cantonese/English private Guest page, Unicode 384-dot raster ESC/POS ticket label pilot, six ticket layouts with portrait/native vs landscape/browser-only distinction, and three genuinely distinct new TV cabinet silhouettes (Space-age Orb, Broadcast Rack, Y2K Jelly). Existing encrypted/signed cloud guest URLs and printer journal safeguards preserved.
+**New in v0.9.9:** 03 Mustard Portable TV, 04 Rusted Industrial TV, 05 Walnut Console TV are independently designed realistic antique UI shells, inspired by three supplied device photographs, while 01 Modern CRT and 02 Heritage TV remain visually unchanged. Default recorded canvas 360p height at **24fps target**; 8/10/12/15/18/20/24/30/Auto targets and 360p/540p/720p output are selectable in Android Admin 01. Canvas capture request and render scheduler now both follow the FPS setting. Hardware or browser encoder may fall short; not event-accepted.
 
-**Hostinger upgrade:** deploy the separate **code-only PHP Cloud ZIP** into existing `public_html` and `retrobooth_private/app/Cloud.php` (backup first), preserving `retrobooth_private/config.php`, `retrobooth_private/data`, and recordings. No Node.js app or new environment keys required on Hostinger. See `docs/RETROBOOTH_V098_UI_TICKET_ZH.md` for exact setup and limitations.
+**Preserved from v0.9.8:** bilingual Cantonese/English private Guest page; cloud Event Master and slideshow permission boundaries; editable TV panel text; printer journal/QR photo tickets; six receipt templates; native Bluetooth Classic SPP 58mm portrait raster pilot. Real Bluetooth printer paper, actual camera and MediaRecorder, hosted PHP and installable APK/EXE are **not physically validated in this source archive**.
 
-**Limitations:** Chinese ESC/POS title/caption/footer is a *hardware-unverified 384-dot GS v 0 raster pilot*; QR remains native. 58mm secure SPP output is vertical only. Real video capture and printer compatibility, APK/EXE compilation from this source, Hostinger deployment, and 32-inch acceptance require separate checks.
+**Full Cantonese setup and limits:** [docs/RETROBOOTH_V099_ANTIQUE_FPS_ZH.md](docs/RETROBOOTH_V099_ANTIQUE_FPS_ZH.md). Back up cloud private `config.php` and `data/`; deploy only the separate code-only Hostinger ZIP and preserve all recordings, IDs, permissions and credentials.
 
 ---
 
-# RetroBooth v0.9.8-alpha.1 — Cloud Event Master, Private Slideshow and Five CRT Frames (27 Nov 2026)
+## Historical release notes (do not follow previous patch installation steps)
+
+# RetroBooth v0.9.7/0.9.8 history — Cloud Event Master, Private Slideshow and Five CRT Frames (27 Nov 2026)
 
 This is a **source build candidate**, not an APK/EXE or a validated production service.
 
 ## What is new
 
-- Hostinger **PHP** Cloud is the event master for title/date, durations, countdown, look, ticket receipt and QR settings. Connected Android v0.9.8 devices check for revisions **only while idle**; camera/microphone/Bluetooth printer pairing stay local. Requires both updated Hostinger cloud files **and** a rebuilt Android APK.
+- Hostinger **PHP** Cloud is the event master for title/date, durations, countdown, look, ticket receipt and QR settings. Connected Android v0.9.9 devices check for revisions **only while idle**; camera/microphone/Bluetooth printer pairing stay local. Requires both updated Hostinger cloud files **and** a rebuilt Android APK.
 - Cloud Admin prevents same-name active event duplication, displays explicit saving states and toggles, distinguishes **reserved** QR slots from **ready** verified videos, and adds private thumbnail/photo, Play, Download, Share view-only and Browser Reprint QR Ticket. Reprint is not a remote Bluetooth printer command.
 - Guest Big-screen consent and Guest Delete options are independent and **off by default**. A private slideshow includes only ready videos with explicit guest consent and staff approval (or event auto-approval after consent). No public event album.
 - TV bodies: **01 Modern CRT, 02 Heritage TV, 03 Space Age Ivory, 04 Studio Broadcast, 05 Y2K Bubble**; screen filters add VHS, Sepia, Cinema, Night Vision. Shared 32-inch landscape sizing and version/Admin access safety margins.
@@ -26,7 +28,7 @@ This is a **source build candidate**, not an APK/EXE or a validated production s
 
 Use the **one full GitHub repository ZIP**, not a mixture of legacy patches. `SYNC_TO_GITHUB.cmd` stages all required paths into an existing GitHub Desktop clone; review/commit/push, confirm Source Preflight green, then manually run the independent Android/Windows workflows. **Android versionCode 16** (same package ID; keep same signing key to preserve local clips).
 
-For Hostinger, deploy only the separate **v0.9.8 PHP Cloud Update ZIP**. Back up and **preserve** the current `retrobooth_private/config.php` and `retrobooth_private/data/`. Update the two public and private code trees, including hidden `.htaccess`; do **not** upload GitHub source/ZIP or any credentials to `public_html`. Hostinger needs PHP 8.2+, HTTPS and outside-public private storage, **not** Node.js.
+For Hostinger, deploy only the separate **v0.9.9 PHP Cloud Update ZIP**. Back up and **preserve** the current `retrobooth_private/config.php` and `retrobooth_private/data/`. Update the two public and private code trees, including hidden `.htaccess`; do **not** upload GitHub source/ZIP or any credentials to `public_html`. Hostinger needs PHP 8.2+, HTTPS and outside-public private storage, **not** Node.js.
 
 See `docs/CLOUD_EVENT_MASTER_V097_ZH.md` for step-by-step Cantonese instructions and security/real-device limitations.
 

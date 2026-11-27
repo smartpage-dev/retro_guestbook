@@ -74,7 +74,7 @@ jobs:
       - name: Upload web distributions
         uses: actions/upload-artifact@v6
         with:
-          name: RetroBooth-Web-v0.9.8-${{ github.run_number }}
+          name: RetroBooth-Web-v0.9.9-${{ github.run_number }}
           path: artifacts/*
           if-no-files-found: error
           retention-days: 30

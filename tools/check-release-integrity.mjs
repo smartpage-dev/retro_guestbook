@@ -1,4 +1,4 @@
-/** Verify the canonical v0.9.8 release source, both bytes and Git staging.
+/** Verify the canonical v0.9.9 release source, both bytes and Git staging.
  * Requires only Node's built-ins. Never modifies a file or the Git index.
  */
 import fs from 'node:fs';
@@ -26,13 +26,13 @@ const checkPath = name => typeof name === 'string' && name.length > 0 && !name.i
 let manifest;
 try { manifest = JSON.parse(fs.readFileSync(path.join(root,'RELEASE_SOURCE_SHA256.json'),'utf8')); }
 catch (e) { console.error('FATAL: RELEASE_SOURCE_SHA256.json missing or unreadable:',e.message); process.exit(2); }
-if (manifest.schema !== 'retrobooth-source-ledger-v1' || manifest.version !== '0.9.8-alpha.1' || manifest.androidVersionCode !== 17) {
+if (manifest.schema !== 'retrobooth-source-ledger-v1' || manifest.version !== '0.9.9-alpha.1' || manifest.androidVersionCode !== 18) {
   fail('Release ledger identity/version invalid; replace with the whole canonical ZIP, not an incremental patch.');
 }
 const files = manifest.files || {};
 const names=Object.keys(files);
 if (names.length < 175) fail(`Ledger incomplete (${names.length} files, expected >=175).`);
-for (const necessary of ['src/.htaccess','src/desktop-admin.html','tools/check_release_versions.py','tools/check-release-integrity.mjs','tools/sync-release-to-repo.mjs','tools/native_build_info.py','tools/verify_apk_badging.py','tests/test_apk_metadata.py','android/app/build.gradle','desktop/package.json','package.json','cloud/retrobooth_private/app/Cloud.php','cloud/public_html/admin/index.html','cloud/public_html/guest/index.html','cloud/public_html/show/index.html','cloud/public_html/assets/admin.js','cloud/public_html/assets/guest.js','cloud/public_html/assets/show.js','src/cloud-flow.js','src/cloud-client.js','src/appearance.css','src/effects.js','tests/cloud_api.py','tests/browser_v097_styles.py','tests/browser_v097_cloud_mock.py','tests/browser_v098_polish.py','tests/java/TicketUnicodeRasterTest.java','docs/RETROBOOTH_V098_UI_TICKET_ZH.md','docs/CLOUD_EVENT_MASTER_V097_ZH.md','tools/package_cloud_update.py','.github/workflows/build-android.yml','.github/workflows/build-windows.yml','.github/workflows/verify-all.yml','SYNC_TO_GITHUB.cmd']) {
+for (const necessary of ['src/.htaccess','src/desktop-admin.html','tools/check_release_versions.py','tools/check-release-integrity.mjs','tools/sync-release-to-repo.mjs','tools/native_build_info.py','tools/verify_apk_badging.py','tests/test_apk_metadata.py','android/app/build.gradle','desktop/package.json','package.json','cloud/retrobooth_private/app/Cloud.php','cloud/public_html/admin/index.html','cloud/public_html/guest/index.html','cloud/public_html/show/index.html','cloud/public_html/assets/admin.js','cloud/public_html/assets/guest.js','cloud/public_html/assets/show.js','src/cloud-flow.js','src/cloud-client.js','src/appearance.css','src/effects.js','tests/cloud_api.py','tests/browser_v097_styles.py','tests/browser_v097_cloud_mock.py','tests/browser_v098_polish.py','tests/browser_v099_antique_fps.py','src/antique-v099.css','docs/RETROBOOTH_V099_ANTIQUE_FPS_ZH.md','docs/RETROBOOTH_V099_QA_REPORT_ZH.md','tests/java/TicketUnicodeRasterTest.java','docs/RETROBOOTH_V098_UI_TICKET_ZH.md','docs/CLOUD_EVENT_MASTER_V097_ZH.md','tools/package_cloud_update.py','.github/workflows/build-android.yml','.github/workflows/build-windows.yml','.github/workflows/verify-all.yml','SYNC_TO_GITHUB.cmd']) {
   if (!(necessary in files)) fail(`Missing release ledger entry: ${necessary}`);
 }
 for (const name of names) {
@@ -50,7 +50,7 @@ try {
   const d=JSON.parse(fs.readFileSync(path.join(root,'desktop/package.json'),'utf8'));
   const v=fs.readFileSync(path.join(root,'VERSION.txt'),'utf8').split(/\r?\n/)[0].trim();
   const gradle=fs.readFileSync(path.join(root,'android/app/build.gradle'),'utf8');
-  if (p.version!==manifest.version || d.version!==manifest.version || v!==manifest.version || !gradle.includes(`versionName '${manifest.version}'`) || !gradle.includes('versionCode 17')) fail('Release version mismatch across packages/VERSION/Android Gradle.');
+  if (p.version!==manifest.version || d.version!==manifest.version || v!==manifest.version || !gradle.includes(`versionName '${manifest.version}'`) || !gradle.includes('versionCode 18')) fail('Release version mismatch across packages/VERSION/Android Gradle.');
   for (const s of ['desktop:prepare','android:assets','test:native-core','test']) if(!p.scripts?.[s])fail(`Missing package.json script: ${s}`);
 } catch (e) { fail('Cannot validate core release versions/scripts: '+e.message); }
 try {
@@ -113,4 +113,4 @@ if(errors.length) {
   console.error('REPAIR: use the ONE canonical FULL ROOT ZIP and SYNC_TO_GITHUB.cmd; avoid mixing patches.');
   process.exit(1);
 }
-say(`PASS: complete v0.9.8 release, ${names.length} SHA-256-checked source files${requireGit?', all tracked by Git':''}.`);
+say(`PASS: complete v0.9.9 release, ${names.length} SHA-256-checked source files${requireGit?', all tracked by Git':''}.`);

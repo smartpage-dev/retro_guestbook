@@ -82,12 +82,12 @@ with sync_playwright() as p:
    const results=[];for(const mode of ['film','heritage','bw']){
     const c=document.createElement('canvas'),v=document.createElement('video'),settings=RetroCore.safeSettings({lookMode:mode,osd:false,lookProfiles:{[mode]:{grain:0,scan:0}}});
     const r=new RetroRenderer(c,v,settings,{backend:'2d'});r.running=false;r.artwork=()=>{r.rawCtx.fillStyle='rgb(180,90,70)';r.rawCtx.fillRect(0,0,r.w,r.h)};r.draw(0);
-    const pixel=Array.from(c.getContext('2d').getImageData(Math.floor(r.w/2),362,1,1).data).slice(0,3);
+    const pixel=Array.from(c.getContext('2d').getImageData(Math.floor(r.w/2),Math.floor(r.h/2)+2,1,1).data).slice(0,3);
     const expected=RetroEffects.transform(180,90,70,RetroEffects.resolve(settings));
     r.settings=RetroCore.safeSettings({...settings,lookProfiles:{...settings.lookProfiles,[mode]:{...settings.lookProfiles[mode],grain:.12}}});r.draw(1);
     const a=Array.from(c.getContext('2d').getImageData(100,100,80,80).data);r.draw(2);const b=Array.from(c.getContext('2d').getImageData(100,100,80,80).data);
     r.settings=RetroCore.safeSettings({...settings,lookProfiles:{...settings.lookProfiles,[mode]:{...settings.lookProfiles[mode],grain:0,scan:.3}}});r.draw(2);
-    const sc=c.getContext('2d'),line=Array.from(sc.getImageData(500,360,1,1).data),between=Array.from(sc.getImageData(500,361,1,1).data);
+    const sc=c.getContext('2d'),line=Array.from(sc.getImageData(Math.floor(r.w/2),Math.floor(r.h/2/4)*4,1,1).data),between=Array.from(sc.getImageData(Math.floor(r.w/2),Math.floor(r.h/2/4)*4+1,1,1).data);
     results.push({mode,pixel,expected,noiseChanges:a.filter((n,i)=>n!==b[i]).length,scanDark:line[0]<between[0]-10,backend:r.mode});
    }return results;
   }''')

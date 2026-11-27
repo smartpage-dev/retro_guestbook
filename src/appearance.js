@@ -1,5 +1,5 @@
 /* Appearance is a saved operator preference, not a capture or privacy mode. */
-const TV_STYLES={edge:'Modern CRT television',heritage:'Heritage television',space:'Space Age Ivory CRT',studio:'Studio Broadcast CRT',bubble:'Y2K Bubble CRT'};
+const TV_STYLES={edge:'Modern CRT television',heritage:'Heritage television',space:'Mustard Portable TV',studio:'Rusted Industrial TV',bubble:'Walnut Console TV'};
 function styleName(style){return TV_STYLES[style]||'Heritage television';}
 function applyScreenAppearance(){
   const previous=document.body.dataset.screenStyle;

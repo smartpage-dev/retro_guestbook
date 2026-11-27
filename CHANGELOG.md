@@ -1,4 +1,12 @@
-## v0.9.8-alpha.1 — Android TV guest UI, bilingual Guest Page, Unicode tickets and new cabinet silhouettes (27 Nov 2026)
+## v0.9.9-alpha.1 — Fully redesigned antique TV 03–05 + 360p/24fps target (27 Nov 2026)
+
+- Built three original, independent interactive cabinet structures inspired by user-provided references: yellow portable 1970s set (handle and antenna), rust/patina 1950s asymmetric cabinet (left dial and speaker tower), mid-century walnut television (woodgrain, silver inset, thin legs and rabbit antenna). Styles 01 and 02 remain unchanged.
+- Changed default recording canvas to 360p-height and default processing/capture-stream target to 24fps. Admin selects 8/10/12/15/18/20/24/30/Auto and 360/540/720p, applying to a new session; `getUserMedia` requests matching ideal input sensor FPS and a lower ideal resolution for 360p output.
+- Improved rAF frame pacing for common 60Hz screens; no 24fps-to-20fps inadvertent round-down. Encoder bitrate nominal 0.9 Mbps at 360p, 1.5 Mbps at 540p and 2.5 Mbps at 720p, subject to browser support.
+- One-time migration old default Auto/720p to new 24/360 while retaining profiles with intentional FPS/resolution overrides. Do not interpret requested FPS as verified measured encoded FPS.
+- Android versionCode 18; same package ID and signing policy. New CSS integrated into local/cloud kiosk build; Hostinger PHP backend and protected guest-delivery controls unchanged. Native APK/EXE compilation and physical Android/print/server acceptance NOT performed locally.
+
+## v0.9.8-alpha.1 (historical) — Android TV guest UI, bilingual Guest Page, Unicode tickets and new cabinet silhouettes (27 Nov 2026)
 
 - Corrected RETROVISION subtitle text overflow on 32-inch Android control panel. Operator-defined TV maker/product/subtitle/channel can sync from Cloud Event Master. Guest-only engineering text is hidden by default; optional concise private-QR text and QR TICKET connected/not-ready status replace the former clutter.
 - Local Admin Camera Lab: Auto/12/15/24/30 *maximum* processed FPS, selectable 360p/540p/720p rendering canvas. No promised frame rate: actual GPU/WebView throughput may remain lower; capture/encoded fps measured separately.

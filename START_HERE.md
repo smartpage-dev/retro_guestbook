@@ -1,10 +1,12 @@
-# START HERE — RetroBooth v0.9.8 (27 Nov 2026)
+# START HERE — RetroBooth v0.9.9-alpha.1 (27 Nov 2026)
 
-**Use the single verified FULL ROOT ZIP**, stage with `SYNC_TO_GITHUB.cmd`, commit + push all new files, confirm GitHub Source Preflight, then run a NEW Android workflow from the updated commit. Android versionCode **17**; use the same signing key. Do not delete/clear the installed APK without exporting local videos.
+**唯一完整 GitHub Root ZIP:** 開始前備份 Android 本機影片，確保 APK 簽署身份不變。Android `versionCode 18`，同一 package ID。將 ZIP 放 clone 資料夾外，解壓 → GitHub Desktop Fetch/Pull → `SYNC_TO_GITHUB.cmd` 指向 clone → 檢查 PASS → Commit + Push → **Source Preflight (Fast)** 成功 → 手動執行 **Build Android APK** (選最新 commit/branch)。此 ZIP **不含 APK/EXE**。
 
-Upgrade Hostinger with the separate v0.9.8 **PHP Cloud Update** (not Node): back up existing config.php + data + videos; overwrite Cloud code only, never secrets or live data. Then open Cloud Admin, select the correct existing event (some legacy duplicate event names might exist), save settings, pair Android with the right existing device identity, choose Sync now / await idle sync. Test one 10-second private video and its phone QR before guests use it.
+**三款全面重新設計嘅電視：** TV 03 黃色手提、TV 04 鏽蝕古董木／金屬機身、TV 05 胡桃木電視櫃。TV 01/02 保留。**錄影預設 360p 高、24fps 目標**（Admin 01 可設定 8/10/12/15/18/20/24/30/Auto 及 360/540/720p，實際效能視裝置而定）。
 
-Full instructions: `docs/RETROBOOTH_V098_UI_TICKET_ZH.md` and `docs/CLOUD_EVENT_MASTER_V097_ZH.md`. Previous v0.9.6 release notes below are historical.
+**Hostinger:** 使用單獨 `RetroBooth_v0.9.9_Hostinger_PHP_Cloud_Update.zip`，先備份 private `config.php`、`data/`、影片；只更新 code，絕不可覆蓋既有配置／活動／影片。上線前實測 10 秒 Android 錄影、私人 QR、Guest 下載、FPS、實體票。
+
+最新繁體中文指南：`docs/RETROBOOTH_V099_ANTIQUE_FPS_ZH.md`。舊版升級教學以下為歷史記錄，請勿與今次打包混用。
 
 ---
 

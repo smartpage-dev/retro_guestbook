@@ -22,6 +22,6 @@ def normalized(p):
  if p.suffix.lower() in TEXT or p.name in {'.htaccess','.gitignore','.gitattributes'}:b=b.replace(b'\r\n',b'\n')
  return b
 files={p.relative_to(R).as_posix():hashlib.sha256(normalized(p)).hexdigest() for p in sorted(R.rglob('*')) if include(p)}
-manifest={'schema':'retrobooth-source-ledger-v1','version':'0.9.8-alpha.1','androidVersionCode':17,'description':'Immutable build-source paths for a complete v0.9.8 GitHub commit; excludes generated caches, artifacts, live media, credentials and QA images.','files':files}
+manifest={'schema':'retrobooth-source-ledger-v1','version':'0.9.9-alpha.1','androidVersionCode':18,'description':'Immutable build-source paths for a complete v0.9.9 GitHub commit; excludes generated caches, artifacts, live media, credentials and QA images.','files':files}
 (R/'RELEASE_SOURCE_SHA256.json').write_text(json.dumps(manifest,indent=2,ensure_ascii=True)+'\n',encoding='utf8')
 print('Generated release source ledger with',len(files),'files')
