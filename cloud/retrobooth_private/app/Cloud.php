@@ -84,6 +84,58 @@ final class CloudRepo {
         });
     }
 }
+
+/* Additive per-event settings. Existing schema-1 stores are read without resetting media. */
+function rb_event_defaults(string $title): array {
+    return ['title'=>$title,'date'=>gmdate('Y-m-d'),'duration'=>10,'countdown'=>3,
+        'screenStyle'=>'heritage','lookMode'=>'follow','ticketCaptureSecond'=>2,
+        'ticketPhotoAspect'=>'4:3','receiptStyle'=>'classic',
+        'receiptCaption'=>'A LITTLE LOVE, TO KEEP.','receiptFooter'=>'THANK YOU FOR BEING HERE',
+        'qrDisplaySeconds'=>10,'showDelay'=>60];
+}
+function rb_event_values(array $event): array {
+    $defaults=rb_event_defaults($event['title']);
+    return array_replace($defaults,array_intersect_key(is_array($event['settings']??null)?$event['settings']:[],$defaults),['title'=>$event['title']]);
+}
+function rb_public_event(array $event): array {
+    unset($event['showTokenHash']);
+    $event['settings']=rb_event_values($event);
+    $event['settingsRevision']=(int)($event['settingsRevision']??1);
+    $event['showEnabled']=($event['showEnabled']??false)===true;
+    $event['autoApproveShow']=($event['autoApproveShow']??false)===true;
+    $event['allowGuestDelete']=($event['allowGuestDelete']??false)===true;
+    $event['showLinkIssued']=isset($event['showTokenHash']);
+    return $event;
+}
+function rb_valid_event_settings(array $values,array $event): array {
+    $current=rb_event_values($event);
+    $known=array_keys($current);
+    foreach($values as $key=>$value) {
+        if(!in_array($key,$known,true))rb_fail(400,'unknown_event_setting');
+        if($key==='title'){
+            if(!is_string($value) || trim($value)==='' || strlen($value)>120)rb_fail(400,'invalid_event_title');
+            $current[$key]=trim($value);continue;
+        }
+        if(in_array($key,['duration','countdown','ticketCaptureSecond','qrDisplaySeconds','showDelay'],true)){
+            $allowed=match($key){'duration'=>[10,30,60],'countdown'=>[0,3],
+                'ticketCaptureSecond'=>[1,2,3],'showDelay'=>[0,30,60,120],default=>range(5,60)};
+            if(!is_int($value)||!in_array($value,$allowed,true))rb_fail(400,'invalid_event_setting_'.$key);
+        } elseif($key==='date') {
+            if(!is_string($value)||!preg_match('/^\d{4}-\d{2}-\d{2}$/D',$value))rb_fail(400,'invalid_event_date');
+        } elseif(in_array($key,['screenStyle','lookMode','ticketPhotoAspect','receiptStyle'],true)){
+            $allowed=match($key){'screenStyle'=>['edge','heritage','space','studio','bubble'],
+                'lookMode'=>['follow','film','heritage','bw','vhs','sepia','cinema','night'],
+                'ticketPhotoAspect'=>['4:3','16:9'],default=>['classic','ticket','minimal']};
+            if(!is_string($value)||!in_array($value,$allowed,true))rb_fail(400,'invalid_event_setting_'.$key);
+        } else {
+            $limit=$key==='receiptCaption'?80:100;
+            if(!is_string($value)||strlen($value)>$limit*4||strlen($value)>$limit && preg_match('/^[\x00-\x7F]*$/D',$value))rb_fail(400,'invalid_event_text_'.$key);
+        }
+        $current[$key]=$value;
+    }
+    return $current;
+}
+
 final class CloudApi {
     public CloudRepo $repo;
     public function __construct(public array $cfg) { $this->repo=new CloudRepo($cfg); }
@@ -102,6 +154,7 @@ final class CloudApi {
         if (!$c) rb_fail(401,'unauthorized');
         if (hash_equals($c['ownerHash'],rb_hash($m[2]))) return ['role'=>'owner','id'=>$m[1]];
         if (hash_equals($c['viewHash'],rb_hash($m[2]))) return ['role'=>'viewer','id'=>$m[1]];
+        foreach($c['staffShares']??[] as $share)if(($share['expiresAt']??0)>time() && hash_equals($share['hash'],rb_hash($m[2])))return ['role'=>'viewer','id'=>$m[1]];
         rb_fail(401,'unauthorized');
     }
     public function rateLimit(string $peer,string $token): void {
@@ -121,7 +174,10 @@ final class CloudApi {
             'moderation'=>$c['moderation'],'revision'=>$c['revision'],
             'size'=>$deleted?0:($c['size']??0),'mime'=>$deleted?'':($c['mime']??''),
             'purge'=>$c['purge']??null,'devicePurgeAck'=>$c['devicePurgeAck']??false,
-            'publicShowConnected'=>false];
+            'thumbnailReady'=>!$deleted && isset($c['thumbnailHash']),
+            'showEnabled'=>($e['showEnabled']??false)===true,
+            'allowGuestDelete'=>($e['allowGuestDelete']??false)===true,
+            'publicShowConnected'=>($e['showEnabled']??false)===true && isset($e['showTokenHash'])];
     }
     private function requireAlive(array &$s,string $id): void {
         $c=$s['clips'][$id]??null;if (!$c) rb_fail(404,'clip_not_found');
@@ -135,13 +191,15 @@ final class CloudApi {
         return $this->repo->transaction(function(array &$s) use($method,$route,$token,$body,$binary,$chunkHash) {
             if (str_starts_with($route,'/api/admin/')) {
                 $this->auth($s,$token,'admin');
-                if ($route==='/api/admin/events' && $method==='GET') return ['events'=>array_values($s['events']),'storage'=>'single-host-locked-files'];
+                if ($route==='/api/admin/events' && $method==='GET') return ['events'=>array_values(array_map('rb_public_event',$s['events'])),'storage'=>'single-host-locked-files'];
                 if ($route==='/api/admin/events' && $method==='POST') {
                     $title=trim((string)($body['title']??''));$days=(int)($body['days']??30);
                     if ($title==='' || strlen($title)>240 || $days<1 || $days>365) rb_fail(400,'invalid_event');
                     if (count($s['events'])>=100) rb_fail(409,'event_limit');
-                    $id=rb_id();$s['events'][$id]=['id'=>$id,'title'=>$title,'expiresAt'=>time()+$days*86400,'issueOpen'=>true,'uploadOpen'=>true,'createdAt'=>time()];
-                    return $s['events'][$id];
+                    foreach($s['events'] as $existing)if(($existing['expiresAt']??0)>time() && strtolower(trim($existing['title']))===strtolower($title))rb_fail(409,'event_title_already_exists');
+                    $id=rb_id();$s['events'][$id]=['id'=>$id,'title'=>$title,'expiresAt'=>time()+$days*86400,'issueOpen'=>true,'uploadOpen'=>true,'createdAt'=>time(),
+                        'settings'=>rb_event_defaults($title),'settingsRevision'=>1,'showEnabled'=>false,'allowGuestDelete'=>false,'autoApproveShow'=>false];
+                    return rb_public_event($s['events'][$id]);
                 }
                 if ($route==='/api/admin/device' && $method==='POST') {
                     $id=(string)($body['eventId']??'');if (!isset($s['events'][$id])) rb_fail(404,'event_not_found');
@@ -156,26 +214,84 @@ final class CloudApi {
                 }
                 if (preg_match('#^/api/admin/event/([a-f0-9]{32})$#D',$route,$m) && $method==='POST') {
                     if (!isset($s['events'][$m[1]])) rb_fail(404,'event_not_found');
-                    foreach(['issueOpen','uploadOpen'] as $key) if (array_key_exists($key,$body)) $s['events'][$m[1]][$key]=$body[$key]===true;
-                    return $s['events'][$m[1]];
+                    foreach(['issueOpen','uploadOpen','showEnabled','allowGuestDelete','autoApproveShow'] as $key)
+                        if (array_key_exists($key,$body)) {
+                            if(!is_bool($body[$key]))rb_fail(400,'invalid_event_toggle');
+                            if(($s['events'][$m[1]][$key]??false)!==$body[$key]) {
+                                $s['events'][$m[1]][$key]=$body[$key];
+                                // Device polling must observe policy changes, including showEnabled.
+                                $s['events'][$m[1]]['settingsRevision']=($s['events'][$m[1]]['settingsRevision']??1)+1;
+                            }
+                        }
+                    return rb_public_event($s['events'][$m[1]]);
+                }
+                if (preg_match('#^/api/admin/event/([a-f0-9]{32})/settings$#D',$route,$m) && $method==='POST') {
+                    $id=$m[1];if(!isset($s['events'][$id]))rb_fail(404,'event_not_found');
+                    $expected=$body['expectedRevision']??null;
+                    if(!is_int($expected)||$expected!==($s['events'][$id]['settingsRevision']??1))rb_fail(409,'event_settings_changed_refresh_first');
+                    if(!isset($body['settings'])||!is_array($body['settings'])||array_is_list($body['settings']))rb_fail(400,'invalid_event_settings');
+                    $new=rb_valid_event_settings($body['settings'],$s['events'][$id]);
+                    foreach($s['events'] as $otherId=>$other)
+                        if($otherId!==$id && ($other['expiresAt']??0)>time() && strtolower($other['title'])===strtolower($new['title']))rb_fail(409,'event_title_already_exists');
+                    $s['events'][$id]['title']=$new['title'];$s['events'][$id]['settings']=$new;
+                    $s['events'][$id]['settingsRevision']=($s['events'][$id]['settingsRevision']??1)+1;
+                    return rb_public_event($s['events'][$id]);
+                }
+                if (preg_match('#^/api/admin/event/([a-f0-9]{32})/slideshow$#D',$route,$m) && $method==='POST') {
+                    $id=$m[1];if(!isset($s['events'][$id]))rb_fail(404,'event_not_found');
+                    if(($s['events'][$id]['showEnabled']??false)!==true)rb_fail(409,'enable_slideshow_first');
+                    if(($body['confirm']??'')!=='ROTATE')rb_fail(400,'confirm_link_rotation');
+                    $secret=rb_secret();$s['events'][$id]['showTokenHash']=rb_hash($secret);
+                    return ['showUrl'=>$this->cfg['publicOrigin'].'/show/#'.$id.'.'.$secret,'revokedPrevious'=>true];
                 }
                 if ($route==='/api/admin/clips' && $method==='POST') {
                     $event=(string)($body['eventId']??'');$rows=[];
-                    foreach($s['clips'] as $c) if ($c['eventId']===$event) $rows[]=[...$this->clipStatus($c,$s['events'][$event],'admin'),'seq'=>$c['seq']??null,'createdAt'=>$c['createdAt']];
+                    foreach($s['clips'] as $c) if ($c['eventId']===$event) $rows[]=[...$this->clipStatus($c,$s['events'][$event],'admin'),'seq'=>$c['seq']??null,'createdAt'=>$c['createdAt'],'eventId'=>$c['eventId']];
                     return ['clips'=>$rows];
                 }
-                if (preg_match('#^/api/admin/clip/([a-f0-9]{32})/(moderate|open|delete)$#D',$route,$m) && $method==='POST') {
+                if (preg_match('#^/api/admin/clip/([a-f0-9]{32})/(moderate|open|delete|share)$#D',$route,$m) && $method==='POST') {
                     $id=$m[1];if (!isset($s['clips'][$id])) rb_fail(404,'clip_not_found');
                     if ($m[2]==='delete') {if (($body['confirm']??'')!=='DELETE') rb_fail(400,'confirmation_required');$this->repo->tombstone($s,$id,'admin_deleted');return ['deleted'=>true];}
                     $this->requireAlive($s,$id);
-                    if ($m[2]==='moderate') {$s['clips'][$id]['moderation']=($body['approved']??false)===true?'approved':'pending';$s['clips'][$id]['revision']++;return ['moderation'=>$s['clips'][$id]['moderation']];}
+                    if ($m[2]==='moderate') {
+                        $event=$s['events'][$s['clips'][$id]['eventId']];
+                        if(($event['showEnabled']??false)!==true)rb_fail(409,'slideshow_disabled');
+                        if($s['clips'][$id]['status']!=='ready')rb_fail(409,'not_ready');
+                        $s['clips'][$id]['moderation']=($body['approved']??false)===true?'approved':'pending';$s['clips'][$id]['revision']++;
+                        return ['moderation'=>$s['clips'][$id]['moderation']];
+                    }
+                    if ($m[2]==='share') {
+                        $event=$s['events'][$s['clips'][$id]['eventId']];
+                        if($s['clips'][$id]['status']!=='ready')rb_fail(409,'not_ready');
+                        $secret=rb_secret();$token=$id.'.'.$secret;$expires=min(time()+7*86400,$event['expiresAt']);
+                        $existing=array_values(array_filter($s['clips'][$id]['staffShares']??[],fn($share)=>($share['expiresAt']??0)>time()));
+                        $existing=array_slice($existing,-4);$existing[]=['hash'=>rb_hash($secret),'expiresAt'=>$expires];
+                        $s['clips'][$id]['staffShares']=$existing;
+                        return ['viewOnlyUrl'=>$this->cfg['publicOrigin'].'/guest/#'.$token,'expiresAt'=>$expires,'canManage'=>false];
+                    }
                     if ($s['clips'][$id]['status']!=='ready') rb_fail(409,'not_ready');return ['mediaGrant'=>$this->mediaGrant($s['clips'][$id])];
+                }
+                rb_fail(404,'not_found');
+            }
+            if (str_starts_with($route,'/api/show/')) {
+                if(!preg_match('/^([a-f0-9]{32})\.([A-Za-z0-9_-]{32})$/D',$token,$m))rb_fail(401,'unauthorized');
+                $event=$s['events'][$m[1]]??null;
+                if(!$event||($event['showEnabled']??false)!==true||($event['expiresAt']??0)<=time()||!isset($event['showTokenHash'])||!hash_equals($event['showTokenHash'],rb_hash($m[2])))rb_fail(403,'slideshow_link_invalid_or_disabled');
+                if($route==='/api/show/playlist' && $method==='GET'){
+                    $rows=[];
+                    foreach($s['clips'] as $clip)if($clip['eventId']===$m[1]&&$clip['status']==='ready'&&$clip['permission']==='allow'&&$clip['moderation']==='approved')$rows[]=['id'=>$clip['id'],'seq'=>$clip['seq']??null,'thumbnailReady'=>isset($clip['thumbnailHash'])];
+                    return ['event'=>$event['title'],'clips'=>$rows,'revision'=>$event['settingsRevision']??1];
+                }
+                if(preg_match('#^/api/show/clip/([a-f0-9]{32})/open$#D',$route,$match) && $method==='POST'){
+                    $clip=$s['clips'][$match[1]]??null;
+                    if(!$clip||$clip['eventId']!==$m[1]||$clip['status']!=='ready'||$clip['permission']!=='allow'||$clip['moderation']!=='approved')rb_fail(403,'clip_not_approved_for_show');
+                    return ['mediaGrant'=>$this->mediaGrant($clip,'show')];
                 }
                 rb_fail(404,'not_found');
             }
             if (str_starts_with($route,'/api/device/')) {
                 $d=$this->auth($s,$token,'device');$e=$s['events'][$d['eventId']];
-                if ($route==='/api/device/verify' && $method==='GET') return ['deviceId'=>$d['id'],'event'=>$e,'publicOrigin'=>$this->cfg['publicOrigin'],'chunkBytes'=>524288,'maxClipBytes'=>67108864];
+                if ($route==='/api/device/verify' && $method==='GET') return ['deviceId'=>$d['id'],'event'=>rb_public_event($e),'publicOrigin'=>$this->cfg['publicOrigin'],'chunkBytes'=>524288,'maxClipBytes'=>67108864];
                 if ($route==='/api/device/reserve' && $method==='POST') {
                     if (!$e['issueOpen'] || $e['expiresAt']<=time()) rb_fail(409,'new_reservations_closed');
                     $count=(int)($body['count']??12);if ($count<1||$count>50) rb_fail(400,'invalid_reservation_count');
@@ -189,7 +305,7 @@ final class CloudApi {
                     }
                     return ['slots'=>$out];
                 }
-                if (!preg_match('#^/api/device/clip/([a-f0-9]{32})/(status|init|complete|delete|ack-delete|chunk/([0-9]{1,4}))$#D',$route,$m)) rb_fail(404,'not_found');
+                if (!preg_match('#^/api/device/clip/([a-f0-9]{32})/(status|init|complete|delete|ack-delete|thumbnail|chunk/([0-9]{1,4}))$#D',$route,$m)) rb_fail(404,'not_found');
                 $id=$m[1];$op=$m[2];$c=$s['clips'][$id]??null;
                 if (!$c || $c['deviceId']!==$d['id']) rb_fail(404,'clip_not_found');
                 if ($e['expiresAt']<=time() && $c['status']!=='deleted') $this->repo->tombstone($s,$id,'expired');
@@ -198,6 +314,20 @@ final class CloudApi {
                 if ($op==='ack-delete' && $method==='POST') {if ($c['status']!=='deleted') rb_fail(409,'not_deleted');$c['devicePurgeAck']=true;return ['acknowledged'=>true];}
                 if ($op==='delete' && $method==='POST') {if (($body['confirm']??'')!=='DELETE') rb_fail(400,'confirmation_required');$this->repo->tombstone($s,$id,'device_deleted');return ['deleted'=>true];}
                 $this->requireAlive($s,$id);if (!$e['uploadOpen']) rb_fail(409,'upload_drain_closed');
+                if ($op==='thumbnail' && $method==='PUT') {
+                    if($c['status']!=='ready')rb_fail(409,'video_must_be_ready_first');
+                    if(strlen($binary)<64||strlen($binary)>262144||substr($binary,0,3)!=="\xff\xd8\xff" || !preg_match('/^[a-f0-9]{64}$/D',$chunkHash)||!hash_equals(rb_hash($binary),$chunkHash))rb_fail(400,'invalid_thumbnail');
+                    if(function_exists('getimagesizefromstring')){
+                        $image=@getimagesizefromstring($binary);
+                        if(!$image || ($image['mime']??'')!=='image/jpeg'||$image[0]<64||$image[1]<64||$image[0]>2048||$image[1]>2048)rb_fail(400,'invalid_thumbnail_dimensions');
+                    }
+                    if(isset($c['thumbnailHash'])) {
+                        if(!hash_equals($c['thumbnailHash'],$chunkHash))rb_fail(409,'immutable_thumbnail_conflict');
+                        return ['thumbnailReady'=>true,'duplicate'=>true];
+                    }
+                    $file=$this->repo->path($id).'/thumbnail.jpg';rb_write($file,$binary);
+                    $c['thumbnailHash']=$chunkHash;$c['revision']++;return ['thumbnailReady'=>true];
+                }
                 if ($op==='init' && $method==='POST') {
                     $size=$body['size']??0;$hash=(string)($body['sha256']??'');$mime=(string)($body['mime']??'');$source=(string)($body['sourceId']??'');
                     if (!is_int($size)||$size<16||$size>67108864||!preg_match('/^[a-f0-9]{64}$/D',$hash)||!in_array($mime,['video/mp4','video/webm'],true)||!preg_match('/^[a-f0-9]{32}$/D',$source)) rb_fail(400,'invalid_upload_metadata');
@@ -257,31 +387,53 @@ final class CloudApi {
                 }
                 if ($a['role']!=='owner') rb_fail(403,'view_only_link');
                 if ($route==='/api/guest/delete' && $method==='POST') {
+                    if (($e['allowGuestDelete']??false)!==true)rb_fail(403,'guest_deletion_disabled');
                     if (($body['confirm']??'')!=='DELETE') rb_fail(400,'confirmation_required');
                     $this->repo->tombstone($s,$id,'guest_deleted');return ['deleted'=>true,'devicePurgeAck'=>$c['devicePurgeAck']];
                 }
                 $this->requireAlive($s,$id);
                 if ($route==='/api/guest/permission' && $method==='POST') {
+                    if (($e['showEnabled']??false)!==true)rb_fail(403,'slideshow_disabled');
                     if (!in_array($body['permission']??'', ['hidden','allow'],true)) rb_fail(400,'invalid_permission');
-                    $c['permission']=$body['permission'];$c['revision']++;return ['permission'=>$c['permission'],'revision'=>$c['revision']];
+                    $c['permission']=$body['permission'];if($c['permission']==='allow' && ($e['autoApproveShow']??false)===true)$c['moderation']='approved';$c['revision']++;return ['permission'=>$c['permission'],'moderation'=>$c['moderation'],'revision'=>$c['revision']];
                 }
                 rb_fail(404,'not_found');
             }
             rb_fail(404,'not_found');
         });
     }
-    private function mediaGrant(array $c): array {
+    private function mediaGrant(array $c,string $purpose='guest'): array {
         // Short-lived HttpOnly cookie. A delete invalidates it regardless of expiry.
-        $expiry=min(time()+900,$this->cfg['mediaCookieMax']??PHP_INT_MAX);
-        $value=$c['id'].'.'.$expiry.'.'.bin2hex(random_bytes(8));
+        $expiry=min(time()+($purpose==='show'?90:900),$this->cfg['mediaCookieMax']??PHP_INT_MAX);
+        $value=$c['id'].'.'.$expiry.'.'.bin2hex(random_bytes(8)).($purpose==='show'?'.show':'');
         return ['id'=>$c['id'],'value'=>$value.'.'.hash_hmac('sha256',$value,$this->cfg['signingKey']),'expires'=>$expiry];
+    }
+    public function thumbnail(string $id,string $token,string $role): string {
+        return $this->repo->transaction(function(array &$s)use($id,$token,$role){
+            if($role==='admin')$this->auth($s,$token,'admin');
+            elseif($role!=='show')rb_fail(403,'forbidden');
+            $clip=$s['clips'][$id]??null;if(!$clip||$clip['status']!=='ready'||!isset($clip['thumbnailHash']))rb_fail(404,'thumbnail_not_available');
+            if($role==='show'){
+                if(!preg_match('/^([a-f0-9]{32})\.([A-Za-z0-9_-]{32})$/D',$token,$m))rb_fail(401,'unauthorized');
+                $event=$s['events'][$m[1]]??null;
+                if(!$event||$clip['eventId']!==$m[1]||($event['showEnabled']??false)!==true||($event['expiresAt']??0)<=time()||!isset($event['showTokenHash'])||!hash_equals($event['showTokenHash'],rb_hash($m[2]))||$clip['permission']!=='allow'||$clip['moderation']!=='approved')rb_fail(403,'not_approved_for_show');
+            }
+            $file=$this->repo->path($id).'/thumbnail.jpg';
+            if(!is_file($file))rb_fail(503,'thumbnail_file_unavailable');
+            $bytes=file_get_contents($file);if(!is_string($bytes)||!hash_equals(rb_hash($bytes),$clip['thumbnailHash']))rb_fail(503,'thumbnail_hash_mismatch');
+            return $bytes;
+        });
     }
     public function media(string $id,string $cookie): array {
         return $this->repo->transaction(function(array &$s) use($id,$cookie) {
-            if (!preg_match('/^([a-f0-9]{32})\.([0-9]{10})\.([a-f0-9]{16})\.([a-f0-9]{64})$/D',$cookie,$m)||$m[1]!==$id||(int)$m[2]<time()) rb_fail(401,'media_authorization_required');
-            $message=$m[1].'.'.$m[2].'.'.$m[3];
-            if (!hash_equals(hash_hmac('sha256',$message,$this->cfg['signingKey']),$m[4])) rb_fail(401,'media_authorization_required');
-            $this->requireAlive($s,$id);$c=$s['clips'][$id];if ($c['status']!=='ready') rb_fail(409,'not_ready');
+            if (!preg_match('/^([a-f0-9]{32})\.([0-9]{10})\.([a-f0-9]{16})(\.show)?\.([a-f0-9]{64})$/D',$cookie,$m)||$m[1]!==$id||(int)$m[2]<time()) rb_fail(401,'media_authorization_required');
+            $message=$m[1].'.'.$m[2].'.'.$m[3].($m[4]??'');
+            if (!hash_equals(hash_hmac('sha256',$message,$this->cfg['signingKey']),$m[5])) rb_fail(401,'media_authorization_required');
+            $this->requireAlive($s,$id);$c=$s['clips'][$id];if($c['status']!=='ready') rb_fail(409,'not_ready');
+            if(($m[4]??'')==='.show'){
+                $event=$s['events'][$c['eventId']];
+                if(($event['showEnabled']??false)!==true||$c['permission']!=='allow'||$c['moderation']!=='approved')rb_fail(403,'clip_not_approved_for_show');
+            }
             $path=$this->repo->path($id).'/video.bin';
             if (!is_file($path)||filesize($path)!==$c['size']) rb_fail(503,'media_file_unavailable');
             // Open under metadata lock. Later revocation stops new requests, not bytes already delivered.

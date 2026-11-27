@@ -28,13 +28,18 @@ try {
     $method=$_SERVER['REQUEST_METHOD']??'GET';$route=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH);
     if ($method==='OPTIONS') {http_response_code(204);exit;}
     if (!str_starts_with($route,'/api/')) {
-        $file=match($route) {'/','/booth','/booth/'=>__DIR__.'/booth/index.html','/guest','/guest/'=>__DIR__.'/guest/index.html','/admin','/admin/'=>__DIR__.'/admin/index.html',default=>null};
+        $file=match($route) {'/','/booth','/booth/'=>__DIR__.'/booth/index.html','/guest','/guest/'=>__DIR__.'/guest/index.html','/admin','/admin/'=>__DIR__.'/admin/index.html','/show','/show/'=>__DIR__.'/show/index.html',default=>null};
         if (!$file || !is_file($file)) rb_fail(404,'not_found');
         header('Content-Type: text/html; charset=utf-8');readfile($file);exit;
     }
     $api=new CloudApi($cfg);
     $auth=$_SERVER['HTTP_AUTHORIZATION']??$_SERVER['REDIRECT_HTTP_AUTHORIZATION']??'';
     $token=preg_match('/^Bearer ([A-Za-z0-9_.-]{32,180})$/D',$auth,$m)?$m[1]:'';
+    if(preg_match('#^/api/(admin|show)/clip/([a-f0-9]{32})/thumbnail$#D',$route,$thumb) && $method==='GET'){
+        $api->rateLimit($_SERVER['REMOTE_ADDR']??'unknown',$token);
+        $bytes=$api->thumbnail($thumb[2],$token,$thumb[1]);
+        header('Content-Type: image/jpeg');header('Content-Length: '.strlen($bytes));echo $bytes;exit;
+    }
     if (preg_match('#^/api/media/([a-f0-9]{32})$#D',$route,$m) && in_array($method,['GET','HEAD'],true)) {
         $media=$api->media($m[1],$_COOKIE['retro_media']??'');$h=$media['handle'];
         try {

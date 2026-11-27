@@ -54,7 +54,7 @@ BrowserStore.prototype.setSettings=async function(value){await new Promise(r=>se
   for w,h in [(1440,1100),(800,700),(390,844),(320,720)]:
    page.set_viewport_size({'width':w,'height':h});page.wait_for_timeout(150)
    check(f'Admin {w} no horizontal overflow',page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
-   check(f'Admin {w} both style cards visible',page.locator('.style-option:visible').count()==2)
+   check(f'Admin {w} five style cards visible',page.locator('.style-option:visible').count()==5)
    check(f'Admin {w} current viewport labels',page.locator('#viewportInfo').inner_text().startswith(f'{w} x {h}'))
    if w in [1440,390]:page.screenshot(path=str(Q/f'admin-{w}.png'),full_page=True)
   (Q/'geometries.json').write_text(json.dumps(geometries,indent=2))
@@ -64,7 +64,7 @@ BrowserStore.prototype.setSettings=async function(value){await new Promise(r=>se
   original=page.evaluate('RetroApp.status.settings')
   for i in range(5):page.locator('#staffEntry').click()
   check('five version taps open Admin',page.locator('#view-admin').is_visible())
-  check('two native radio style options',page.locator('input[name=screenStyle]').count()==2)
+  check('five native radio style options',page.locator('input[name=screenStyle]').count()==5)
   page.locator('#styleEdge').check()
   check('choice is draft until Apply',page.evaluate('RetroApp.status.settings.screenStyle==="heritage"'))
   page.locator('#screenStyleSave').click();page.wait_for_function('RetroApp.status.view==="booth"');page.wait_for_timeout(250)

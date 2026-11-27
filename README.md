@@ -1,3 +1,27 @@
+# RetroBooth v0.9.7-alpha.1 — Cloud Event Master, Private Slideshow and Five CRT Frames (27 Nov 2026)
+
+This is a **source build candidate**, not an APK/EXE or a validated production service.
+
+## What is new
+
+- Hostinger **PHP** Cloud is the event master for title/date, durations, countdown, look, ticket receipt and QR settings. Connected Android v0.9.7 devices check for revisions **only while idle**; camera/microphone/Bluetooth printer pairing stay local. Requires both updated Hostinger cloud files **and** a rebuilt Android APK.
+- Cloud Admin prevents same-name active event duplication, displays explicit saving states and toggles, distinguishes **reserved** QR slots from **ready** verified videos, and adds private thumbnail/photo, Play, Download, Share view-only and Browser Reprint QR Ticket. Reprint is not a remote Bluetooth printer command.
+- Guest Big-screen consent and Guest Delete options are independent and **off by default**. A private slideshow includes only ready videos with explicit guest consent and staff approval (or event auto-approval after consent). No public event album.
+- TV bodies: **01 Modern CRT, 02 Heritage TV, 03 Space Age Ivory, 04 Studio Broadcast, 05 Y2K Bubble**; screen filters add VHS, Sepia, Cinema, Night Vision. Shared 32-inch landscape sizing and version/Admin access safety margins.
+- Private video delivery, QR ticket photo still, SPP ticket printer, local-first capture unchanged from v0.9.6 except for new Cloud-controlled event options. All clips remain private by default.
+
+## Download / setup
+
+Use the **one full GitHub repository ZIP**, not a mixture of legacy patches. `SYNC_TO_GITHUB.cmd` stages all required paths into an existing GitHub Desktop clone; review/commit/push, confirm Source Preflight green, then manually run the independent Android/Windows workflows. **Android versionCode 16** (same package ID; keep same signing key to preserve local clips).
+
+For Hostinger, deploy only the separate **v0.9.7 PHP Cloud Update ZIP**. Back up and **preserve** the current `retrobooth_private/config.php` and `retrobooth_private/data/`. Update the two public and private code trees, including hidden `.htaccess`; do **not** upload GitHub source/ZIP or any credentials to `public_html`. Hostinger needs PHP 8.2+, HTTPS and outside-public private storage, **not** Node.js.
+
+See `docs/CLOUD_EVENT_MASTER_V097_ZH.md` for step-by-step Cantonese instructions and security/real-device limitations.
+
+---
+
+## Historical v0.9.6 baseline notes (DO NOT follow old PATCH installation steps)
+
 # RetroBooth v0.9.6 — Direct Receipt-Designer Test Print & 4:3 / 16:9
 
 New in **Admin → 04 / RECEIPT DESIGN**: photo aspect selector (4:3 default / 16:9), direct **Test print PHOTO + QR** and **Test print QR only** buttons. Hardware transport is Android paired/pinned Bluetooth Classic secure SPP and native ESC/POS. The on-screen preview is richer than the native print layout; logos/Chinese fonts are not yet physically printed. Test QR is deliberately non-working; printer write success is **not paper confirmation**. See `docs/RECEIPT_PRINT_V096_ZH.md`.

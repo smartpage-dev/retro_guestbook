@@ -4,9 +4,13 @@
  const defaults=Object.freeze({
   film:Object.freeze({grain:.035,scan:.085,saturation:.78,warmth:.28,softness:.26}),
   heritage:Object.freeze({grain:.04,scan:.12,saturation:.045,warmth:.60,softness:.42}),
-  bw:Object.freeze({grain:.035,scan:.10,saturation:0,warmth:0,softness:.34})
+  bw:Object.freeze({grain:.035,scan:.10,saturation:0,warmth:0,softness:.34}),
+  vhs:Object.freeze({grain:.070,scan:.18,saturation:.65,warmth:.24,softness:.62}),
+  sepia:Object.freeze({grain:.054,scan:.08,saturation:.38,warmth:.88,softness:.46}),
+  cinema:Object.freeze({grain:.026,scan:.025,saturation:.96,warmth:.20,softness:.19}),
+  night:Object.freeze({grain:.050,scan:.15,saturation:.07,warmth:0,softness:.43})
  });
- const names={film:'Colour Film CRT',heritage:'Heritage Soft Mono',bw:'Neutral Black & White'};
+ const names={film:'Colour Film CRT',heritage:'Heritage Soft Mono',bw:'Neutral Black & White',vhs:'VHS Tape / Scanlines',sepia:'Sepia Archive',cinema:'35mm Cinema',night:'Night Vision'};
  function bounded(n,min,max,fallback){return typeof n==='number'&&Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback;}
  function safe(raw={}){
   if(!raw||typeof raw!=='object')raw={};
@@ -16,10 +20,10 @@
    profiles[key]={grain:bounded(p.grain,0,.12,d.grain),scan:bounded(p.scan,0,.30,d.scan),
     saturation:bounded(p.saturation,0,1.25,d.saturation),warmth:bounded(p.warmth,0,1,d.warmth),softness:bounded(p.softness,0,1,d.softness)};
   }
-  return {lookMode:['follow','film','heritage','bw'].includes(raw.lookMode)?raw.lookMode:'follow',lookProfiles:profiles};
+  return {lookMode:['follow','film','heritage','bw','vhs','sepia','cinema','night'].includes(raw.lookMode)?raw.lookMode:'follow',lookProfiles:profiles};
  }
  function resolve(settings){
-  const safeValue=safe(settings);const key=safeValue.lookMode==='follow'?(settings?.screenStyle==='edge'?'film':'heritage'):safeValue.lookMode;
+  const safeValue=safe(settings);const follow={edge:'film',heritage:'heritage',space:'sepia',studio:'cinema',bubble:'vhs'};const key=safeValue.lookMode==='follow'?(follow[settings?.screenStyle]||'heritage'):safeValue.lookMode;
   const p={...safeValue.lookProfiles[key]};if(key==='bw'){p.saturation=0;p.warmth=0;}
   return {key,name:names[key],...p};
  }
@@ -27,8 +31,8 @@
   // Row-major 3x3 matrix: luminance-aware desaturation, restrained tint, lifted blacks.
   const s=p.key==='bw'?0:p.saturation,lum=[.299,.587,.114];
   const strength=p.key==='film'?.075:.16,warm=p.key==='bw'?0:p.warmth;
-  const gains=[1+warm*.018,1,1-warm*strength];
-  const contrast=p.key==='film'?.91:.94,lift=p.key==='film'?.042:.021;
+  const gains=p.key==='night'?[.28,1.16,.34]:p.key==='sepia'?[1.22,1.05,.68]:[1+warm*.018,1,1-warm*strength];
+  const contrast=p.key==='film'?.91:p.key==='cinema'?1.04:.94,lift=p.key==='film'?.042:p.key==='night'?.007:.021;
   const matrix=[];
   for(let row=0;row<3;row++)for(let col=0;col<3;col++)matrix.push(((1-s)*lum[col]+(row===col?s:0))*contrast*gains[row]);
   return {matrix,offset:[lift+warm*.008,lift+warm*.006,lift],width:Math.round((800-p.softness*300)/2)*2};

@@ -52,7 +52,7 @@ def main() -> int:
         print('\nVERSION ALIGNMENT FAILED:', file=sys.stderr)
         for message in errors:
             print('  - ' + message, file=sys.stderr)
-        print('Restore the matching files from the SAME v0.9.6 full repository archive; '
+        print('Restore the matching files from the SAME v0.9.7 full repository archive; '
               'commit and push them together before starting a NEW workflow run.', file=sys.stderr)
         return 1
     print('PASS: all four release version declarations match.')

@@ -4,12 +4,14 @@ function test(name,fn){fn();console.log('PASS '+name);count++;}
 test('look follows shell by default',()=>assert.equal(E.safe().lookMode,'follow'));
 test('edge resolves to film',()=>assert.equal(E.resolve(C.safeSettings({screenStyle:'edge'})).key,'film'));
 test('heritage resolves to soft mono',()=>assert.equal(E.resolve(C.safeSettings()).key,'heritage'));
+for(const [style,expected] of Object.entries({space:'sepia',studio:'cinema',bubble:'vhs'}))test(style+' resolves to distinct CRT effect',()=>assert.equal(E.resolve(C.safeSettings({screenStyle:style})).key,expected));
+for(const effect of ['vhs','sepia','cinema','night'])test(effect+' can be selected',()=>assert.equal(E.resolve(C.safeSettings({lookMode:effect})).key,effect));
 test('manual film overrides heritage shell',()=>assert.equal(E.resolve(C.safeSettings({lookMode:'film'})).key,'film'));
 test('manual mono overrides edge shell',()=>assert.equal(E.resolve(C.safeSettings({screenStyle:'edge',lookMode:'heritage'})).key,'heritage'));
 test('invalid look mode falls back safely',()=>assert.equal(E.safe({lookMode:'bad'}).lookMode,'follow'));
 test('null settings accepted safely',()=>assert.equal(C.safeSettings(null).lookMode,'follow'));
 for(const key of Object.keys(E.defaults)){
- test(key+' default grain is subtle',()=>assert(E.defaults[key].grain>0&&E.defaults[key].grain<.05));
+ test(key+' default grain within controlled effect range',()=>assert(E.defaults[key].grain>0&&E.defaults[key].grain<=.08));
  test(key+' independent profile object',()=>{let a=E.safe(),b=E.safe();a.lookProfiles[key].grain=.12;assert.notEqual(a.lookProfiles[key].grain,b.lookProfiles[key].grain);});
  test(key+' nonfinite input falls back',()=>assert.equal(E.safe({lookProfiles:{[key]:{grain:Infinity}}}).lookProfiles[key].grain,E.defaults[key].grain));
  test(key+' zero value is preserved',()=>assert.equal(E.safe({lookProfiles:{[key]:{grain:0,scan:0}}}).lookProfiles[key].grain,0));

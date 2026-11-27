@@ -1,5 +1,6 @@
 /* Appearance is a saved operator preference, not a capture or privacy mode. */
-function styleName(style){return style==='edge'?'Modern CRT television':'Heritage television';}
+const TV_STYLES={edge:'Modern CRT television',heritage:'Heritage television',space:'Space Age Ivory CRT',studio:'Studio Broadcast CRT',bubble:'Y2K Bubble CRT'};
+function styleName(style){return TV_STYLES[style]||'Heritage television';}
 function applyScreenAppearance(){
   const previous=document.body.dataset.screenStyle;
   document.body.dataset.screenStyle=settings.screenStyle;
@@ -13,6 +14,7 @@ function applyScreenAppearance(){
 function syncAppearanceForm(){
   $('styleEdge').checked=settings.screenStyle==='edge';
   $('styleHeritage').checked=settings.screenStyle==='heritage';
+  for(const style of ['space','studio','bubble'])$('style'+style.charAt(0).toUpperCase()+style.slice(1)).checked=settings.screenStyle===style;
   $('styleSaveStatus').textContent='Selected: '+styleName(settings.screenStyle)+'. Apply to return to the booth.';
   updateStyleSelection();
 }
@@ -31,7 +33,7 @@ async function commitSettings(next){
   }finally{settingsSaving=false;buttons.forEach(b=>b.disabled=false);renderState();}
 }
 async function applyScreenStyle(style){
-  if(!['edge','heritage'].includes(style))throw new Error('Unknown screen style.');
+  if(!Object.hasOwn(TV_STYLES,style))throw new Error('Unknown screen style.');
   // Merge from the saved settings, never reset duration/receipt/privacy as a side effect.
   await commitSettings(C.safeSettings({...settings,screenStyle:style}));
   syncAppearanceForm();

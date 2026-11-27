@@ -2,7 +2,8 @@
  <div class="card-number">07 / PRIVATE CLOUD DELIVERY - ALPHA</div><h2>A real link. A private moment.</h2>
  <p>Connect a device bundle from Cloud Admin. Real recordings use pre-reserved guest links; uploads run while idle. Demo recordings remain local.</p>
  <label for="cloudBundle">Device setup bundle (secret; do not publish)</label><textarea id="cloudBundle" rows="4" autocomplete="off" spellcheck="false" placeholder='Paste the JSON from Cloud Admin here'></textarea>
- <div class="button-row"><button id="cloudConnect" class="btn primary" type="button">Verify + connect cloud</button><button id="cloudRefill" class="btn secondary" type="button">Refill QR reserve</button><button id="cloudRetry" class="btn secondary" type="button">Retry / sync now</button><button id="cloudDisable" class="btn secondary" type="button">Local-only for new recordings</button></div>
+ <p id="cloudMasterNotice" class="small mono" role="status">Cloud event settings sync while idle; camera and printer hardware remain local.</p>
+ <div class="button-row"><button id="cloudConnect" class="btn primary" type="button">Verify + connect cloud</button><button id="cloudSyncEvent" class="btn secondary" type="button">Sync event settings now</button><button id="cloudRefill" class="btn secondary" type="button">Refill QR reserve</button><button id="cloudRetry" class="btn secondary" type="button">Retry / sync now</button><button id="cloudDisable" class="btn secondary" type="button">Local-only for new recordings</button></div>
  <p id="cloudStatus" class="small mono" role="status">Cloud is off. Existing recordings are not automatically uploaded.</p>
  <div id="cloudQueue" class="cloud-queue"></div>
  <p class="small muted">Your receipt link can manage and delete that recording. Keep it private. Hide keeps the private video; Delete revokes cloud access and waits for the booth to reconnect before confirming local cleanup. Projector broadcasting and physical printing are not connected.</p>

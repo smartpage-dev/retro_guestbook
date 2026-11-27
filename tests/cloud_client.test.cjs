@@ -19,12 +19,13 @@ const rejects=fn=>{try{fn();return false;}catch{return true;}};
  let next=1,received=new Set(),expected=null;
  const fetcher=async(url,opt)=>{
   calls.push({url,opt});const path=new URL(url).pathname;let code=200,body={};
-  if(path.endsWith('/verify'))body={deviceId:cfg.deviceId,event:{id:cfg.eventId,expiresAt:cfg.expiresAt},publicOrigin:cfg.serverOrigin};
+  if(path.endsWith('/verify'))body={deviceId:cfg.deviceId,event:{id:cfg.eventId,expiresAt:cfg.expiresAt,settingsRevision:4,settings:{screenStyle:'space',duration:30}},publicOrigin:cfg.serverOrigin};
   else if(path.endsWith('/reserve'))body={slots:Array.from({length:JSON.parse(opt.body).count},()=>slot(next++))};
   else if(path.endsWith('/status'))body={id:records[0].cloud.id,status:remoteDeleted?'deleted':'uploading',permission:'hidden',moderation:'pending',revision:2};
   else if(path.endsWith('/init')){const v=JSON.parse(opt.body);if(expected&&JSON.stringify(v)!==JSON.stringify(expected))throw new Error('unexpected metadata change');expected=v;body={status:'uploading',received:[...received],chunkBytes:524288};}
   else if(path.includes('/chunk/')){const i=Number(path.split('/').at(-1));if(failChunk&&i===1){failChunk=false;throw new TypeError('Network disconnected fixture');}received.add(i);body={accepted:true};}
   else if(path.endsWith('/complete'))body={ready:true,sha256:expected.sha256,size:expected.size};
+  else if(path.endsWith('/thumbnail'))body={thumbnailReady:true};
   else if(path.endsWith('/ack-delete')){acks++;body={acknowledged:true};}
   return {ok:code<400,status:code,json:async()=>body};
  };
@@ -33,15 +34,18 @@ const rejects=fn=>{try{fn();return false;}catch{return true;}};
  const make=()=>new C.Client({store,list:()=>store.list(),change,purge,canRun:()=>canRun,fetcher});
  let client=make();await client.init();check('new install cloud off',client.connection===null);
  await client.connect(cfg);check('connect verifies server then reserves twelve links',client.poolCount===12&&calls[0].url.endsWith('/verify'));
+ const master=await client.verifyEvent();check('Cloud Event Master revision/settings exposed to Android',master.settingsRevision===4&&master.settings.screenStyle==='space');
  const frozen=await client.claim('c'.repeat(32));check('claim consumes one link',client.poolCount===11);check('slot freezes server and event',frozen.transport.serverOrigin===cfg.serverOrigin&&frozen.eventId===cfg.eventId);
  client=make();await client.init();check('restarted client restores connection and pool',client.poolCount===11&&client.connection.deviceId===cfg.deviceId);
  const second=await client.claim('d'.repeat(32));check('restart does not reuse consumed link',second.id!==frozen.id);
- let blob=new Blob([new Uint8Array(1100000)]);records=[{id:'c'.repeat(32),kind:'real',lifecycle:'active',cloud:frozen,blob,mime:'video/mp4',sha256:await C.sha(blob),seq:1,validation:{status:'metadata_readable'}}];
+ let blob=new Blob([new Uint8Array(1100000)]);const fakeJpeg='data:image/jpeg;base64,'+Buffer.concat([Buffer.from([255,216,255,224]),Buffer.alloc(112,128)]).toString('base64');records=[{ticketSnapshot:fakeJpeg,id:'c'.repeat(32),kind:'real',lifecycle:'active',cloud:frozen,blob,mime:'video/mp4',sha256:await C.sha(blob),seq:1,validation:{status:'metadata_readable'}}];
  canRun=false;const before=calls.length;await client.tick();check('recording pauses new cloud work',calls.length===before);
  canRun=true;failChunk=true;await client.tick();check('partial upload retained for retry',received.has(0)&&!received.has(1)&&records[0].cloud.attempts===1&&records[0].blob===blob);
  records[0].cloud.retryAt=0;client=make();await client.init();await client.tick();check('queue resumes after client restart',records[0].cloud.status==='ready');
  check('already accepted chunk not resent',calls.filter(x=>x.url.endsWith('/chunk/0')).length===1);
  check('whole file hash acknowledged before ready',records[0].cloud.verifiedAt>0);
+ check('ticket screenshot transmitted only after cloud video ready',records[0].cloud.thumbnailUploaded===true&&calls.some(x=>x.url.endsWith('/thumbnail')&&x.opt.method==='PUT'));
+ check('ticket screenshot uses hash-protected binary payload',calls.some(x=>x.url.endsWith('/thumbnail')&&/^[a-f0-9]{64}$/.test(x.opt.headers['X-Chunk-SHA256'])));
  check('cloud copy does not auto-delete local media',records[0].blob===blob);
  const frozenUrl=C.guestURL(records[0].cloud);await client.disable();check('local-only affects new capture not frozen jobs',client.connection===null&&C.guestURL(records[0].cloud)===frozenUrl);
  remoteDeleted=true;records[0].cloud.lastCheck=0;await client.tick();check('server tombstone purges local Blob',records[0].lifecycle==='deleted'&&!records[0].blob&&purges===1);check('local cleanup acknowledged after purge',acks===1);

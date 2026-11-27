@@ -1,3 +1,9 @@
+# v0.9.7 最新版建議
+
+最新請使用 **RetroBooth_v0.9.7_Canonical_Full_GitHub_Root.zip** 配合同一 ZIP 內 `SYNC_TO_GITHUB.cmd`；Android `versionCode 16`，不要混合 v0.9.6 舊補丁。Source Preflight 必須先通過。見 [CLOUD_EVENT_MASTER_V097_ZH.md](CLOUD_EVENT_MASTER_V097_ZH.md)。下文為 v0.9.6 歷史教學。
+
+---
+
 # RetroBooth v0.9.6 — GitHub 全面修復及一次過同步（Android/Windows）
 
 ## 為甚麼反覆 Build 失敗？

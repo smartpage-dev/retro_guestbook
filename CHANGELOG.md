@@ -1,3 +1,10 @@
+## v0.9.7-alpha.1 — Cloud Event Master, private consented slideshow, five TV bodies (27 Nov 2026)
+
+- Cloud Admin event settings revisions, idle Android sync, duplicate-create protection, button loading feedback, ready-first recording list, protected JPG thumbnails, Play/Download/Share/View-only QR browser reprint.
+- Guest Big-screen consent + deletion only exposed when event toggles are enabled; all flags default OFF. Slideshow requires guest consent plus staff approval (or event auto-approval after consent); rotating link revokes old access.
+- Five TV bodies (three new: Space Age Ivory, Studio Broadcast, Y2K Bubble), eight independent look presets (four new: VHS, Sepia, Cinema, Night Vision), same safe layout.
+- Private/cloud API security regressions 122, browser mocked Admin/Guest 15, style geometry 139. No Hostinger live deployment or Android hardware acceptance in this archive.
+
 ## v0.9.6-alpha.1 — Direct receipt print tests + true 4:3 / 16:9 photo raster (26 Nov 2026)
 
 - Section 04 includes direct **Photo + diagnostic QR** and **QR-only** native Bluetooth ESC/POS test actions, using the current (even unsaved) draft fields. The Android confirmation dialog, transport journal and unknown-outcome safety remain in effect.

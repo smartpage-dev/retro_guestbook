@@ -1,4 +1,4 @@
-/* RetroBooth v0.9.6-alpha.1. Pure, independently testable domain helpers. */
+/* RetroBooth v0.9.7-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -27,7 +27,7 @@
       title: String(raw.title || 'ALEX & SAM').trim().slice(0, 60) || 'ALEX & SAM',
       date: /^\d{4}-\d{2}-\d{2}$/.test(raw.date || '') ? raw.date : '2026-12-20',
       duration: [10,30,60].includes(Number(raw.duration)) ? Number(raw.duration) : 10,
-      screenStyle: ['edge','heritage'].includes(raw.screenStyle) ? raw.screenStyle : 'heritage',
+      screenStyle: ['edge','heritage','space','studio','bubble'].includes(raw.screenStyle) ? raw.screenStyle : 'heritage',
       preset: ['warm','soft','mono'].includes(raw.preset) ? raw.preset : 'warm',
       grain: Math.max(0, Math.min(0.15, Number(raw.grain) || 0)),
       mirror: raw.mirror !== false, osd: raw.osd !== false,

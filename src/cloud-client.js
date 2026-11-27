@@ -42,6 +42,12 @@
    if(binding(old)!==binding(c))await this.store.setAux('cloud-pool',{binding:binding(c),slots:[]});
    this.error='';await this.refill();return proof;
   }
+  async verifyEvent(){
+   if(!this.connection)return null;
+   const proof=await this.call(this.connection,'/api/device/verify');
+   if(proof.deviceId!==this.connection.deviceId||proof.event?.id!==this.connection.eventId||proof.publicOrigin!==this.connection.serverOrigin)throw new Error('Event identity changed on cloud.');
+   return proof.event;
+  }
   async disable(){await this.store.setAux('cloud-connection',{enabled:false});this.connection=null;this.onStatus();}
   async poolStatus(){const pool=await this.store.getAux('cloud-pool');this.poolCount=pool?.binding===binding(this.connection)?pool.slots.filter(s=>s.expiresAt*1000>Date.now()).length:0;this.onStatus();return this.poolCount;}
   async refill(){
@@ -86,6 +92,19 @@
    if(!result.ready||result.sha256!==clip.sha256||result.size!==clip.blob.size)throw new Error('Cloud verification did not match the local file.');
    await this.patch(clip.id,{status:'ready',attempts:0,retryAt:0,lastError:'',verifiedAt:Date.now()});
   }
+  async thumbnail(clip){
+   const cc=clip.cloud;
+   if(!cc||cc.status!=='ready'||cc.thumbnailUploaded||!this.canRun())return;
+   const still=clip.ticketSnapshot||clip.rawSnapshot;
+   if(typeof still!=='string'||!/^data:image\/jpeg;base64,[A-Za-z0-9+/]+=*$/.test(still)||still.length>350000)return;
+   const decoded=atob(still.split(',')[1]);const bytes=new Uint8Array(decoded.length);
+   for(let i=0;i<decoded.length;i++)bytes[i]=decoded.charCodeAt(i);
+   if(bytes.length<64||bytes.length>262144)return;
+   const blob=new Blob([bytes],{type:'application/octet-stream'});
+   const result=await this.call(config(cc.transport),'/api/device/clip/'+cc.id+'/thumbnail',{method:'PUT',bytes:blob,chunkHash:await sha(blob)});
+   if(result.thumbnailReady!==true)throw new Error('Cloud did not acknowledge thumbnail.');
+   await this.patch(clip.id,{thumbnailUploaded:true,thumbnailError:'',thumbnailRetryAt:0});
+  }
   async sync(clip){
    const cc=clip.cloud;if(!cc)return;
    const result=await this.call(config(cc.transport),'/api/device/clip/'+cc.id+'/status');
@@ -114,6 +133,12 @@
       const latest=(await this.list()).find(x=>x.id===clip.id);
       if(!latest||latest.lifecycle==='deleted')continue;
       if(latest.cloud.status!=='ready')await this.upload(latest);
+      const forThumbnail=(await this.list()).find(x=>x.id===clip.id);
+      if(forThumbnail?.cloud?.status==='ready' && (forThumbnail.cloud.thumbnailRetryAt||0)<=Date.now()){
+       try{await this.thumbnail(forThumbnail);}catch(e){
+        await this.patch(clip.id,{thumbnailRetryAt:Date.now()+60000,thumbnailError:e.message});
+       }
+      }
       this.error='';
      }catch(e){
       this.error=e.message;const n=(clip.cloud.attempts||0)+1,delay=[5000,15000,60000,300000][Math.min(n-1,3)];
