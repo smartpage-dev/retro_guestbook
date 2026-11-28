@@ -1,8 +1,12 @@
-# RetroBooth v0.9.9-alpha.1 — Android/Windows + Hostinger PHP Cloud
+> **v0.9.10-alpha.1 (28 Nov 2026):** Android Admin 09 now supports selecting an additional USB/local folder with persistent Android SAF permission, idle-time copied videos, retry and SHA-256 verification. IndexedDB remains the original. Hardware USB/Android acceptance is still pending; see `docs/RETROBOOTH_V010_USB_BACKUP_ZH.md`.
 
-**Current full source ZIP:** build target Android `versionCode 18`, unchanged package ID `studio.luce.retrobooth.preview`, GitHub Actions for Android APK / Windows EXE / source preflight / full verification. **ZIP contains source, not compiled APK/EXE.** Keep existing signing identity to upgrade without uninstalling or losing stored videos.
+# RetroBooth v0.9.10-alpha.1 — Android/Windows + Hostinger PHP Cloud
 
-**New in v0.9.9:** 03 Mustard Portable TV, 04 Rusted Industrial TV, 05 Walnut Console TV are independently designed realistic antique UI shells, inspired by three supplied device photographs, while 01 Modern CRT and 02 Heritage TV remain visually unchanged. Default recorded canvas 360p height at **24fps target**; 8/10/12/15/18/20/24/30/Auto targets and 360p/540p/720p output are selectable in Android Admin 01. Canvas capture request and render scheduler now both follow the FPS setting. Hardware or browser encoder may fall short; not event-accepted.
+**Current full source ZIP:** build target Android `versionCode 19`, unchanged package ID `studio.luce.retrobooth.preview`, GitHub Actions for Android APK / Windows EXE / source preflight / full verification. **ZIP contains source, not compiled APK/EXE.** Keep existing signing identity to upgrade without uninstalling or losing stored videos.
+
+**New in v0.9.10:** Android Admin 09 selects a second local/USB folder using Android's system picker; original IndexedDB recordings remain intact. Automatic backup copies only new current-event recordings by default. An explicit EVENT BACKUP SCOPE lets staff review the time range and include earlier current-event clips when USB is connected after the event; previous clients' clips are excluded. Each copied video is checked by SHA-256 on the USB. Native USB/Android acceptance is pending.
+
+**Preserved from v0.9.9:** 03 Mustard Portable TV, 04 Rusted Industrial TV, 05 Walnut Console TV are independently designed antique TV shells; 01 Modern CRT and 02 Heritage TV remain visually unchanged. Default recorded canvas 360p at **24fps target**; 8/10/12/15/18/20/24/30/Auto and 360p/540p/720p remain selectable. Hardware frame rate not guaranteed.
 
 **Preserved from v0.9.8:** bilingual Cantonese/English private Guest page; cloud Event Master and slideshow permission boundaries; editable TV panel text; printer journal/QR photo tickets; six receipt templates; native Bluetooth Classic SPP 58mm portrait raster pilot. Real Bluetooth printer paper, actual camera and MediaRecorder, hosted PHP and installable APK/EXE are **not physically validated in this source archive**.
 
@@ -18,7 +22,7 @@ This is a **source build candidate**, not an APK/EXE or a validated production s
 
 ## What is new
 
-- Hostinger **PHP** Cloud is the event master for title/date, durations, countdown, look, ticket receipt and QR settings. Connected Android v0.9.9 devices check for revisions **only while idle**; camera/microphone/Bluetooth printer pairing stay local. Requires both updated Hostinger cloud files **and** a rebuilt Android APK.
+- Hostinger **PHP** Cloud is the event master for title/date, durations, countdown, look, ticket receipt and QR settings. Connected Android v0.9.10 devices check for revisions **only while idle**; camera/microphone/Bluetooth printer pairing stay local. Requires both updated Hostinger cloud files **and** a rebuilt Android APK.
 - Cloud Admin prevents same-name active event duplication, displays explicit saving states and toggles, distinguishes **reserved** QR slots from **ready** verified videos, and adds private thumbnail/photo, Play, Download, Share view-only and Browser Reprint QR Ticket. Reprint is not a remote Bluetooth printer command.
 - Guest Big-screen consent and Guest Delete options are independent and **off by default**. A private slideshow includes only ready videos with explicit guest consent and staff approval (or event auto-approval after consent). No public event album.
 - TV bodies: **01 Modern CRT, 02 Heritage TV, 03 Space Age Ivory, 04 Studio Broadcast, 05 Y2K Bubble**; screen filters add VHS, Sepia, Cinema, Night Vision. Shared 32-inch landscape sizing and version/Admin access safety margins.
@@ -28,7 +32,7 @@ This is a **source build candidate**, not an APK/EXE or a validated production s
 
 Use the **one full GitHub repository ZIP**, not a mixture of legacy patches. `SYNC_TO_GITHUB.cmd` stages all required paths into an existing GitHub Desktop clone; review/commit/push, confirm Source Preflight green, then manually run the independent Android/Windows workflows. **Android versionCode 16** (same package ID; keep same signing key to preserve local clips).
 
-For Hostinger, deploy only the separate **v0.9.9 PHP Cloud Update ZIP**. Back up and **preserve** the current `retrobooth_private/config.php` and `retrobooth_private/data/`. Update the two public and private code trees, including hidden `.htaccess`; do **not** upload GitHub source/ZIP or any credentials to `public_html`. Hostinger needs PHP 8.2+, HTTPS and outside-public private storage, **not** Node.js.
+For Hostinger, deploy only the separate **v0.9.10 PHP Cloud Update ZIP**. Back up and **preserve** the current `retrobooth_private/config.php` and `retrobooth_private/data/`. Update the two public and private code trees, including hidden `.htaccess`; do **not** upload GitHub source/ZIP or any credentials to `public_html`. Hostinger needs PHP 8.2+, HTTPS and outside-public private storage, **not** Node.js.
 
 See `docs/CLOUD_EVENT_MASTER_V097_ZH.md` for step-by-step Cantonese instructions and security/real-device limitations.
 

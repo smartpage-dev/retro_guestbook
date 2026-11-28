@@ -1,6 +1,6 @@
 {
   "name": "luce-retrobooth",
-  "version": "0.9.9-alpha.1",
+  "version": "0.9.10-alpha.1",
   "private": true,
   "description": "RetroBooth Android and Windows build candidate; local-first video guestbook",
   "engines": {
@@ -9,7 +9,7 @@
   "scripts": {
     "build": "node tools/build.mjs",
     "start": "node tools/serve.mjs",
-    "test": "node tests/media_separation.test.cjs && node tests/diagnostics.test.cjs && node tests/core.test.cjs && node tests/delivery.test.cjs && node tests/effects.test.cjs && node tests/cloud_client.test.cjs && node tests/store_cloud_contract.test.cjs && node tests/printer_client.test.cjs && node tools/validate.mjs && node --test tests/desktop.test.cjs",
+    "test": "node --test tests/usb_backup.test.cjs && node tests/media_separation.test.cjs && node tests/diagnostics.test.cjs && node tests/core.test.cjs && node tests/delivery.test.cjs && node tests/effects.test.cjs && node tests/cloud_client.test.cjs && node tests/store_cloud_contract.test.cjs && node tests/printer_client.test.cjs && node tools/validate.mjs && node --test tests/desktop.test.cjs",
     "test:browser": "python tests/run_suite.py",
     "package:web": "node tools/package.mjs",
     "android:assets": "node tools/build.mjs",

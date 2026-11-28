@@ -1,26 +1,27 @@
 {
   "schema": "retrobooth-current-source-provenance-v1",
-  "version": "0.9.9-alpha.1",
-  "source": "Incremental modification of user-uploaded v0.9.8 FULL GitHub source ZIP and v0.9.8 Hostinger code-only cloud ZIP; keeps their PHP Cloud and native implementations, not a rewrite.",
+  "version": "0.9.10-alpha.1",
+  "source": "Incremental USB backup changes on the user-supplied v0.9.9 FULL GitHub source ZIP; all existing antiques/FPS, Cloud/QR, IndexedDB clip storage are retained.",
   "inputArchive": {
-    "filename": "RetroBooth_v0.9.8_Android_Windows_GitHub_Ready (1).zip",
-    "sha256": "8ef0231a47018ca6ff62faed31f379e8a0fa21a5d2bb467c07158437a1171440"
+    "filename": "RetroBooth_v0.9.9_Android_Windows_GitHub_Ready.zip",
+    "sha256": "e2973325e256c505d43c7debbcaf9d0f4db94c1a2c327af2363ca4d9f5b6c524"
   },
   "historicalSourceNote": "history/v0.9/SOURCE_PROVENANCE_v090.json",
   "changedAreas": [
-    "Original CSS-rendered antique cabinets for 03/04/05 based on supplied photographs; 01/02 unchanged",
-    "Default render output 360p with 24 FPS target, lower Admin FPS choices, rate-aware captureStream and camera input hints",
-    "rAF pacing under 60Hz and default-profile migration",
-    "Source release verification, Chinese upgrade guide, simulated Chromium screenshots and regression tests"
+    "Android folder picker ACTION_OPEN_DOCUMENT_TREE + persisted user-scoped permission; no storage-all-files access",
+    "Native write/readback SHA-256, temporary partial files, collision-safe deterministic filenames",
+    "Admin 09 status, idle-only automatic backup, manual retry/Verify All, indexedDB ledger per folder ID",
+    "USB failure tests and simulated browser QA; existing UI/recording features retained"
   ],
   "importantLimits": [
-    "Android TEST APK and Windows EXE not compiled in this container",
-    "Chromium screenshot and automated tests do not establish real encoded FPS on 32-inch Android or live camera",
-    "Cloud Hostinger deployment, physical Bluetooth printer/photo text or cutter success unverified; private configuration/media never included"
+    "Native Android APK not compiled in this environment (no Android SDK/Gradle installed); GitHub Actions performs build",
+    "USB OTG and Android DocumentsProvider real hardware, file rename and crash behavior not physically accepted",
+    "Guest Delete or Cloud revocation does not erase independent USB copies",
+    "Hostinger private config/data must not be overwritten; no real Hostinger deployment performed"
   ],
-  "reproducibility": "node tools/build.mjs; npm run desktop:prepare; npm test; CHROMIUM_PATH=/usr/bin/chromium python tests/browser_v099_antique_fps.py; python tools/test_native_core.py; python tests/cloud_api.py; python tools/make-release-ledger.py; python tools/package_source.py; python tools/package_cloud_update.py; node tools/check-release-integrity.mjs",
+  "reproducibility": "node tools/build.mjs; npm run desktop:prepare; npm test; python tests/browser_v010_usb_backup.py; python tests/run_suite.py; npm run test:native-core; python tests/cloud_api.py; python tools/make-release-ledger.py; python tools/package_source.py; python tools/package_cloud_update.py; node tools/check-release-integrity.mjs",
   "inputHostingerArchive": {
-    "filename": "RetroBooth_v0.9.8_Hostinger_PHP_Cloud_Update(1).zip",
-    "sha256": "8ccfd68a5c25ad1496f9e10f453fe9fc708ac0acb88f8412ffb0029ded8b23b3"
+    "filename": "RetroBooth_v0.9.9_Hostinger_PHP_Cloud_Update.zip",
+    "sha256": "f206af4d8ec3f8178e1db2fc38a36272a2e6e1680fc7d9caf108e74fa932cf0c"
   }
 }

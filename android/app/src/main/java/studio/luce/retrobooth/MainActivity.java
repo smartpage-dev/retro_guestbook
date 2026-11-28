@@ -47,6 +47,7 @@ public final class MainActivity extends Activity {
     private static final int CAMERA_REQUEST=41, FILE_REQUEST=42, EXPORT_REQUEST=43;
     private WebView web;
     private NativePrinter printer;
+    private NativeBackup backup;
     private volatile String cloudOrigin="";
     private boolean cloudApprovalPending=false;
     private FrameLayout root;
@@ -104,6 +105,7 @@ public final class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         root=new FrameLayout(this);setContentView(root);
         printer=new NativePrinter(this);
+        backup=new NativeBackup(this);
         web=new WebView(this);root.addView(web,new FrameLayout.LayoutParams(-1,-1));
         nativeDiag("app_created","sdk_"+Build.VERSION.SDK_INT);
         WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);
@@ -168,6 +170,11 @@ public final class MainActivity extends Activity {
                 (view,message,sourceOrigin,isMainFrame,reply)->{
                     if(!isMainFrame||!trusted(sourceOrigin)||view.getUrl()==null||!"/assets/www/index.html".equals(Uri.parse(view.getUrl()).getPath()))return;
                     try{String data=message.getData();if(data!=null&&data.length()<512)sendDiagnostics(new JSONObject(data),reply);}catch(Exception ignored){}
+                });
+            WebViewCompat.addWebMessageListener(web,"RetroBackupNative",Collections.singleton(ORIGIN),
+                (view,message,sourceOrigin,isMainFrame,reply)->{
+                    if(!isMainFrame||!trusted(sourceOrigin)||view.getUrl()==null||!"/assets/www/index.html".equals(Uri.parse(view.getUrl()).getPath()))return;
+                    try {String data=message.getData();if(data!=null&&data.length()<48000)backup.handle(new JSONObject(data),reply);}catch(Exception e){nativeDiag("backup_message_rejected","invalid_envelope");}
                 });
             WebViewCompat.addWebMessageListener(web,"RetroNative",Collections.singleton(ORIGIN),
                 (view,message,sourceOrigin,isMainFrame,reply)->{
@@ -285,6 +292,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onActivityResult(int code,int result,Intent data){
         super.onActivityResult(code,result,data);
+        if(code==NativeBackup.PICK_TREE_REQUEST){backup.pickerResult(result,data);return;}
         if(code==FILE_REQUEST&&fileCallback!=null){fileCallback.onReceiveValue(result==RESULT_OK&&data!=null&&data.getData()!=null?new Uri[]{data.getData()}:null);fileCallback=null;}
         if(code==EXPORT_REQUEST){synchronized(exportLock){
             ExportJob job=exportJob;if(job==null)return;
@@ -334,5 +342,5 @@ public final class MainActivity extends Activity {
         immersive();
     }
     @Override public void onBackPressed(){if(videoView!=null){hideVideo();return;}new AlertDialog.Builder(this).setTitle("Exit RetroBooth TEST?").setMessage("Export recordings before clearing data or uninstalling. This is not an event-ready recorder.").setNegativeButton("Stay",null).setPositiveButton("Exit",(d,w)->finish()).show();}
-    @Override protected void onDestroy(){if(printer!=null)printer.destroy();if(pendingPermission!=null)pendingPermission.deny();if(deferredPermission!=null)deferredPermission.deny();if(fileCallback!=null)fileCallback.onReceiveValue(null);synchronized(exportLock){cancelExport();}writer.shutdownNow();if(web!=null){web.stopLoading();web.destroy();}super.onDestroy();}
+    @Override protected void onDestroy(){if(backup!=null)backup.destroy();if(printer!=null)printer.destroy();if(pendingPermission!=null)pendingPermission.deny();if(deferredPermission!=null)deferredPermission.deny();if(fileCallback!=null)fileCallback.onReceiveValue(null);synchronized(exportLock){cancelExport();}writer.shutdownNow();if(web!=null){web.stopLoading();web.destroy();}super.onDestroy();}
 }

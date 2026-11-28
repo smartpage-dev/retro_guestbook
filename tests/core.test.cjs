@@ -46,8 +46,8 @@ test('ticket 4:3 screenshot is default',()=>assert.equal(C.safeSettings().ticket
 test('ticket 16:9 screenshot accepted',()=>assert.equal(C.safeSettings({ticketPhotoAspect:'16:9'}).ticketPhotoAspect,'16:9'));
 test('ticket invalid screenshot ratio rejected',()=>assert.equal(C.safeSettings({ticketPhotoAspect:'3:2'}).ticketPhotoAspect,'4:3'));
 
-test('v0.9.9 recorded image defaults to 360p',()=>assert.equal(C.safeSettings().renderHeight,360));
-test('v0.9.9 FPS target defaults to 24',()=>assert.equal(C.safeSettings().renderMaxFps,'24'));
+test('v0.9.10 recorded image defaults to 360p',()=>assert.equal(C.safeSettings().renderHeight,360));
+test('v0.9.10 FPS target defaults to 24',()=>assert.equal(C.safeSettings().renderMaxFps,'24'));
 test('lower recording FPS targets remain accepted',()=>[8,10,12,15,18,20].forEach(n=>assert.equal(C.safeSettings({renderMaxFps:String(n)}).renderMaxFps,String(n))));
 test('24 and 30 FPS targets remain accepted',()=>[24,30].forEach(n=>assert.equal(C.safeSettings({renderMaxFps:String(n)}).renderMaxFps,String(n))));
 test('all output render sizes remain supported',()=>[360,540,720].forEach(n=>assert.equal(C.safeSettings({renderHeight:n}).renderHeight,n)));

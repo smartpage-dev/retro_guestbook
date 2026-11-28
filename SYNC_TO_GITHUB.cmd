@@ -1,6 +1,6 @@
 @echo off
 setlocal
-echo RetroBooth v0.9.6 - Verified source sync to GitHub Desktop repo
+echo RetroBooth v0.9.10 - Verified source sync to GitHub Desktop repo
 echo Please CLOSE GitHub Desktop changes window if files are being refreshed.
 echo This tool will NOT commit or push anything.
 echo Before continuing, use GitHub Desktop: Fetch origin, Pull latest main, and ensure no uncommitted changes.

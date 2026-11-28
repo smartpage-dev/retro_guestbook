@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#141c16"><meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
-<title>RetroBooth v0.9.9 | Luce Studio | Live Video Guestbook</title>
+<title>RetroBooth v0.9.10 | Luce Studio | Live Video Guestbook</title>
 <style>:root{--paper:#f4f1e8;--ink:#30382c;--muted:#73786b;--line:#d9d8cb;--green:#536247;--cream:#ece2c7;--amber:#a07d41;--red:#a34534;--white:#fffdf6;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang HK','Microsoft JhengHei',sans-serif;--serif:Georgia,'Times New Roman',serif}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.6 var(--sans)}button,a,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}button,a,input,select{touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #9d7a45;outline-offset:4px}button{color:inherit}a{color:inherit}h1,h2,p{margin:0}h1{font:52px/1.08 var(--serif);font-weight:400;letter-spacing:-1.9px}h1 em{font-weight:400;color:var(--green)}h2{font:30px/1.15 var(--serif);font-weight:400;letter-spacing:-.7px}p{line-height:1.75}.site-header{max-width:1440px;margin:auto;padding:22px 48px;display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{text-decoration:none;font:italic 38px/.95 var(--serif);letter-spacing:-2px}.brand span{display:block;font:8px/1.5 var(--mono);letter-spacing:1.1px;margin-top:6px}.site-header nav{display:flex;gap:8px}.nav{border:0;background:transparent;padding:12px 16px;font-size:13px}.nav.active{background:#e4e6d9;border-radius:3px}#countBadge{font:10px var(--mono);background:#d3d8c6;border-radius:50%;padding:2px 5px;margin-left:6px}.build-tag{text-align:right;font:9px/1.8 var(--mono);letter-spacing:.8px}.build-tag span{display:block;color:var(--muted)}.notice{display:flex;align-items:center;justify-content:center;gap:8px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#eeebdf;padding:9px 20px;font:11px/1.5 var(--mono)}.notice button{border:0;border-bottom:1px solid currentColor;padding:0;margin-left:14px;background:none;font:inherit}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;flex:none}.amber{background:#ae833a}.green{background:#667c50}.small{font-size:12px}.muted{color:var(--muted)}.mono{font-family:var(--mono)}.separator{margin:0 10px;color:#a9ad9c}main{max-width:1370px;margin:auto;padding:0 48px}.section-intro{display:flex;align-items:flex-end;justify-content:space-between;padding:36px 0 28px;gap:40px}.eyebrow{font:10px/1.6 var(--mono);letter-spacing:1.6px;margin-bottom:12px;color:var(--green)}.intro-aside{max-width:322px;padding-bottom:3px}.intro-aside p{margin-bottom:17px;font-size:14px;letter-spacing:.4px}.booth-layout{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:44px;align-items:start}.television{background:repeating-linear-gradient(2deg,transparent 0 4px,#ffffff04 5px 7px),linear-gradient(110deg,#7a6551,#a0886b 45%,#80674f);border:2px solid #665541;border-radius:17px 17px 11px 11px;padding:22px 20px 0;display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:17px;box-shadow:inset 0 2px 0 #c6b59d,0 16px 24px #44362218}.tv-bezel{padding:12px;background:#333930;border:1px solid #252b24;border-radius:42px;box-shadow:inset 0 2px 6px #0008,0 1px 0 #b4a18b}.tv-screen{isolation:isolate;position:relative;aspect-ratio:4/3;overflow:hidden;border-radius:34px;background:#223025;color:#f5ebc9;box-shadow:inset 0 0 25px #000}#cameraCanvas{display:block;width:100%;height:100%;object-fit:contain;transform-origin:center}#cameraCanvas.mirrored{transform:scaleX(-1)}.screen-top,.screen-bottom{position:absolute;z-index:4;left:6%;right:6%;display:flex;justify-content:space-between;gap:6px;align-items:center;font:clamp(8px,.85vw,11px)/1.3 var(--mono);text-shadow:0 1px 2px #000}.screen-top{top:6%;letter-spacing:1px}.screen-top button{background:none;border:0;color:inherit;font:inherit;padding:4px 0;user-select:none;-webkit-user-select:none}.screen-top #screenEvent{max-width:55%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.screen-bottom{bottom:5%;font-size:8px;letter-spacing:.6px}.screen-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 38px #071a1c77;border-radius:inherit;z-index:4}.idle-overlay{position:absolute;bottom:12%;left:0;right:0;text-align:center;z-index:3}.screen-prompt{font-weight:600;font-size:clamp(13px,1.6vw,21px);letter-spacing:2px;text-shadow:0 2px 4px #000;padding:8px;background:#1e2c236e}.idle-overlay p{font-size:10px;margin-top:7px;color:#eee5cd}.state-overlay{position:absolute;inset:0;z-index:5;background:#18271dcc;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}.state-kicker{font:11px var(--mono);letter-spacing:2px;margin-bottom:18px}.state-title{font:clamp(30px,4vw,64px)/1.2 var(--serif)}.state-title.countdown{font:120px var(--mono)}.state-overlay p{font-size:13px;max-width:90%;margin-top:20px}.record-overlay{position:absolute;inset:0;background:#12201680;z-index:5}.rec-bar{display:flex;justify-content:space-between;padding:13% 7% 0;font:14px var(--mono)}.rec-bar i{background:#f1866a;display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;animation:recblink 1s infinite}.wave-block{position:absolute;top:43%;left:10%;width:80%;text-align:center}.wave-block canvas{width:100%;height:70px}.wave-block p{font-size:13px;margin-top:8px;letter-spacing:2px}.wave-block small{display:block;font-size:10px;margin-top:4px;color:#e8c79b}.record-progress{position:absolute;bottom:12%;left:8%;width:84%;height:3px;background:#ffffff22}.record-progress div{height:3px;background:#d9dfac;width:0}.tv-hardware{display:flex;align-items:center;flex-direction:column;padding:10px 0;min-width:0}.tv-hw-label{color:#eadcc3;font:italic 22px/.9 var(--serif);text-align:center}.tv-hw-label small{font:8px var(--mono);letter-spacing:2px}.dial{width:57px;height:57px;border-radius:50%;background:repeating-conic-gradient(#4c4c40 0 4deg,#33352e 5deg 10deg);border:3px solid #aaa28a;box-shadow:2px 4px 6px #0005;display:grid;place-items:center;margin-top:26px;margin-bottom:6px}.dial i{width:7px;height:37px;background:linear-gradient(90deg,#b3b2a0,#dddac4,#858777);transform:rotate(29deg);border-radius:3px}.small-dial{width:42px;height:42px;margin-top:15px;margin-bottom:14px}.small-dial i{height:25px;width:5px;transform:rotate(-50deg)}.tv-hardware>small{font:7px var(--mono);letter-spacing:1px;color:#eadcc3}.speaker{background:repeating-linear-gradient(#33372c 0 2px,#796f5a 3px 6px);width:65px;flex:1;min-height:42px;margin:7px 0 19px;border-radius:5px;border:1px solid #655b4b}.power-dot{height:6px;width:6px;border-radius:50%;background:#d1c986;box-shadow:0 0 6px #ebdd9c;margin-bottom:7px}.tv-bottom{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;margin-top:-4px;color:#ece2cb;font:8px var(--mono);letter-spacing:1px}.tv-bottom span:first-child{font-weight:bold;letter-spacing:3px}.tv-feet{display:flex;justify-content:space-between;padding:0 13%;height:12px}.tv-feet i{width:45px;background:#4b4a3c;clip-path:polygon(0 0,100% 0,85% 100%,15% 100%)}.guest-actions{display:flex;gap:10px;justify-content:center;margin-top:23px}.btn{min-height:46px;border:1px solid transparent;padding:12px 20px;border-radius:4px;display:inline-flex;gap:10px;align-items:center;justify-content:center;font-weight:500;font-size:13px;line-height:1.4}.btn svg{width:18px;height:18px;flex:none}.primary{background:var(--green);color:#fff9e8}.primary:hover{background:#46563b}.secondary{background:transparent;border-color:#b9beaa}.secondary:hover{background:#e7e8dd}.stop{background:#a44a36;color:#fff}.control-strip{display:flex;gap:15px;align-items:center;justify-content:center;margin:17px 0 10px;font-size:10px}.control-strip button{border:0;background:none;padding:5px 0;border-bottom:1px solid #b0b6a1;font-size:11px}.control-strip span{font:9px var(--mono);color:var(--muted)}.privacy-line{text-align:center;color:var(--muted);font-size:10px}.workflow{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);margin-top:22px;padding:17px 0;gap:10px}.workflow>div{display:flex;gap:10px;align-items:center;opacity:.45}.workflow>div.active{opacity:1}.workflow b{font:11px var(--mono);border:1px solid #afb69f;padding:4px 6px;border-radius:50%}.workflow .active b{background:#dae1c9}.workflow span{font-size:11px}.receipt-column{padding-top:4px}.panel-heading{display:flex;justify-content:space-between;align-items:center}.panel-heading .eyebrow{font-size:8px;letter-spacing:1.4px}.paper-badge{width:45px;height:45px;border:1px solid #b6baab;border-radius:50%;font:17px/1 var(--serif);display:flex;align-items:center;justify-content:center;flex-direction:column;transform:rotate(12deg)}.paper-badge small{font:8px var(--mono)}.printer-slot{height:12px;background:#606653;border-radius:6px;margin:23px 8px 0;box-shadow:inset 0 3px 5px #0004}.receipt-paper{position:relative;background:#fff;margin:-5px 17px 0;padding:11px 8px 16px;box-shadow:0 8px 19px #29251a13;transform:rotate(-1deg)}.receipt-paper:after{content:'';position:absolute;height:6px;left:0;right:0;bottom:-5px;background:linear-gradient(135deg,#fff 25%,transparent 25%) -3px 0,linear-gradient(225deg,#fff 25%,transparent 25%) -3px 0;background-size:8px 8px}.receipt-paper canvas{display:block;width:100%;height:auto;image-rendering:pixelated}.receipt-caption{display:flex;gap:8px;align-items:center;margin-top:24px;font:10px/1.5 var(--mono)}.receipt-column>.small{font-size:10px;margin-top:9px}.text-button{background:none;border:0;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 0;font-size:12px;width:100%;text-align:left}.under-row{border-top:1px solid var(--line);padding:16px 0;display:flex;gap:20px;justify-content:space-between;font:8px/1.6 var(--mono);letter-spacing:.6px;color:var(--muted)}footer{max-width:1370px;padding:24px 48px 28px;margin:auto;display:flex;justify-content:space-between;gap:20px;font:9px/1.6 var(--mono);letter-spacing:1px;color:var(--muted)}.footer-dot{margin:0 12px}footer button{border:0;background:var(--paper);text-decoration:underline;padding:7px}.page-heading{display:flex;justify-content:space-between;gap:25px;align-items:center;padding:40px 0 30px}.page-heading p{font-size:13px;margin-top:16px;color:var(--muted)}.stats-row{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:6px;margin-bottom:28px;padding:22px 0}.stats-row>div{padding:0 24px;border-right:1px solid var(--line)}.stats-row>div:last-child{border:0}.stats-row span{font:32px var(--serif)}.stats-row p{font-size:11px;color:var(--muted);margin-top:6px}.library-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.clip-card{border:1px solid var(--line);background:var(--white);padding:12px;border-radius:6px;min-width:0}.clip-card img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;display:block}.clip-card .card-info{padding:13px 4px}.clip-card h3{font:22px var(--serif);margin:8px 0}.clip-card p{font-size:11px;color:var(--muted);word-break:break-word}.clip-card .button-row{margin-top:12px}.clip-card .btn{min-height:38px;padding:9px 13px;font-size:11px}.pill{font:9px var(--mono);padding:5px 7px;border:1px solid #d1ccb9;border-radius:3px;display:inline-block;background:#eee9d9}.green-pill{background:#e4ead8;border-color:#c3ccb4}.empty-state{text-align:center;padding:80px 20px}.empty-state>svg{width:46px;height:46px;color:var(--green);fill:currentColor;margin-bottom:20px}.empty-state p{margin:20px 0;color:var(--muted)}.admin-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:24px}.admin-card{background:var(--white);border:1px solid var(--line);border-radius:6px;padding:28px;min-width:0}.admin-card h2{margin-bottom:22px}.card-number{font:9px var(--mono);letter-spacing:1px;color:var(--muted);margin-bottom:16px}.admin-card label{display:block;font-size:12px;margin-bottom:17px}.admin-card input:not([type=checkbox]):not([type=range]),.admin-card select{display:block;width:100%;min-width:0;background:#f8f7f0;border:1px solid #d1d4c4;border-radius:4px;padding:11px 12px;margin-top:7px;font-size:13px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}.admin-card input[type=range]{width:100%;margin-top:12px;accent-color:var(--green)}.admin-card output{float:right;font:11px var(--mono)}.admin-card .check{display:flex;align-items:center;gap:10px;font-size:12px}.check input{accent-color:var(--green);width:16px;height:16px;flex:none}.admin-card .small{margin-top:13px}.admin-stack{display:grid;gap:24px}.diagnostics{margin-bottom:20px}.diag-row{display:flex;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding:9px 0;font-size:11px}.diag-row span:last-child{text-align:right;font-family:var(--mono);font-size:10px;max-width:60%;overflow-wrap:anywhere}.button-row{display:flex;flex-wrap:wrap;gap:10px}.button-row .btn{flex:1}.scenario{background:#ecefe3}.scenario .check:first-of-type{margin-top:20px}pre{white-space:pre-wrap;word-break:break-word;font:10px/1.8 var(--mono);margin-top:16px}.wide{grid-column:1/-1}.gates{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}.gates p{font-size:12px;color:var(--muted);margin:10px 0 17px}.gates strong{font-size:13px}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);max-width:min(90%,650px);padding:15px 22px;background:#303a29;color:#fffbed;box-shadow:0 6px 22px #0003;border-radius:6px;z-index:100;font-size:13px;line-height:1.5}dialog{border:1px solid var(--line);background:var(--paper);padding:36px;max-width:560px;width:calc(100% - 32px);max-height:90vh;overflow:auto;color:var(--ink);border-radius:9px;box-shadow:0 30px 90px #0004}dialog::backdrop{background:#1c261ba8;backdrop-filter:blur(4px)}dialog h2{font-size:36px;margin-bottom:24px}dialog p{font-size:13px;margin-bottom:20px}dialog video,dialog img{width:100%;max-height:50vh;background:#20271e;border-radius:4px;margin-bottom:18px}.dialog-close{position:absolute;top:12px;right:16px;background:none;border:0;font-size:26px;min-width:35px;min-height:35px}.view[hidden],[hidden]{display:none!important}.view.active{animation:appear .25s ease-out}.kiosk .site-header,.kiosk .notice,.kiosk .section-intro,.kiosk .receipt-column,.kiosk .under-row,.kiosk .workflow,.kiosk .control-strip,.kiosk .privacy-line,.kiosk footer>span{display:none}.kiosk main{padding:20px;max-width:1100px}.kiosk .booth-layout{display:block}.kiosk .television{max-width:980px;margin:auto}.kiosk footer{padding:0;justify-content:center}.kiosk .guest-actions{margin-top:20px}.kiosk #exitKiosk{display:block}.kiosk .tv-screen{max-height:70vh}.kiosk .tv-bezel{display:flex;justify-content:center}.kiosk .tv-screen{width:100%;aspect-ratio:4/3}.kiosk #screenEvent{display:none}@keyframes recblink{50%{opacity:.35}}@keyframes appear{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}@media(min-width:1500px){.screen-prompt{font-size:22px}.screen-top{font-size:12px}}@media(max-width:1100px){.site-header{padding:20px 28px}.build-tag{display:none}main{padding:0 28px}.booth-layout{grid-template-columns:minmax(0,1fr) 222px;gap:28px}.television{padding:15px 13px 0;grid-template-columns:minmax(0,1fr) 64px;gap:12px}.tv-bezel{padding:9px;border-radius:30px}.tv-screen{border-radius:23px}.tv-hardware{padding-top:7px}.dial{width:44px;height:44px;margin-top:19px}.dial i{height:28px}.small-dial{width:33px;height:33px}.small-dial i{height:20px}.speaker{width:47px;min-height:30px;margin-bottom:10px}.tv-hw-label{font-size:19px}.tv-hw-label small{font-size:6px}.screen-bottom{font-size:6px}.control-strip{flex-wrap:wrap;gap:12px}.intro-aside{max-width:260px}.gates{grid-template-columns:repeat(2,1fr)}.admin-card{padding:22px}footer{padding:24px 28px}h1{font-size:46px}.panel-heading h2{font-size:27px}}@media(max-width:760px){.site-header{padding:18px 20px;gap:16px;flex-wrap:wrap}.brand{font-size:34px}.brand span{font-size:7px}.site-header nav{gap:0;flex:1;justify-content:flex-end}.nav{padding:10px;font-size:11px}.notice{font-size:9px;align-items:flex-start;text-align:left;padding:10px 20px}.notice .dot{margin-top:4px}.notice button{margin-left:auto;white-space:nowrap}main{padding:0 20px}.section-intro{padding-top:28px;gap:20px}.intro-aside{max-width:190px}.intro-aside p{font-size:11px;line-height:1.7}.intro-aside .small{font-size:9px}h1{font-size:38px}.eyebrow{font-size:8px;letter-spacing:1px}.booth-layout{grid-template-columns:1fr;gap:20px}.television{grid-template-columns:minmax(0,1fr) 65px;padding:16px 13px 0}.tv-screen{border-radius:27px}.screen-prompt{font-size:18px}.screen-top{font-size:9px}.screen-bottom{font-size:7px}.receipt-column{max-width:340px;width:100%;margin:0 auto 25px;border-top:1px solid var(--line);padding-top:24px}.receipt-paper{max-width:250px;margin-left:auto;margin-right:auto}.printer-slot{max-width:270px;margin-left:auto;margin-right:auto}.receipt-column>.small{font-size:11px}.under-row{font-size:8px;flex-direction:column;gap:8px}.page-heading{padding:30px 0 25px;align-items:flex-start;flex-direction:column}.admin-grid{grid-template-columns:1fr}.wide{grid-column:auto}.library-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats-row{padding:18px 0;gap:20px 0;grid-template-columns:repeat(2,1fr)}.stats-row>div:nth-child(2){border:0}.stats-row span{font-size:27px}footer{padding:18px 20px;flex-direction:column;gap:7px}.state-title{font-size:32px}.state-title.countdown{font-size:85px}}@media(max-width:480px){.site-header nav{flex-basis:100%;justify-content:space-between;margin:0 -7px}.section-intro{display:block}.intro-aside{max-width:none;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px}.intro-aside p{margin:0;max-width:200px}.intro-aside .small{white-space:nowrap;font-size:8px}.separator{margin:0 4px}.television{padding:12px 9px 0;grid-template-columns:minmax(0,1fr) 38px;gap:8px;border-radius:12px}.tv-bezel{padding:6px;border-radius:22px}.tv-screen{border-radius:17px}.tv-hw-label{font-size:13px}.tv-hw-label small{font-size:5px;letter-spacing:.2px}.dial{width:29px;height:29px;border-width:2px;margin-top:13px}.dial i{height:17px;width:4px}.small-dial{width:24px;height:24px;margin-top:9px;margin-bottom:8px}.small-dial i{height:13px}.tv-hardware>small{font-size:5px;letter-spacing:0}.speaker{width:26px;min-height:22px;margin:3px 0 9px}.tv-bottom{font-size:5px;margin:0;padding:0 2px 10px;gap:8px}.tv-bottom span:first-child{letter-spacing:1.5px}.screen-top{font-size:7px}.screen-bottom{font-size:5px;letter-spacing:0}.screen-prompt{font-size:13px;letter-spacing:1px;padding:5px}.idle-overlay p{font-size:8px;margin-top:4px}.guest-actions{gap:8px;margin-top:18px}.guest-actions .btn{font-size:12px;padding:10px 14px}.control-strip{gap:12px}.control-strip span{flex-basis:100%;text-align:center}.workflow{gap:6px;margin-top:18px;padding-bottom:5px}.workflow>div{gap:6px}.workflow span{font-size:10px}.workflow b{font-size:9px;padding:3px 5px}.rec-bar{font-size:10px;padding-top:16%}.wave-block{top:39%}.wave-block canvas{height:42px}.wave-block p{font-size:10px;letter-spacing:1px}.wave-block small{font-size:8px}.state-overlay{padding:17px}.state-kicker{font-size:8px;margin-bottom:10px}.state-title{font-size:25px}.state-title.countdown{font-size:60px}.state-overlay p{font-size:10px;margin-top:12px}.form-row{grid-template-columns:1fr;gap:0}.library-grid{grid-template-columns:1fr}.admin-card{padding:22px 18px}.gates{gap:24px 18px}.gates strong{font-size:12px}.gates p{font-size:11px}dialog{padding:28px 22px}dialog h2{font-size:30px}.button-row .btn{font-size:11px;padding:11px 13px}.kiosk main{padding:12px}.kiosk .screen-prompt{font-size:13px}}@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
 
 .admin-grid{align-items:start}.kiosk .television{max-width:min(980px,calc((100dvh - 200px)*1.3333 + 150px))}.kiosk .tv-screen{max-height:none}
@@ -994,11 +994,31 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 
 /* v0.9.9: direct staff receipt test in section 04, also usable on compact Android Admin. */
 .receipt-test-panel{margin:18px 0;padding:16px;border-radius:9px;background:#ede9df;border:1px solid #b9b6aa}.receipt-test-panel .card-number{margin-bottom:10px}.receipt-test-panel .button-row{flex-wrap:wrap}.receipt-test-panel .button-row .btn{min-height:44px;white-space:normal}.receipt-test-panel p{overflow-wrap:anywhere}#receiptTestNotice{padding-top:10px;margin-bottom:0;line-height:1.65}@media(max-width:520px){.receipt-test-panel .button-row{flex-direction:column}.receipt-test-panel .button-row .btn{width:100%}}
+
+.backup-card{background:linear-gradient(122deg,#f6f1e5,#e9eddf);border:1px solid #cdd1c2}
+.backup-card>p{max-width:960px}.backup-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
+.backup-stats>div{border:1px solid #bcc4b3;background:#fffdf8c7;padding:14px 12px;border-radius:6px;display:grid;gap:4px}
+.backup-stats strong{font:26px/1.25 var(--mono);color:#34543b;overflow-wrap:anywhere}
+.backup-stats small{font:9px/1.45 var(--mono);color:#667361;letter-spacing:.6px}
+.backup-status{font:12px/1.65 var(--mono);color:#435044;padding:11px 13px;background:#edf0e9;border-left:3px solid #6d8258;border-radius:3px;overflow-wrap:anywhere}
+.backup-folder{font:12px/1.6 var(--mono);border:1px dashed #a7b29d;padding:12px;border-radius:4px;overflow-wrap:anywhere;background:#fffdf8}
+.backup-progress{width:100%;height:14px;accent-color:#526e4d;margin-top:12px}
+.backup-recent{display:grid;gap:5px;margin:8px 0 18px;max-height:210px;overflow-y:auto}
+.backup-recent p{font:11px/1.5 var(--mono);border-bottom:1px solid #d0d6c8;padding:7px 2px;margin:0;overflow-wrap:anywhere}
+@media(max-width:700px){.backup-stats{grid-template-columns:1fr 1fr}.backup-stats>div:first-child{grid-column:span 2}.backup-card .button-row{flex-wrap:wrap}}
+
+.backup-scope{background:#fffdf7b8;border:1px solid #aab7a4;border-radius:5px;padding:13px 15px;margin:12px 0 18px}
+.backup-scope>strong{font:11px/1.5 var(--mono);letter-spacing:.7px;color:#35583b}
+.backup-scope>p{font:12px/1.6 var(--mono);overflow-wrap:anywhere;margin:8px 0}
+.backup-scope-tools{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:12px 0}
+.backup-scope-tools label{font:11px/1.45 var(--mono);display:grid;gap:6px;min-width:240px;flex:1}
+.backup-scope-tools input{padding:11px;border:1px solid #a8b49f;border-radius:4px;background:#fff;color:#243329;min-height:44px;font:13px var(--mono);max-width:100%}
+.backup-scope-tools button{flex:1;min-width:220px}
 </style>
 </head>
 <body class="kiosk" data-capture-state="idle" data-screen-style="heritage">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="phoneIcon" viewBox="0 0 24 24"><path d="M5 3 2 6c0 7 9 16 16 16l3-3-5-5-3 2c-3-1-5-3-6-6l2-3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol><symbol id="tapeIcon" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="8" width="14" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="11" r="1.4"/><circle cx="16" cy="11" r="1.4"/><path d="m6 20 2-4h8l2 4" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol></svg>
-<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.9.9 / NOT EVENT-READY</span></div></header>
+<header class="site-header"><a class="brand" href="#booth" aria-label="Luce Studio home">luce<span>STUDIO / MEMORY MACHINES</span></a><nav aria-label="Prototype sections"><button class="nav active" data-view="booth">The booth</button><button class="nav" data-view="library">Tape library <span id="countBadge">0</span></button><button class="nav" data-view="admin">Control room</button><button class="nav" data-view="show">Live show preview</button></nav><div class="build-tag">INTERACTIVE PROTOTYPE<span>v0.9.10 / NOT EVENT-READY</span></div></header>
 <div class="notice"><span class="dot amber"></span><span id="globalNotice">Demo mode. Camera is off. Printing and cloud are not connected.</span><button id="aboutBtn">What works?</button></div>
 <main>
 <section id="view-booth" class="view active">
@@ -1032,7 +1052,7 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
   <div class="panel-hint" id="panelHint">撓一次就得</div>
   <div class="panel-lamps" aria-hidden="true"><span data-lamp="idle"><i></i>READY</span><span data-lamp="recording"><i></i>REC</span><span data-lamp="saving"><i></i>SAVE</span></div>
   <div class="speaker" aria-hidden="true"></div>
-  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.9.9. Tap five times for staff settings">v0.9.9 / PREVIEW</button></div>
+  <div class="panel-footer"><span id="panelBoundary">DEMO / CAMERA OFF</span><button id="staffEntry" class="staff-entry" title="Tap five times for Control room" aria-label="Version v0.9.10. Tap five times for staff settings">v0.9.10 / PREVIEW</button></div>
 </aside><div class="antique-feet" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div>
 <div class="control-strip"><button id="cameraBtn">Enable camera + microphone</button><button id="kioskBtn">Kiosk preview</button><span id="inputHint">Keyboard: [ lift / ] replace</span></div>
 <p class="privacy-line" id="privacyNoticeCompact" hidden>私人影片僅透過專屬 QR 提供 · PRIVATE QR DELIVERY</p>
@@ -1139,6 +1159,33 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
  <p id="printerNotice" class="small" role="status"></p>
 </section>
 
+<section class="admin-card wide backup-card" id="usbBackupCard">
+ <div class="card-number">09 / LOCAL USB VIDEO BACKUP · ANDROID</div>
+ <h2>Keep a second copy. Take the memories home.</h2>
+ <p>本機影片繼續保留喺 RetroBooth。你可以喺 Android 揀一個 USB 手指入面嘅活動資料夾；完成錄影後，App 會喺閒置時自動複製影片，並逐段讀返 USB 檔案做 SHA-256 核對。</p>
+ <div class="backup-stats"><div><strong id="usbBackupVerified">0 / 0</strong><small>VERIFIED / TOTAL REAL CLIPS</small></div><div><strong id="usbBackupPending">0</strong><small>NOT VERIFIED FOR THIS FOLDER</small></div><div><strong id="usbBackupFailed">0</strong><small>ERRORS NEED ATTENTION</small></div></div>
+ <p id="usbBackupStatus" class="backup-status" role="status" aria-live="polite">Checking Android USB backup support…</p>
+ <p id="usbBackupFolder" class="backup-folder" title="Android grants access to a selected folder, not the whole device.">No folder selected / 未選擇資料夾</p>
+ <div class="backup-scope" aria-label="Event backup selection">
+  <strong>EVENT BACKUP SCOPE · 活動影片範圍</strong>
+  <p id="usbBackupScope">未選活動備份範圍。其他活動嘅舊片唔會自動複製。</p>
+  <div class="backup-scope-tools">
+   <label for="usbBackupSince">Include earlier clips from / 補備份由邊個時間開始
+    <input id="usbBackupSince" type="datetime-local" disabled>
+   </label>
+   <button id="usbBackupApplyScope" class="btn secondary" type="button" disabled>Review &amp; include earlier clips / 核對舊片</button>
+  </div>
+  <p class="small muted">預設只備份揀資料夾後拍攝、而且活動名稱同日期相同嘅影片。活動尾先插 USB，可以揀活動開始時間並確認數量；舊活動片唔會自動被包括。每個活動請選不同資料夾。</p>
+ </div>
+ <div class="button-row"><button id="usbBackupChoose" class="btn primary" type="button">Choose USB / Folder 選擇資料夾</button><button id="usbBackupToggle" class="btn secondary" type="button" disabled>Pause automatic backup</button><button id="usbBackupRefresh" class="btn secondary" type="button">Check USB status</button></div>
+ <div class="button-row"><button id="usbBackupCopy" class="btn primary" type="button">Copy pending clips / 補備份</button><button id="usbBackupVerify" class="btn secondary" type="button">Verify all before hand-off / 交 USB 前核對</button><button id="usbBackupForget" class="btn secondary" type="button">Forget selected folder</button></div>
+ <progress id="usbBackupProgress" class="backup-progress" max="100" value="0" hidden></progress>
+ <p id="usbBackupProgressLabel" class="small mono" role="status" aria-live="polite">Idle / 等候</p>
+ <div id="usbBackupRecent" class="backup-recent" aria-live="polite"></div>
+ <p class="small muted"><b>交 USB 前必做：</b> 完成所有錄影，確保數量全部顯示 verified，再按 <b>Verify all</b>，並實際喺電腦開啟幾段影片播放。若拔走 USB、冇空間、寫入失敗或程序中斷，原本 App 內影片唔會被移除；重新插入後按 <b>Copy pending clips</b> 補回。不要錄影途中拔 USB。</p>
+ <p class="small muted">只備份真正錄影影片（WebM／MP4），唔會複製私密 QR、Cloud device secrets 或 Demo 模擬片。USB 上嘅獨立影片唔受雲端撤銷、Guest Delete 或 App 刪片控制；請取得活動主辦方授權、妥善保管及安全交付。USB 備份唔係雲端同步；Windows／一般網頁版不支援自動 USB 資料夾寫入。</p>
+</section>
+
 <section id="desktopCard" class="admin-card wide" hidden>
   <div class="card-number">09 / WINDOWS DESKTOP</div>
   <h2>One app. Your own device.</h2>
@@ -1176,10 +1223,10 @@ body[data-screen-style=heritage] .delivery-overlay{background:radial-gradient(el
 </section>
 
 </main>
-<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.9-alpha.1 · 27 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
+<footer><span>LOVE, ON TAPE. <span class="footer-dot">/</span> LUCE STUDIO</span><span>v0.9.10-alpha.1 · 28 NOV 2026</span><button id="exitKiosk" hidden>Exit kiosk preview</button></footer>
 
 <div id="toast" class="toast" role="status" hidden></div>
-<dialog id="aboutDialog"><button class="dialog-close" data-close="aboutDialog" aria-label="Close">×</button><div class="eyebrow">PROTOTYPE BOUNDARY</div><h2>Real interactions.<br>Honest boundaries.</h2><p><b>Working:</b> demo flow, optional camera and microphone, retro canvas recording, browser-local saved clips, playback/export, pixel receipt composition, settings and failure scenarios.</p><p><b>Not connected:</b> Windows/browser printer hardware, physical handset, native crash-recoverable storage and remote projector. Android has an unverified secure-SPP ESC/POS photo + QR printing pilot. Local Control room is not authenticated; the separate Cloud Admin requires its secret key.</p><p>Demo sessions contain no guest video. Real recordings stay local unless Cloud Delivery is explicitly connected. Existing recordings are not silently enrolled. No analytics or external fonts are used.</p><p>For Android screen testing, serve the static package over HTTPS. Opening an HTML attachment inside a chat or Files preview may not execute the app.</p><button class="btn primary" data-close="aboutDialog">Explore the prototype</button></dialog>
+<dialog id="aboutDialog"><button class="dialog-close" data-close="aboutDialog" aria-label="Close">×</button><div class="eyebrow">PROTOTYPE BOUNDARY</div><h2>Real interactions.<br>Honest boundaries.</h2><p><b>Working:</b> demo flow, optional camera and microphone, retro canvas recording, browser-local saved clips, Android opt-in SAF USB video backup, playback/export, pixel receipt composition, settings and failure scenarios.</p><p><b>Not connected:</b> Windows/browser printer hardware, physical handset, native crash-recoverable storage and remote projector. Android has an unverified secure-SPP ESC/POS photo + QR printing pilot. Local Control room is not authenticated; the separate Cloud Admin requires its secret key.</p><p>Demo sessions contain no guest video. Real recordings stay local unless Cloud Delivery is explicitly connected. Existing recordings are not silently enrolled. No analytics or external fonts are used.</p><p>For Android screen testing, serve the static package over HTTPS. Opening an HTML attachment inside a chat or Files preview may not execute the app.</p><button class="btn primary" data-close="aboutDialog">Explore the prototype</button></dialog>
 <dialog id="clipDialog"><button class="dialog-close" data-close="clipDialog" aria-label="Close">×</button><div class="eyebrow" id="clipLabel">LOCAL RECORDING</div><h2 id="clipTitle">Message</h2><video id="playback" playsinline controls></video><img id="clipStill" alt="Demo broadcast still" hidden><p id="clipDetails"></p><div class="button-row"><button id="videoDownload" class="btn primary">Download video</button><button id="clipReceiptBtn" class="btn secondary">View receipt</button></div></dialog>
 <dialog id="errorDialog"><div class="eyebrow">OPERATOR ATTENTION</div><h2>Keep the moment safe.</h2><p id="errorText"></p><p id="recoveryText" class="small"></p><div class="button-row"><button id="retrySave" class="btn primary">Retry local save</button><button id="recoveryDownload" class="btn secondary">Download recovery video</button><button id="resetError" class="btn secondary">Acknowledge & reset</button></div></dialog>
 <dialog id="deleteDialog" class="delete-dialog">
@@ -2738,7 +2785,90 @@ module.exports = QRCode;
  }
  root.RetroPrinter={PROFILE,guestTicket,ticketDesign,hash,Client};if(typeof module!=='undefined'&&module.exports)module.exports=root.RetroPrinter;
 })(typeof window==='undefined'?globalThis:window);
-</script><script>/* RetroBooth v0.9.9-alpha.1. Pure, independently testable domain helpers. */
+</script><script>/* Optional Android Storage Access Framework bridge. No filesystem paths and no write access
+ * outside the user-selected tree. Independent copied videos cannot be revoked on guest deletion.
+ */
+(function(root){
+ 'use strict';
+ function fileNameFor(clip){
+  if(!clip||clip.kind!=='real'||!clip.blob||!/^[a-f0-9]{32}$/.test(clip.id))throw new Error('A saved real recording is required.');
+  const date=new Date(clip.createdAt);if(Number.isNaN(date.getTime()))throw new Error('Invalid original recording time.');
+  const stamp=date.toISOString().slice(0,19).replace(/[-:T]/g,'');
+  const number=String(clip.seq).padStart(5,'0');
+  const type=String(clip.mime||clip.blob.type||'').split(';',1)[0].toLowerCase();
+  if(!['video/webm','video/mp4'].includes(type))throw new Error('Only original WebM/MP4 recordings can be copied to USB.');
+  return 'RetroBooth_'+stamp+'_'+number+'_'+clip.id.slice(0,16)+(type==='video/mp4'?'.mp4':'.webm');
+ }
+ function isSaved(clip){return !!(clip&&clip.kind==='real'&&clip.lifecycle!=='deleted'&&clip.blob instanceof Blob&&clip.blob.size>0);}
+ function key(folder,clip){return folder+':'+clip.id;}
+ class RetroBackupClient {
+  constructor(native){
+   if(!native?.postMessage)throw new Error('Android native USB backup bridge is missing.');
+   this.native=native;this.pending=new Map();this.copying=false;
+   const original=native.onmessage;
+   native.onmessage=e=>{
+    try{const msg=JSON.parse(e.data);const handler=this.pending.get(msg.id);
+     if(handler){this.pending.delete(msg.id);clearTimeout(handler.timer);if(msg.error)handler.reject(new Error(msg.error));else handler.resolve(msg);return;}}
+    catch(e){}if(typeof original==='function')original(e);
+   };
+  }
+  async command(op,data={},id=null,timeout=30000){
+   id=id||this.newId();if(this.pending.has(id))throw new Error('Duplicate native backup command.');
+   return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error('Android USB backup operation timed out ('+op+').'));},timeout);
+    this.pending.set(id,{resolve,reject,timer});
+    try{this.native.postMessage(JSON.stringify({id,op,...data}));}
+    catch(e){clearTimeout(timer);this.pending.delete(id);reject(e);}
+   });
+  }
+  newId(){const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);return Array.from(bytes,x=>x.toString(16).padStart(2,'0')).join('');}
+  status(){return this.command('status');}
+  select(){return this.command('select',{},null,600000);}
+  enable(){return this.command('enable');}
+  pause(){return this.command('pause');}
+  forget(){return this.command('forget');}
+  metadata(clip){
+   const sha=clip.sha256;if(!/^[a-f0-9]{64}$/.test(sha||''))throw new Error('This video has no SHA-256. Keep it locally and export manually.');
+   const name=fileNameFor(clip),type=name.endsWith('.mp4')?'video/mp4':'video/webm';
+   if(clip.blob.size>268435456)throw new Error('USB transfer limit is 256 MiB per recording. Export this one manually.');
+   return {name,mime:type,size:clip.blob.size,sha256:sha};
+  }
+  async copy(clip,onProgress=()=>{},canContinue=()=>true){
+   if(this.copying)throw new Error('Another USB copy is in progress.');
+   this.copying=true;const id=this.newId();let began=false;
+   try{
+    const meta=this.metadata(clip);
+    if(!canContinue())throw new Error('USB copy postponed until booth is idle.');
+    // A timed-out/lost begin acknowledgement may still leave a native temp open.
+    // Always attempt abort with the same ID, even when begin itself fails.
+    began=true;const first=await this.command('begin',meta,id,60000);
+    if(first.alreadyVerified)return {bytes:meta.size,verified:true,alreadyVerified:true,name:meta.name};
+    for(let index=0,offset=0;offset<meta.size;index++,offset+=32768){
+     if(!canContinue())throw new Error('USB copy postponed until booth is idle.');
+     const bytes=new Uint8Array(await clip.blob.slice(offset,Math.min(offset+32768,meta.size)).arrayBuffer());
+     let chars='';for(const b of bytes)chars+=String.fromCharCode(b);
+     const result=await this.command('chunk',{index,base64:btoa(chars)},id,60000);
+     if(index%4===0||offset+bytes.length>=meta.size)onProgress(result.bytes,meta.size);
+    }
+    const outcome=await this.command('finish',{},id,180000);
+    if(!outcome.verified||outcome.bytes!==meta.size)throw new Error('Native USB copy was not independently verified.');
+    return {bytes:outcome.bytes,verified:true,name:outcome.name};
+   }catch(error){
+    if(began){try{await this.command('abort',{},id,12000);}catch{}}
+    throw error;
+   }finally{this.copying=false;}
+  }
+  async verify(clip){
+   const meta=this.metadata(clip);const result=await this.command('verify',meta,null,180000);
+   if(!result.verified||result.bytes!==meta.size)throw new Error('USB copy could not be verified.');
+   return result;
+  }
+ }
+ const api={RetroBackupClient,fileNameFor,isSaved,key};
+ root.RetroBackup=api;
+ if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(typeof window==='undefined'?globalThis:window);
+</script><script>/* RetroBooth v0.9.10-alpha.1. Pure, independently testable domain helpers. */
 (function (root) {
   'use strict';
   const E=root.RetroEffects || require('./effects.js');
@@ -3267,7 +3397,7 @@ return {Ring,safe};
     try {const saved=await store.getSettings();if(saved?.value){
       settings=C.safeSettings(saved.value);
       // Upgrade a previous uncustomized Auto/720 profile to the new 24/360 default.
-      // Preserve every other saved operator profile, even on first v0.9.9 launch.
+      // Preserve every other saved operator profile, even on first v0.9.10 launch.
       const migrated=await store.getAux('v099-performance-profile-checked');
       if(!migrated){
         if(String(saved.value.renderMaxFps)==='auto'&&Number(saved.value.renderHeight)===720){
@@ -3318,11 +3448,11 @@ return {Ring,safe};
     document.body.classList.toggle('guest-surface',view==='guest');
     document.querySelectorAll('.view').forEach(el=>{const active=el.id==='view-'+view;el.hidden=!active;el.classList.toggle('active',active);});
     document.querySelectorAll('.nav').forEach(el=>el.classList.toggle('active',el.dataset.view===view));
-    if(view==='library')renderLibrary();if(view==='admin'){syncForm();refreshDiagnostics();previewDesign();renderCloud();refreshPrinterClips();refreshPrinter();}
+    if(view==='library')renderLibrary();if(view==='admin'){usbPaint();syncForm();refreshDiagnostics();previewDesign();renderCloud();refreshPrinterClips();refreshPrinter();}
     if(view==='show')reconcileShow();
     window.scrollTo(0,0);if(view==='booth')requestAnimationFrame(fitPicture);
   }
-  function setState(next){const old=state;state=C.transition(state,next);if(['idle','error'].includes(state))clearDelivery();log('state',{from:old,to:state});renderState();}
+  function setState(next){const old=state;state=C.transition(state,next);if(['idle','error'].includes(state))clearDelivery();log('state',{from:old,to:state});renderState();if(state==='idle')usbSchedule();else if(usbWakeTimer){clearTimeout(usbWakeTimer);usbWakeTimer=null;}if(currentView==='admin')usbPaint();}
   function renderState(){
     applyScreenAppearance();
     $('screenState').textContent=labels[state];document.body.dataset.captureState=state;
@@ -3676,6 +3806,7 @@ return {Ring,safe};
     const saved=pending;clips=clips.filter(x=>x.id!==saved.id);clips.push(saved);pending=null;
     announceChange(saved.id);
     log('local_save',{id:saved.id,bytes:saved.sizeBytes,kind:saved.kind,validation:saved.validation.status,persistent:store.available});
+    if(saved.kind==='real'){usbManualVerification=null;usbPaint();usbSchedule();}
     let receiptError='';
     try{await displayReceipt(saved);}catch(e){receiptError=e.message;lastReceipt=null;$('receiptDownload').disabled=true;const rc=$('receiptCanvas');rc.height=160;const ctx=rc.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,rc.width,rc.height);ctx.fillStyle='#111';ctx.font='18px monospace';ctx.textAlign='center';ctx.fillText('RECEIPT PREVIEW UNAVAILABLE',192,65);ctx.fillText('VIDEO RETAINED LOCALLY',192,100);log('receipt_preview_failed',{error:e.message});}
     if(saved.kind==='real' && (saved.interrupted||saved.validation.status!=='metadata_readable')){
@@ -4105,6 +4236,190 @@ async function exportToAndroid(blob,name){
  finally{window.RetroNative.onmessage=previous;nativeExportBusy=false;}
 }
 
+    const usbClient=window.RetroBackupNative?.postMessage&&window.RetroBackup?.RetroBackupClient
+      ?new window.RetroBackup.RetroBackupClient(window.RetroBackupNative):null;
+  let usbInfo={available:!!usbClient,configured:false,ready:false,enabled:false};
+  let usbLedger={},usbWorking=false,usbWakeTimer=null,usbLastFailure=0,usbManualVerification=null,usbScope=null;
+  // Data minimization: never silently copy a previous client's event to a newly chosen USB.
+  const usbScopeReady=()=>!!(usbScope&&usbInfo.folderKey&&usbScope.folderKey===usbInfo.folderKey&&Number.isFinite(usbScope.sinceAt));
+  const usbSameEvent=()=>usbScopeReady()&&usbScope.eventTitle===String(settings.title||'')&&usbScope.eventDate===String(settings.date||'');
+  const usbAllSaved=()=>clips.filter(x=>window.RetroBackup?.isSaved(x));
+  const usbInScope=(clip,since)=>usbScopeReady()&&window.RetroBackup.isSaved(clip)&&
+    String(clip.title||'')===usbScope.eventTitle&&String(clip.eventDate||'')===usbScope.eventDate&&
+    Number.isFinite(Date.parse(clip.createdAt))&&Date.parse(clip.createdAt)>=since;
+  const usbSavedClips=()=>clips.filter(c=>usbInScope(c,usbScope?.sinceAt));
+  const usbKey=(clip)=>window.RetroBackup.key(usbInfo.folderKey||'',clip);
+  function usbLocalDateTime(ms){
+    const d=new Date(ms),two=n=>String(n).padStart(2,'0');
+    return d.getFullYear()+'-'+two(d.getMonth()+1)+'-'+two(d.getDate())+'T'+two(d.getHours())+':'+two(d.getMinutes());
+  }
+  async function usbNewScope(folderKey){
+    if(!store.available)throw new Error('Local database is required to save the event backup scope.');
+    if(usbScope?.folderKey===folderKey)return; // same USB keeps its existing event boundary
+    const chosen={folderKey,sinceAt:Date.now(),eventTitle:String(settings.title||''),eventDate:String(settings.date||'')};
+    await store.setAux('usb-backup-scope-v1',chosen);usbScope=chosen;
+    $('usbBackupSince').value=usbLocalDateTime(chosen.sinceAt);
+    usbManualVerification=null;
+    log('usb_event_scope_created',{folder:folderKey,eventDate:chosen.eventDate,newClipsOnly:true});
+  }
+  async function usbIncludeEarlier(){
+    if(!usbScopeReady()||usbWorking||state!=='idle')return;
+    const proposed=Date.parse($('usbBackupSince').value);
+    if(!Number.isFinite(proposed)||proposed>Date.now()){usbProgress('Choose a valid event starting time, not in the future.');return;}
+    if(proposed>usbScope.sinceAt){
+      usbProgress('Cannot narrow a USB scope after copying: existing files would remain. Use a NEW event folder.');
+      return;
+    }
+    const extra=clips.filter(c=>usbInScope(c,proposed)&&!usbInScope(c,usbScope.sinceAt));
+    const existing=usbSavedClips().length;
+    if(!extra.length){usbProgress('No earlier clips match this event title/date and time. Other event clips remain excluded.');return;}
+    const earliest=new Date(Math.min(...extra.map(c=>Date.parse(c.createdAt)))).toLocaleString();
+    if(!confirm('INCLUDE EARLIER VIDEOS ON CLIENT USB?\nEvent: '+usbScope.eventTitle+' / '+usbScope.eventDate+'\nEarlier matching clips: '+extra.length+' (earliest '+earliest+')\nTotal selected clips: '+(existing+extra.length)+'\n\nCheck these recordings belong to THIS client. Older USB files are never automatically deleted.'))return;
+    const adjusted={...usbScope,sinceAt:proposed};
+    await store.setAux('usb-backup-scope-v1',adjusted);usbScope=adjusted;
+    usbManualVerification=null;usbLastFailure=0;usbPaint();usbSchedule();
+    usbProgress('Included '+extra.length+' earlier current-event clips. Review totals and Copy pending clips.');
+    log('usb_event_scope_extended',{folder:usbInfo.folderKey,added:extra.length,total:existing+extra.length});
+  }
+  function usbCounts(){
+    const real=usbSavedClips(),verified=real.filter(c=>usbLedger[usbKey(c)]?.status==='verified').length;
+    return {real,verified,pending:real.length-verified,failed:real.filter(c=>usbLedger[usbKey(c)]?.status==='failed').length};
+  }
+  function usbPaint(){
+    const count=usbCounts(),configured=!!usbInfo.configured,ready=!!usbInfo.ready,on=!!usbInfo.enabled;
+    const scoped=usbScopeReady(),excluded=usbAllSaved().length-count.real.length,matching=usbSameEvent();
+    $('usbBackupScope').textContent=!scoped?'NO EVENT SCOPE — Choose this USB folder again to start a fresh event boundary. No old videos will be copied.':
+      'SELECTED EVENT: '+usbScope.eventTitle+' / '+usbScope.eventDate+' · From '+new Date(usbScope.sinceAt).toLocaleString()+' · '+count.real.length+' eligible, '+excluded+' other local clip(s) excluded.'+
+      (matching?'':' CURRENT EVENT SETTINGS DIFFER — automatic backup is paused for safety.');
+    $('usbBackupVerified').textContent=count.verified+' / '+count.real.length;
+    $('usbBackupPending').textContent=String(count.pending);$('usbBackupFailed').textContent=String(count.failed);
+    $('usbBackupFolder').textContent=configured?'Selected: '+(usbInfo.folderName||'Unavailable')+(usbInfo.folderKey?' · ID '+usbInfo.folderKey.slice(0,8):''):'No destination selected · 請先選 USB 活動資料夾';
+    $('usbBackupStatus').textContent=!usbClient?'ANDROID APP ONLY — Browser and Windows versions cannot auto-write USB folders.':
+       !configured?'NOT CONFIGURED — Choose an Android folder/USB drive.':
+       !ready?'USB OFFLINE / FOLDER UNAVAILABLE — Reconnect and refresh; originals are safe in app.':
+       !scoped?'SCOPE REQUIRED — Re-select this folder; previous-event videos are excluded by default.':
+       !matching?'EVENT CHANGED — Previous event USB scope remains; new clips are not auto-copied. Use a NEW USB event folder.':
+       !on?'PAUSED — Folder permission retained. Existing USB files are unchanged.':
+       usbWorking?'COPY/VERIFY IN PROGRESS — Do not remove USB until complete.':
+       count.real.length===0?'NO CLIPS IN EVENT SCOPE — Old client videos excluded; set event start time to include earlier clips.':
+       count.pending===0?'ALL SCOPED CLIPS WERE VERIFIED WHEN COPIED — Run Verify all before hand-off.':
+       count.failed>0?'BACKUP ATTENTION — '+count.failed+' error(s). Check USB and retry.':
+       'AUTO BACKUP ON — '+count.pending+' saved recording(s) waiting for idle copy.';
+    const control=!!usbClient&&!usbWorking&&state==='idle';
+    $('usbBackupChoose').disabled=!control;
+    $('usbBackupToggle').disabled=!control||!configured||!scoped;
+    $('usbBackupSince').disabled=!control||!scoped;
+    $('usbBackupApplyScope').disabled=!control||!scoped;
+    $('usbBackupToggle').textContent=on?'Pause auto backup / 暫停':'Resume auto backup / 繼續';
+    $('usbBackupCopy').disabled=!control||!ready||!on||count.pending===0;
+    $('usbBackupVerify').disabled=!control||!ready||!on||count.real.length===0;
+    $('usbBackupRefresh').disabled=!control;
+    $('usbBackupForget').disabled=!control||!configured;
+    const recent=$('usbBackupRecent');recent.replaceChildren();
+    for(const clip of count.real.slice().reverse().slice(0,6)){
+      const entry=usbLedger[usbKey(clip)],p=document.createElement('p');
+      p.textContent='CLIP '+String(clip.seq).padStart(3,'0')+' · '+(entry?.status==='verified'?'VERIFIED':entry?.status==='failed'?'FAILED — '+String(entry.error||'Unknown error').slice(0,125):'PENDING');
+      recent.append(p);
+    }
+    if(usbManualVerification){const p=document.createElement('p');p.textContent=usbManualVerification;recent.prepend(p);}
+  }
+  function usbProgress(message,ratio=null){
+    $('usbBackupProgressLabel').textContent=message;
+    $('usbBackupProgress').hidden=ratio===null;
+    if(ratio!==null)$('usbBackupProgress').value=Math.max(0,Math.min(100,ratio));
+  }
+  async function usbPersist(clip,status,error=''){
+    if(!store.available)throw new Error('Local IndexedDB is unavailable; cannot store durable USB backup progress.');
+    usbLedger[usbKey(clip)]={status,error:error.slice(0,300),name:window.RetroBackup.fileNameFor(clip),bytes:clip.blob.size,at:new Date().toISOString()};
+    await store.setAux('usb-backup-ledger-v1',usbLedger); // persisted, keyed by selected folder + original clip id
+    usbPaint();
+  }
+  function usbCanRun(){return !!usbClient&&!!store.available&&usbScopeReady()&&usbInfo.ready&&usbInfo.enabled&&state==='idle'&&document.visibilityState==='visible';}
+  function usbSchedule(delay=1500){
+    if(usbWakeTimer)clearTimeout(usbWakeTimer);
+    if(!usbCanRun()||!usbSameEvent()||usbWorking||usbCounts().pending===0)return;
+    usbWakeTimer=setTimeout(()=>{
+       usbWakeTimer=null;
+       if(Date.now()-usbLastFailure<60000)return;
+       void usbRun(false);
+    },delay);
+  }
+  async function usbReload(){
+    if(!usbClient){usbPaint();return;}
+    const response=await usbClient.status();usbInfo=response;usbPaint();return response;
+  }
+  async function usbRun(manual=false){
+    if(!usbCanRun()||usbWorking){usbPaint();return;}
+    if(!manual&&(!usbSameEvent()||Date.now()-usbLastFailure<60000))return;
+    usbWorking=true;usbManualVerification=null;usbPaint();let copied=0;
+    try{
+      // Iterate an immutable snapshot. A new clip saved while we copy is picked up at next idle.
+      const queue=usbSavedClips().filter(c=>usbLedger[usbKey(c)]?.status!=='verified').sort((a,b)=>a.seq-b.seq);
+      for(const clip of queue){
+        if(!usbCanRun())break;
+        const filename=window.RetroBackup.fileNameFor(clip);
+        usbProgress('COPYING '+filename+' · '+(copied+1)+' / '+queue.length,0);
+        try{
+          const result=await usbClient.copy(clip,(bytes,total)=>usbProgress('COPY '+filename+' · '+(bytes/1048576).toFixed(1)+' / '+(total/1048576).toFixed(1)+' MiB',100*bytes/total),()=>usbCanRun());
+          if(!result.verified)throw new Error('Native file verification was not completed.');
+          await usbPersist(clip,'verified');usbLastFailure=0;copied++;usbProgress('VERIFIED '+filename+' · original retained',100);
+          log('usb_backup_verified',{clip:clip.id,bytes:result.bytes,folder:usbInfo.folderKey,alreadyPresent:!!result.alreadyVerified});
+        }catch(e){
+          const paused=/postponed until booth is idle/.test(e.message);
+          if(!paused){try{await usbPersist(clip,'failed',e.message);}catch(err){log('usb_backup_ledger_failure',{error:err.message});}
+            usbLastFailure=Date.now();usbProgress('USB COPY FAILED: '+e.message);log('usb_backup_failed',{clip:clip.id,error:e.message});}
+          else usbProgress('USB copy paused for guest recording; original is safe.');
+          break; // do not hammer a disconnected/full USB with every recording
+        }
+      }
+      if(manual&&copied)toast(copied+' clip(s) copied and verified on USB.');
+    }finally{usbWorking=false;usbPaint();if(!usbLastFailure&&usbCanRun())usbSchedule(2000);}
+  }
+  async function usbVerifyAll(){
+    if(!usbCanRun()||usbWorking)return;
+    usbWorking=true;usbManualVerification=null;usbPaint();const real=usbSavedClips();let good=0,missing=0;
+    try{
+      for(const clip of real){
+        if(!usbCanRun()){usbProgress('Verification interrupted; repeat before giving away USB.');return;}
+        usbProgress('VERIFYING '+(good+missing+1)+' / '+real.length+' · '+window.RetroBackup.fileNameFor(clip),100*(good+missing)/real.length);
+        try{await usbClient.verify(clip);await usbPersist(clip,'verified');good++;}
+        catch(e){missing++;try{await usbPersist(clip,'failed',e.message);}catch(err){log('usb_backup_ledger_failure',{error:err.message});}
+          log('usb_verify_failed',{clip:clip.id,error:e.message});}
+      }
+      usbManualVerification='LAST FULL CHECK '+new Date().toLocaleString()+' · VERIFIED '+good+'/'+real.length+(missing?' · '+missing+' MISSING/INVALID. DO NOT HAND OVER.':' · ALL SHA-256 OK. Check playback on a separate computer.');
+      usbProgress(usbManualVerification,100);toast(missing?'USB incomplete. Retry missing/invalid clips before hand-off.':'All '+good+' USB video copies verified. Test playback before handing it over.');
+    }finally{usbWorking=false;usbPaint();}
+  }
+  async function usbAction(task){
+    if(!usbClient||usbWorking||state!=='idle')return;
+    usbWorking=true;usbPaint();
+    try{const result=await task();if(result)usbInfo=result;
+      else await usbReload();usbLastFailure=0;usbManualVerification=null;usbPaint();usbSchedule();}
+    catch(e){usbProgress('USB: '+e.message);toast(e.message);}
+    finally{usbWorking=false;usbPaint();usbSchedule();}
+  }
+  async function setupBackup(){
+    try{usbLedger=await store.getAux('usb-backup-ledger-v1')||{};if(!usbLedger||typeof usbLedger!=='object'||Array.isArray(usbLedger))usbLedger={};}
+    catch(e){usbLedger={};log('usb_ledger_read_failed',{error:e.message});}
+    try{const saved=await store.getAux('usb-backup-scope-v1');
+      if(saved&&typeof saved.folderKey==='string'&&typeof saved.eventTitle==='string'&&typeof saved.eventDate==='string'&&Number.isFinite(saved.sinceAt)){
+        usbScope=saved;$('usbBackupSince').value=usbLocalDateTime(saved.sinceAt);
+      }}catch(e){log('usb_scope_read_failed',{error:e.message});}
+    $('usbBackupChoose').onclick=()=>usbAction(async()=>{const next=await usbClient.select();if(next.folderKey)await usbNewScope(next.folderKey);return next;});
+    $('usbBackupToggle').onclick=()=>usbAction(()=>usbInfo.enabled?usbClient.pause():usbClient.enable());
+    $('usbBackupRefresh').onclick=()=>usbAction(async()=>{const next=await usbClient.status();return next;});
+    $('usbBackupCopy').onclick=async()=>{try{usbLastFailure=0;await usbReload();await usbRun(true);}catch(e){usbProgress('USB backup: '+e.message);toast(e.message);}};
+    $('usbBackupVerify').onclick=()=>void usbVerifyAll();
+    $('usbBackupApplyScope').onclick=()=>void usbIncludeEarlier().catch(e=>{usbProgress('Scope: '+e.message);toast(e.message);});
+    $('usbBackupForget').onclick=()=>{if(confirm('Forget the selected USB folder? Existing USB copies will NOT be deleted; original app videos stay.'))void usbAction(()=>usbClient.forget());};
+    if(usbClient){try{await usbReload();}catch(e){usbProgress('USB bridge: '+e.message);log('usb_status_failed',{error:e.message});}}
+    usbPaint();usbSchedule();
+    // Detect a reinserted USB while idle, without any broad filesystem permission or tight polling.
+    if(usbClient)setInterval(()=>{
+      if(!usbWorking&&state==='idle'&&document.visibilityState==='visible')usbReload().then(()=>usbSchedule()).catch(e=>log('usb_status_failed',{error:e.message}));
+    },90000);
+  }
+
 /* Narrow desktop host integration; absent in browser and Android builds. */
 function setupDesktop(){
  const host=window.RetroDesktop;if(!host||!$('desktopCard'))return;
@@ -4315,7 +4630,7 @@ async function setupCloud(){
 
   /* Only bundled Android can connect SPP. The cloud server never talks to nearby Bluetooth. */
 let printerClient=null,printerActionBusy=false;
-function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. Photo + QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9.9 TEST APK for this pilot.';
+function printerText(){const s=printerClient?.status;if(!printerClient?.available&&window.RetroDesktop)return 'Windows desktop / no native Bluetooth bridge. Photo + QR ticket printing is Android-only in this build. Screen QR remains available.';if(!printerClient?.available)return 'Browser / no native Bluetooth bridge. Build and install the Android v0.9.10 TEST APK for this pilot.';
  return (s.connected?'CONNECTED (transport only)':'DISCONNECTED')+' / '+(s.pinned||'no pinned device')+' / automatic '+(s.automaticEnabled?'ON':'OFF')+' / fast return '+(s.fastReturnArmed?'OPERATOR RISK ACCEPTED':'OFF; screen QR retained')+' / no electronic paper confirmation'+(s.error?' / '+s.error:'');}
 function renderPrinter(){if(!$('printerStatus'))return;$('printerStatus').textContent=printerText();const available=!!printerClient?.available;
  for(const id of ['printerPermission','printerSettings','printerList','printerPin','printerConnect','printerTest','printerTestPhoto','printerEnableAuto','printerDisableAuto','printerManual','printerReprint','printerObserve','printerFastOff','printerRefresh'])$(id).disabled=!available||printerActionBusy;
@@ -4420,7 +4735,7 @@ function setupPrinter(){
       const native=await nativeDiagnostics();
       let permissions={};
       if(navigator.permissions?.query){for(const name of ['camera','microphone']){try{permissions[name]=(await navigator.permissions.query({name})).state;}catch{permissions[name]='unavailable';}}}
-      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.9-alpha.1',generatedAt:new Date().toISOString(),
+      const report={schema:'retrobooth-diagnostic-v1',version:'0.9.10-alpha.1',generatedAt:new Date().toISOString(),
         notice:'App-scoped diagnostic data, not Android system logcat. Up to 250 sanitized events survive app restarts where browser storage permits. No videos, snapshots, private QR URLs, credentials or device identifiers are intentionally included. Review before sharing.',
         runtime:{userAgent:navigator.userAgent,secureContext:window.isSecureContext,visibility:document.visibilityState,online:navigator.onLine,platform:navigator.platform,viewport:{width:innerWidth,height:innerHeight},webviewBridge:!!window.RetroDiagnosticsNative,mediaRecorder:!!window.MediaRecorder,canvasCapture:!!$('cameraCanvas').captureStream,renderer:renderer.mode,rendererFps:Number(renderer.fps.toFixed(1)),renderFpsCap:settings.renderMaxFps,renderHeight:settings.renderHeight,state,mode,storageAvailable:store.available,cloudConfigured:!!cloudClient?.connection,printerBridge:!!window.RetroPrinterNative,clipCount:clips.length},
         media:{permissions,cameraReady:cameraReady(),microphoneReady:microphoneReady(),partialPreview:mediaPartiallyReady(),cameraCount:$('cameraSelect').options.length-1,microphoneCount:$('micSelect').options.length-1,explicitCameraSelected:!!$('cameraSelect').value,explicitMicSelected:!!$('micSelect').value,direction:$('cameraDirection').value,lastFailure:lastMediaFailure},
@@ -4444,7 +4759,7 @@ function setupPrinter(){
   $('clipReceiptBtn').onclick=async()=>{await displayReceipt(selectedClip);$('clipDialog').close();go('booth');};
   $('clipDialog').addEventListener('close',()=>{$('playback').pause();$('playback').removeAttribute('src');$('playback').load();if(playbackURL){URL.revokeObjectURL(playbackURL);playbackURL=null;}});
   $('receiptDownload').onclick=()=>{if(!lastReceipt)return;$('receiptCanvas').toBlob(b=>{if(b)download(b,'RetroBooth_receipt_'+String(lastReceipt.clip.seq).padStart(3,'0')+'_PREVIEW.png');});};
-  $('manifestBtn').onclick=()=>textDownload({version:'0.9.9-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,ticketSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
+  $('manifestBtn').onclick=()=>textDownload({version:'0.9.10-alpha.1',note:'Metadata only. This is NOT a video backup. Download real videos separately.',clips:clips.map(({blob,rawSnapshot,ticketSnapshot,thumbnail,...rest})=>rest)},'RetroBooth_manifest_NOT_A_VIDEO_BACKUP.json');
   $('settingsForm').onsubmit=async e=>{
     e.preventDefault();if(state!=='idle'||settingsSaving){toast('Finish the active session or settings save first.');return;}
     const next=C.safeSettings({...settings,title:$('eventTitle').value,date:$('eventDate').value,duration:$('duration').value,preset:$('preset').value,grain:Number($('grain').value)/100,mirror:$('mirror').checked,osd:$('osd').checked,trigger:$('trigger').value,receipt:$('receiptMode').value,panelMaker:$('panelMakerInput').value,panelProduct:$('panelProductInput').value,panelSubtitle:$('panelSubtitleInput').value,panelChannel:$('panelChannelInput').value,renderMaxFps:$('renderMaxFpsInput').value,renderHeight:Number($('renderHeightInput').value),guestScreenInfo:$('guestScreenInfoInput').checked,...designForm()});
@@ -4495,7 +4810,7 @@ function setupPrinter(){
   window.addEventListener('retro-native-pause',()=>{if(state==='recording')stopRecording(true,'App left foreground or the device suspended.');else if(['greeting','countdown'].includes(state)){session++;setState('idle');}});
   window.addEventListener('beforeunload',e=>{if(busy()||pending){e.preventDefault();e.returnValue='';}});
   window.addEventListener('rendererfailure',e=>{if(state==='recording')stopRecording(true,e.detail);else showError(e.detail);});
-  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();setupDesktop();await setupCloud();
+  setupExperience();setupLandscape();setupAppearance();setupCameraLab();setupDelivery();setupPrinter();setupDesktop();await setupCloud();await setupBackup();
   if(navigator.locks&&surfaceRole==='booth'){
     await new Promise(resolve=>{
       navigator.locks.request('luce-retrobooth-capture',{ifAvailable:true},lock=>{
@@ -4504,7 +4819,7 @@ function setupPrinter(){
       }).catch(()=>{log('tab_lock_unavailable');resolve();});
     });
   }
-  ready=true;log('app_ready',{version:'0.9.9-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
+  ready=true;log('app_ready',{version:'0.9.10-alpha.1',nativeDiagnostics:!!window.RetroDiagnosticsNative,secureContext:window.isSecureContext});syncForm();renderState();refreshDiagnostics();
   if(surfaceRole==='guest'){openGuest(location.hash.slice(7));}else if(surfaceRole==='show'){go('show');}else{go(new URLSearchParams(location.search).has('setup')?'admin':'booth');}
   if(document.documentElement.dataset.serviceWorker==='true' && location.protocol!=='file:' && 'serviceWorker'in navigator){
     navigator.serviceWorker.register('./sw.js').catch(e=>log('offline_shell_unavailable',{error:e.message}));

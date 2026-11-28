@@ -10,7 +10,7 @@ import hashlib, json, zipfile
 ROOT=Path(__file__).resolve().parents[1]
 PUBLIC=ROOT/'cloud/public_html'
 PRIVATE=ROOT/'cloud/retrobooth_private'
-OUT=ROOT/'artifacts/RetroBooth_v0.9.9_Hostinger_PHP_Cloud_Update.zip'
+OUT=ROOT/'artifacts/RetroBooth_v0.9.10_Hostinger_PHP_Cloud_Update.zip'
 SKIP={'.env','config.php','data','node_modules','__pycache__'}
 SENSITIVE={'.key','.pem','.p12','.jks','.keystore','.db','.sqlite','.sqlite3','.webm','.mp4','.mov','.mkv'}
 files={}
@@ -26,7 +26,7 @@ need=['public_html/.htaccess','public_html/index.php','public_html/admin/index.h
 assert all(f in files for f in need)
 manifest={'schema':'retrobooth-hostinger-code-only-v1','version':(ROOT/'VERSION.txt').read_text().strip(),'purpose':'UPGRADE EXISTING SITE; NEVER overwrite private config.php/data','sha256':{k:hashlib.sha256(v).hexdigest() for k,v in files.items()}}
 files['CLOUD_CODE_SHA256.json']=(json.dumps(manifest,indent=2,ensure_ascii=True)+'\n').encode()
-files['READ_ME_BEFORE_UPLOAD_ZH.md']=(ROOT/'docs/RETROBOOTH_V099_ANTIQUE_FPS_ZH.md').read_bytes()
+files['READ_ME_BEFORE_UPLOAD_ZH.md']=(ROOT/'docs/RETROBOOTH_V010_USB_BACKUP_ZH.md').read_bytes()
 OUT.parent.mkdir(exist_ok=True)
 with zipfile.ZipFile(OUT,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for name,data in files.items():

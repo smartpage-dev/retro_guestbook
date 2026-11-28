@@ -1,12 +1,18 @@
-# START HERE — RetroBooth v0.9.9-alpha.1 (27 Nov 2026)
+# v0.9.10 — NEW: Android USB / Local Folder Video Backup
 
-**唯一完整 GitHub Root ZIP:** 開始前備份 Android 本機影片，確保 APK 簽署身份不變。Android `versionCode 18`，同一 package ID。將 ZIP 放 clone 資料夾外，解壓 → GitHub Desktop Fetch/Pull → `SYNC_TO_GITHUB.cmd` 指向 clone → 檢查 PASS → Commit + Push → **Source Preflight (Fast)** 成功 → 手動執行 **Build Android APK** (選最新 commit/branch)。此 ZIP **不含 APK/EXE**。
+**Install the updated Android TEST APK via GitHub Actions; Admin > 09 > Choose USB / Folder. Original IndexedDB recordings are retained; USB copies are separately SHA-256 verified.** See `docs/RETROBOOTH_V010_USB_BACKUP_ZH.md`. No actual Android USB hardware validation has been performed. The v0.9.10 Hostinger ZIP is code-only and is not needed for local Android USB copying.
 
-**三款全面重新設計嘅電視：** TV 03 黃色手提、TV 04 鏽蝕古董木／金屬機身、TV 05 胡桃木電視櫃。TV 01/02 保留。**錄影預設 360p 高、24fps 目標**（Admin 01 可設定 8/10/12/15/18/20/24/30/Auto 及 360/540/720p，實際效能視裝置而定）。
+# START HERE — RetroBooth v0.9.10-alpha.1 (28 Nov 2026)
 
-**Hostinger:** 使用單獨 `RetroBooth_v0.9.9_Hostinger_PHP_Cloud_Update.zip`，先備份 private `config.php`、`data/`、影片；只更新 code，絕不可覆蓋既有配置／活動／影片。上線前實測 10 秒 Android 錄影、私人 QR、Guest 下載、FPS、實體票。
+**唯一完整 GitHub Root ZIP:** 開始前備份 Android 本機影片，確保 APK 簽署身份不變。Android `versionCode 19`，同一 package ID。將 ZIP 放 clone 資料夾外，解壓 → GitHub Desktop Fetch/Pull → `SYNC_TO_GITHUB.cmd` 指向 clone → 檢查 PASS → Commit + Push → **Source Preflight (Fast)** 成功 → 手動執行 **Build Android APK** (選最新 commit/branch)。此 ZIP **不含 APK/EXE**。
 
-最新繁體中文指南：`docs/RETROBOOTH_V099_ANTIQUE_FPS_ZH.md`。舊版升級教學以下為歷史記錄，請勿與今次打包混用。
+**新 Android USB Backup：** Admin > 09 用系統資料夾選擇器選 USB 活動子資料夾；預設只自動備份選好資料夾之後錄製嘅今次活動影片。活動完先插 USB 就先設定 Event Backup Scope 起始時間、確認數量，再補備份。逐片 SHA-256 驗證，舊客戶影片預設排除。詳細操作見 `docs/RETROBOOTH_V010_USB_BACKUP_ZH.md`。
+
+**三款全面重新設計嘅電視（v0.9.9 保留）：** TV 03 黃色手提、TV 04 鏽蝕古董木／金屬機身、TV 05 胡桃木電視櫃。TV 01/02 保留。**錄影預設 360p 高、24fps 目標**（Admin 01 可設定 8/10/12/15/18/20/24/30/Auto 及 360/540/720p，實際效能視裝置而定）。
+
+**Hostinger:** 使用單獨 `RetroBooth_v0.9.10_Hostinger_PHP_Cloud_Update.zip`，先備份 private `config.php`、`data/`、影片；只更新 code，絕不可覆蓋既有配置／活動／影片。上線前實測 10 秒 Android 錄影、私人 QR、Guest 下載、FPS、實體票。
+
+USB 備份繁體中文指南：`docs/RETROBOOTH_V010_USB_BACKUP_ZH.md`；TV／FPS 指南：`docs/RETROBOOTH_V099_ANTIQUE_FPS_ZH.md`。舊版升級教學以下為歷史記錄，請勿與今次打包混用。
 
 ---
 

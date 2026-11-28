@@ -13,11 +13,11 @@ export function zip(entries){const chunks=[],directory=[];let offset=0;
 const dist=path.join(root,'dist');if(!fs.existsSync(path.join(dist,'index.html')))throw new Error('Run npm run build first.');
 const files=fs.readdirSync(dist).filter(x=>fs.statSync(path.join(dist,x)).isFile()).sort().map(x=>[x,fs.readFileSync(path.join(dist,x))]);
 const intro=fs.readFileSync(path.join(root,'docs/QUICK_START.md'));
-fs.writeFileSync(path.join(out,'RetroBooth_v0.9.9_Hostinger_Static_Preview.zip'),zip([...files,['START_HERE.md',intro]]));
+fs.writeFileSync(path.join(out,'RetroBooth_v0.9.10_Hostinger_Static_Preview.zip'),zip([...files,['START_HERE.md',intro]]));
 const local=[...files.map(([n,b])=>['app/'+n,b]),['serve.mjs',fs.readFileSync('tools/serve.mjs')],['START_HERE.md',intro]];
 for(const f of ['Start_Webcam_Windows.bat','Start_Webcam_macOS.command','Start_Webcam_Linux.sh'])local.push([f,fs.readFileSync('launchers/'+f)]);
-fs.writeFileSync(path.join(out,'RetroBooth_v0.9.9_Local_Webcam_Test.zip'),zip(local));
-fs.copyFileSync(path.join(dist,'RetroBooth_Prototype.html'),path.join(out,'RetroBooth_Prototype_v0.9.9_Webcam.html'));
+fs.writeFileSync(path.join(out,'RetroBooth_v0.9.10_Local_Webcam_Test.zip'),zip(local));
+fs.copyFileSync(path.join(dist,'RetroBooth_Prototype.html'),path.join(out,'RetroBooth_Prototype_v0.9.10_Webcam.html'));
 const cloud=[];
 function tree(dir,prefix){for(const ent of fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){
  if(ent.name==='config.php'||ent.name==='data')continue;
@@ -28,7 +28,7 @@ tree(path.join(root,'cloud/public_html'),'public_html/');tree(path.join(root,'cl
 cloud.push(['tools/generate-cloud-config.mjs',fs.readFileSync('tools/generate-cloud-config.mjs')]);
 cloud.push(['history/v0.8/SETUP_AND_RUNNING_GUIDE.md',fs.readFileSync('history/v0.8/SETUP_AND_RUNNING_GUIDE.md')]);
 cloud.push(['START_HERE.md',intro],['SETUP_AND_RUNNING_GUIDE.md',fs.readFileSync('docs/SETUP_AND_RUNNING_GUIDE.md')]);
-fs.writeFileSync(path.join(out,'RetroBooth_v0.9.9_Hostinger_Cloud_Alpha.zip'),zip(cloud));
+fs.writeFileSync(path.join(out,'RetroBooth_v0.9.10_Hostinger_Cloud_Alpha.zip'),zip(cloud));
 const hashes={};for(const f of fs.readdirSync(out).filter(x=>!x.endsWith('.json')).sort())hashes[f]=crypto.createHash('sha256').update(fs.readFileSync(path.join(out,f))).digest('hex');
 fs.writeFileSync(path.join(out,'SHA256SUMS.json'),JSON.stringify(hashes,null,2)+'\n');
 console.log('Packaged web test distributions into artifacts/');

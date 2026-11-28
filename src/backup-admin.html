@@ -1,0 +1,26 @@
+<section class="admin-card wide backup-card" id="usbBackupCard">
+ <div class="card-number">09 / LOCAL USB VIDEO BACKUP · ANDROID</div>
+ <h2>Keep a second copy. Take the memories home.</h2>
+ <p>本機影片繼續保留喺 RetroBooth。你可以喺 Android 揀一個 USB 手指入面嘅活動資料夾；完成錄影後，App 會喺閒置時自動複製影片，並逐段讀返 USB 檔案做 SHA-256 核對。</p>
+ <div class="backup-stats"><div><strong id="usbBackupVerified">0 / 0</strong><small>VERIFIED / TOTAL REAL CLIPS</small></div><div><strong id="usbBackupPending">0</strong><small>NOT VERIFIED FOR THIS FOLDER</small></div><div><strong id="usbBackupFailed">0</strong><small>ERRORS NEED ATTENTION</small></div></div>
+ <p id="usbBackupStatus" class="backup-status" role="status" aria-live="polite">Checking Android USB backup support…</p>
+ <p id="usbBackupFolder" class="backup-folder" title="Android grants access to a selected folder, not the whole device.">No folder selected / 未選擇資料夾</p>
+ <div class="backup-scope" aria-label="Event backup selection">
+  <strong>EVENT BACKUP SCOPE · 活動影片範圍</strong>
+  <p id="usbBackupScope">未選活動備份範圍。其他活動嘅舊片唔會自動複製。</p>
+  <div class="backup-scope-tools">
+   <label for="usbBackupSince">Include earlier clips from / 補備份由邊個時間開始
+    <input id="usbBackupSince" type="datetime-local" disabled>
+   </label>
+   <button id="usbBackupApplyScope" class="btn secondary" type="button" disabled>Review &amp; include earlier clips / 核對舊片</button>
+  </div>
+  <p class="small muted">預設只備份揀資料夾後拍攝、而且活動名稱同日期相同嘅影片。活動尾先插 USB，可以揀活動開始時間並確認數量；舊活動片唔會自動被包括。每個活動請選不同資料夾。</p>
+ </div>
+ <div class="button-row"><button id="usbBackupChoose" class="btn primary" type="button">Choose USB / Folder 選擇資料夾</button><button id="usbBackupToggle" class="btn secondary" type="button" disabled>Pause automatic backup</button><button id="usbBackupRefresh" class="btn secondary" type="button">Check USB status</button></div>
+ <div class="button-row"><button id="usbBackupCopy" class="btn primary" type="button">Copy pending clips / 補備份</button><button id="usbBackupVerify" class="btn secondary" type="button">Verify all before hand-off / 交 USB 前核對</button><button id="usbBackupForget" class="btn secondary" type="button">Forget selected folder</button></div>
+ <progress id="usbBackupProgress" class="backup-progress" max="100" value="0" hidden></progress>
+ <p id="usbBackupProgressLabel" class="small mono" role="status" aria-live="polite">Idle / 等候</p>
+ <div id="usbBackupRecent" class="backup-recent" aria-live="polite"></div>
+ <p class="small muted"><b>交 USB 前必做：</b> 完成所有錄影，確保數量全部顯示 verified，再按 <b>Verify all</b>，並實際喺電腦開啟幾段影片播放。若拔走 USB、冇空間、寫入失敗或程序中斷，原本 App 內影片唔會被移除；重新插入後按 <b>Copy pending clips</b> 補回。不要錄影途中拔 USB。</p>
+ <p class="small muted">只備份真正錄影影片（WebM／MP4），唔會複製私密 QR、Cloud device secrets 或 Demo 模擬片。USB 上嘅獨立影片唔受雲端撤銷、Guest Delete 或 App 刪片控制；請取得活動主辦方授權、妥善保管及安全交付。USB 備份唔係雲端同步；Windows／一般網頁版不支援自動 USB 資料夾寫入。</p>
+</section>

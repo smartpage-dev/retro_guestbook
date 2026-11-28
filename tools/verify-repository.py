@@ -1,4 +1,4 @@
-"""Check RetroBooth v0.9.9 repository shape and three independent workflows.
+"""Check RetroBooth v0.9.10 repository shape and three independent workflows.
 This is a source-contract check, not proof of native compilation.
 """
 from pathlib import Path
@@ -15,6 +15,7 @@ required = [
     'src/.htaccess', 'src/desktop-admin.html', 'src/diagnostics.js', 'tests/diagnostics.test.cjs',
     'cloud/public_html/show/index.html','cloud/public_html/assets/show.js','cloud/public_html/assets/admin.js',
     'docs/CLOUD_EVENT_MASTER_V097_ZH.md','tests/browser_v097_styles.py','tests/browser_v097_cloud_mock.py','tests/browser_v098_polish.py','tests/browser_v099_antique_fps.py','src/antique-v099.css','docs/RETROBOOTH_V099_ANTIQUE_FPS_ZH.md','docs/RETROBOOTH_V099_QA_REPORT_ZH.md','tools/package_cloud_update.py',
+    'android/app/src/main/java/studio/luce/retrobooth/NativeBackup.java','src/backup-client.js','src/backup-flow.js','src/backup-admin.html','src/backup.css','docs/RETROBOOTH_V010_USB_BACKUP_ZH.md','tests/usb_backup.test.cjs',
     'tests/media_separation.test.cjs','tests/browser_v093_separated.py','docs/ANDROID_MEDIA_V093.md',
     'tests/browser_v094_style_fit.py','docs/MODERN_CRT_V094.md',
     'tests/browser_v096_receipt_printer.py','docs/RECEIPT_PRINT_V096_ZH.md','src/ticket-photo.js',
@@ -46,7 +47,7 @@ for label, text, tokens in [
     assert '    needs: verify' not in text, f'{label}: platform build should not depend on shared Verify'
 assert 'python tools/verify_apk_badging.py native-artifacts/APK_INFO.txt' in android, 'APK version verification must compare signed artifact with Gradle'
 assert 'grep "versionCode=' not in android, 'Do not hardcode obsolete Android versionCode in workflow'
-assert 'versionCode 18' in (R/'docs/ANDROID_QUICK_START.md').read_text(), 'Current Android quick start must say versionCode 18'
+assert 'versionCode 19' in (R/'docs/ANDROID_QUICK_START.md').read_text(), 'Current Android quick start must say versionCode 19'
 assert 'push:' in (R/'.github/workflows/source-preflight.yml').read_text(), 'Fast source preflight must run on push.'
 for wf in ['build-android.yml', 'build-windows.yml', 'verify-all.yml', 'source-preflight.yml']:
     assert 'check-release-integrity.mjs --require-git' in (R/'.github/workflows'/wf).read_text(), f'Integrity guard missing: {wf}'

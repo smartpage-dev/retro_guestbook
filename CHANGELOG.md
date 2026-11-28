@@ -1,3 +1,11 @@
+## v0.9.10-alpha.1 — Android removable-USB additional video backup (28 Nov 2026)
+
+- Local recordings continue to be saved first in WebView IndexedDB. Android Admin 09 adds user-selected SAF folder / removable USB backup without all-files storage access. Native persisted read/write grants; existing backup files never overwritten blindly.
+- Durable per-clip/per-destination progress; idle-only queued extra copies; manual retry / automatic resume; interruption preserves originals. **Privacy guard:** a new folder defaults to recordings created only after folder selection and with the same event title/date; an operator may explicitly review/confirm an earlier event start to backfill that event. Other-event clips stay excluded. Only saved real WebM/MP4, no QR links, Cloud credentials or demo footage.
+- Native chunked writer writes `INCOMPLETE_` temp files, reads them back for SHA-256, renames and verifies visible final file. Duplicate finalized filenames are hash-checked before reusing; missing/corrupt folders are not reported complete.
+- Admin shows per-event pending/verified counts, verify-all before physical delivery and pause/forget controls. Does not undo independent copies when a guest deletes or cloud access is revoked. 32-inch Android USB device/format/SAF-provider acceptance still required.
+- Preserves v0.9.9 antique TVs 01–05, 360p/24fps defaults, Android package ID, cloud delivery, QR ticket printer; Android `versionCode 19`. See `docs/RETROBOOTH_V010_USB_BACKUP_ZH.md`.
+
 ## v0.9.9-alpha.1 — Fully redesigned antique TV 03–05 + 360p/24fps target (27 Nov 2026)
 
 - Built three original, independent interactive cabinet structures inspired by user-provided references: yellow portable 1970s set (handle and antenna), rust/patina 1950s asymmetric cabinet (left dial and speaker tower), mid-century walnut television (woodgrain, silver inset, thin legs and rabbit antenna). Styles 01 and 02 remain unchanged.

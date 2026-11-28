@@ -20,7 +20,7 @@ android {
 
 
 class ApkBadgingTests(unittest.TestCase):
-    def run_case(self, *, code="18", version="0.9.9-alpha.1", apk_code="18", apk_version="0.9.9-alpha.1", appid="studio.luce.retrobooth.preview", badging=True):
+    def run_case(self, *, code="19", version="0.9.10-alpha.1", apk_code="19", apk_version="0.9.10-alpha.1", appid="studio.luce.retrobooth.preview", badging=True):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             (root / "android/app").mkdir(parents=True)
@@ -49,11 +49,11 @@ class ApkBadgingTests(unittest.TestCase):
     def test_no_aapt_package_rejected(self):
         self.assertNotEqual(0, self.run_case(badging=False).returncode)
 
-    def test_next_release_dynamically_accepted(self):
-        self.assertEqual(0, self.run_case(code="18", version="0.9.9-alpha.1", apk_code="18", apk_version="0.9.9-alpha.1").returncode)
+    def test_current_release_dynamically_accepted(self):
+        self.assertEqual(0, self.run_case(code="19", version="0.9.10-alpha.1", apk_code="19", apk_version="0.9.10-alpha.1").returncode)
 
-    def test_next_release_outdated_code_rejected(self):
-        self.assertNotEqual(0, self.run_case(code="18", version="0.9.9-alpha.1", apk_code="17", apk_version="0.9.9-alpha.1").returncode)
+    def test_current_release_outdated_code_rejected(self):
+        self.assertNotEqual(0, self.run_case(code="19", version="0.9.10-alpha.1", apk_code="17", apk_version="0.9.10-alpha.1").returncode)
 
 
 if __name__ == "__main__":

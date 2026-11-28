@@ -1,12 +1,14 @@
+> **v0.9.10 / Android versionCode 19:** Admin 09 allows optional additional USB or local-folder video backup, with SAF permission, independent copies, pending retry and SHA-256 verify before client hand-off. See `docs/RETROBOOTH_V010_USB_BACKUP_ZH.md`. Do not uninstall/clear app data; keep the same signing key to preserve IndexedDB clips.
+
 **Before GitHub build:** see [ONE_TIME_GITHUB_SOURCE_SYNC_ZH.md](ONE_TIME_GITHUB_SOURCE_SYNC_ZH.md); run the automatic Fast Source Preflight after committing the canonical full release.
 
-**Latest v0.9.9 Android versionCode 18.** The printer pilot supports 384-dot QR + live/countdown still raster, with Admin 04 direct test printing and 4:3 / 16:9 screenshot choices. See [RECEIPT_PRINT_V096_ZH.md](RECEIPT_PRINT_V096_ZH.md) and [QR_PHOTO_TICKET_V095_ZH.md](QR_PHOTO_TICKET_V095_ZH.md). This is not BLE/USB, paper-status or cutter support. Android APK compilation and real paper testing are required.
+**Latest v0.9.10 Android versionCode 19.** The printer pilot supports 384-dot QR + live/countdown still raster, with Admin 04 direct test printing and 4:3 / 16:9 screenshot choices. See [RECEIPT_PRINT_V096_ZH.md](RECEIPT_PRINT_V096_ZH.md) and [QR_PHOTO_TICKET_V095_ZH.md](QR_PHOTO_TICKET_V095_ZH.md). Ticket printing remains Bluetooth Classic-only (no USB printer, paper-status or cutter support); the new USB **video backup** in Admin 09 is a separate feature. Android APK compilation and real paper testing are required.
 
 **v0.9.3 onward: Independent media input fix.** Admin > 02 / Device Check > 1 / APPLY CAMERA - LIVE preview. The preview needs no microphone. Then use 2 / APPLY MICROPHONE; until both are ready, guest Start is disabled. See [ANDROID_MEDIA_V093.md](ANDROID_MEDIA_V093.md).
 
 # 03 / Android APK
 
-Same application ID, versionCode 18
+Same application ID, versionCode 19
 
 1. Download and extract the Android-APK artifact after a successful Android job. Use the TEST.apk, not the unsigned APK or AAB.
 2. Before updating an existing installation, export important recordings and retain the same signing identity. Do not uninstall or clear data to get around an update error.
@@ -19,7 +21,7 @@ Source minimum is Android 8/API 26; the intended screen is Android 12, still req
 
 ## Bluetooth QR pilot remains Android-only
 
-Pair the printer in Android settings, then pin its exact address in Admin section 08. Use secure Classic SPP and a compatible native ESC/POS QR profile. Test a diagnostic ticket, then a real selected private QR. No BLE/USB support; the 384-dot GS v 0 photo extension is a hardware-unverified test path.
+Pair the printer in Android settings, then pin its exact address in Admin section 08. Use secure Classic SPP and a compatible native ESC/POS QR profile. Test a diagnostic ticket, then a real selected private QR. No BLE or USB ticket printer support (USB video backup is separate); the 384-dot GS v 0 photo extension is a hardware-unverified test path.
 
 Default send result is sent_unconfirmed, not paper-confirmed; keep timed screen QR enabled initially. Unknown jobs never auto-replay. The detailed connection, reprint and fast-return checklist is preserved in history/v0.8/SETUP_AND_RUNNING_GUIDE.md, sections 12-16.
 

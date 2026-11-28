@@ -1,0 +1,170 @@
+{
+  "schema": "retrobooth-v010-browser-regression-v1",
+  "version": "0.9.10-alpha.1",
+  "scope": "Synthetic/mocked Chromium test suite. No physical Android USB, camera, Bluetooth printer or deployment acceptance.",
+  "all_passed": true,
+  "completed_groups": 32,
+  "passed_assertions": 1096,
+  "groups": [
+    {
+      "group": "browser_v04-layout",
+      "exit": 0,
+      "checks": 234
+    },
+    {
+      "group": "browser_v04-appearance",
+      "exit": 0,
+      "checks": 17
+    },
+    {
+      "group": "browser_v04-storage-contract",
+      "exit": 0,
+      "checks": 14
+    },
+    {
+      "group": "browser_v04-flow",
+      "exit": 0,
+      "checks": 28
+    },
+    {
+      "group": "browser_v04-media",
+      "exit": 0,
+      "checks": 8
+    },
+    {
+      "group": "browser_v02-privacy",
+      "exit": 0,
+      "checks": 20
+    },
+    {
+      "group": "browser_v02-recovery",
+      "exit": 0,
+      "checks": 10
+    },
+    {
+      "group": "browser_v02-receipt",
+      "exit": 0,
+      "checks": 11
+    },
+    {
+      "group": "browser_v05-effects-ui",
+      "exit": 0,
+      "checks": 16
+    },
+    {
+      "group": "browser_v05-pixels",
+      "exit": 0,
+      "checks": 12
+    },
+    {
+      "group": "browser_v05-camera-errors",
+      "exit": 0,
+      "checks": 14
+    },
+    {
+      "group": "browser_v05-native-export",
+      "exit": 0,
+      "checks": 6
+    },
+    {
+      "group": "browser_v05-webcam-synthetic",
+      "exit": 0,
+      "checks": 21
+    },
+    {
+      "group": "browser_v06-settings",
+      "exit": 0,
+      "checks": 13
+    },
+    {
+      "group": "browser_v06-branches",
+      "exit": 0,
+      "checks": 35
+    },
+    {
+      "group": "browser_v06-timers",
+      "exit": 0,
+      "checks": 14
+    },
+    {
+      "group": "browser_v06-layout",
+      "exit": 0,
+      "checks": 82
+    },
+    {
+      "group": "browser_v06-webcam-guard",
+      "exit": 0,
+      "checks": 6
+    },
+    {
+      "group": "browser_v07-booth-cloud",
+      "exit": 0,
+      "checks": 32
+    },
+    {
+      "group": "browser_v07-guest",
+      "exit": 0,
+      "checks": 15
+    },
+    {
+      "group": "browser_v07-admin",
+      "exit": 0,
+      "checks": 12
+    },
+    {
+      "group": "browser_v08-printer-ui",
+      "exit": 0,
+      "checks": 21
+    },
+    {
+      "group": "browser_v08-native-flow",
+      "exit": 0,
+      "checks": 14
+    },
+    {
+      "group": "browser_v08-deadline-manual",
+      "exit": 0,
+      "checks": 13
+    },
+    {
+      "group": "browser_v091_camera-probes",
+      "exit": 0,
+      "checks": 17
+    },
+    {
+      "group": "browser_v092_diagnostics-export",
+      "exit": 0,
+      "checks": 11
+    },
+    {
+      "group": "browser_v093_separated-independent-inputs",
+      "exit": 0,
+      "checks": 34
+    },
+    {
+      "group": "browser_v094_style_fit-modern-crt-layout",
+      "exit": 0,
+      "checks": 170
+    },
+    {
+      "group": "browser_v095_ticket_photo-countdown-photo-ticket",
+      "exit": 0,
+      "checks": 11
+    },
+    {
+      "group": "browser_v096_receipt_printer-receipt-print-ratios",
+      "exit": 0,
+      "checks": 19
+    },
+    {
+      "group": "browser_v099_antique_fps-antique-fps",
+      "exit": 0,
+      "checks": 139
+    },
+    {
+      "group": "browser_v010_usb_backup-usb-backup",
+      "exit": 0,
+      "checks": 27
+    }
+  ]
+}
